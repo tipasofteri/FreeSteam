@@ -5,7 +5,7 @@
     { "source": "/index", "destination": "/", "permanent": true },
     { "source": "/index.html", "destination": "/", "permanent": true }
   ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.py" }
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index.py" }
   ]
 }
