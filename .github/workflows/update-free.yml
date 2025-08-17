@@ -42,8 +42,7 @@ jobs:
           # подтянуть последние изменения, чтобы избежать non-fast-forward
           git fetch origin
           git pull --rebase origin main || true
-          # Сброситься к удалённой ветке, чтобы гарантированно убрать предыдущие локальные коммиты с большими файлами
-          git reset --hard origin/main
+          # Не делаем reset --hard, чтобы не потерять сгенерированные файлы перед коммитом
           
           # ВНИМАНИЕ: добавляем только частичные файлы, чтобы избежать лимита GitHub (>100MB)
           git add free_goods_detail_part*.json || true
