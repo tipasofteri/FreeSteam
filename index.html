@@ -1,0 +1,5755 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FreeSteam</title>
+
+    <link rel="icon" href="steamfreeico.png">
+
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="assets/css/nouislider.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+
+:root {
+    --bg-dark: #121212;
+    --bg-surface: #1E1E1E;
+    --bg-elevated: #232323;
+    --accent: #4CAF50;
+    --accent-hover: #66BB6A;
+
+    --accent-secondary: #2196F3;
+
+    --text-primary: #ffffff;
+
+    --text-secondary: #b0b0b0;
+
+    --text-muted: #757575;
+
+    --border-radius: 8px;
+
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+}
+
+
+
+ * {
+
+    box-sizing: border-box;
+
+    margin: 0;
+
+    padding: 0;
+
+}
+
+
+
+body {
+
+    background-color: var(--bg-dark);
+
+    color: var(--text-primary);
+
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+    line-height: 1.6;
+
+    min-height: 100vh;
+
+    padding-bottom: 2rem;
+
+    overflow: auto;
+
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+    height: 10px;
+    background: #0f1115;
+}
+::-webkit-scrollbar-thumb {
+    background: #2a2f3a;
+    border: 1px solid #1e2230;
+    border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #3a4050;
+}
+::-webkit-scrollbar-track {
+    background: #0f1115;
+}
+
+
+
+input::-webkit-outer-spin-button,
+
+input::-webkit-inner-spin-button {
+
+    -webkit-appearance: none;
+    
+}
+
+
+
+.container {
+
+    max-width: none;
+
+    width: 100%;
+
+    padding: 0 1rem;
+
+}
+
+.header-links {
+    display: flex;
+    align-items: center;
+}
+.btn-steam-top {
+    --brass-dark: #7c5d26;
+    --brass-mid: #b9935a;
+    --brass-bright: #d4af37;
+    --glow: rgba(212, 175, 55, 0.45);
+    --shadow: rgba(0, 0, 0, 0.45);
+
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .45rem .95rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--brass-dark) 0%, var(--brass-mid) 42%, var(--brass-bright) 100%);
+    color: #111;
+    text-decoration: none;
+    font-weight: 700;
+    letter-spacing: .2px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow:
+        0 4px 16px var(--glow),
+        0 1px 0 rgba(255,255,255,0.2) inset,
+        0 -2px 0 rgba(0,0,0,0.25) inset,
+        0 0 0 1px rgba(0,0,0,0.2);           
+    transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+    will-change: transform, box-shadow;
+}
+
+.btn-steam-top i {
+    font-size: 1.05rem;
+}
+
+.btn-steam-top:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 6px 22px rgba(212, 175, 55, 0.6),
+        0 1px 0 rgba(255,255,255,0.22) inset,
+        0 -2px 0 rgba(0,0,0,0.28) inset,
+        0 0 0 1px rgba(0,0,0,0.22);
+    filter: brightness(1.03);
+}
+
+.btn-steam-top:active {
+    transform: translateY(0) scale(0.99);
+    box-shadow:
+        0 3px 12px rgba(212, 175, 55, 0.35),
+        0 1px 0 rgba(255,255,255,0.18) inset,
+        0 -2px 0 rgba(0,0,0,0.32) inset,
+        0 0 0 1px rgba(0,0,0,0.25);
+    filter: brightness(0.98);
+}
+
+.btn-steam-top:focus-visible {
+    outline: 2px solid rgba(212,175,55,0.8);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn-steam-top { transition: none; }
+}
+
+
+
+.app-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            padding: 1rem 0;
+
+            margin-bottom: 0.75rem;
+
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+            position: sticky;
+
+            top: 0;
+
+            background: rgba(18, 18, 18, 0.8);
+
+            backdrop-filter: blur(6px);
+
+            z-index: 1000;
+
+        }
+
+        .badge-popular {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 3;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #ff7043, #ff1744);
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06) inset;
+            user-select: none;
+            pointer-events: none; 
+        }
+        .badge-popular .emoji { filter: drop-shadow(0 0 6px rgba(255, 87, 34, 0.65)); }
+
+        .badge-leader {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 3;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #ffea00, #ffc107, #ff9800);
+            color: #2b2100;
+            font-size: 0.85rem;
+            font-weight: 800;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08) inset;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+            user-select: none;
+            pointer-events: none;
+        }
+        .badge-leader .emoji { filter: drop-shadow(0 0 6px rgba(255, 193, 7, 0.75)); }
+
+
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+
+
+        .app-title i {
+            color: var(--accent-primary);
+            font-size: 2rem;
+        }
+
+        .app-title-glitch {
+            position: relative;
+            display: inline-block;
+            line-height: 1;
+            text-shadow: none;
+        }
+        .app-title-glitch::before,
+        .app-title-glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+        .app-title-glitch::before {
+            color: #ff3366;
+            transform: translate(0, 0);
+            clip-path: inset(0 0 0 0);
+            animation: glitchShift1 2.2s infinite steps(10);
+            mix-blend-mode: screen;
+            filter: drop-shadow(0 0 2px rgba(255,51,102,.6));
+        }
+        .app-title-glitch::after {
+            color: #33e0ff;
+            transform: translate(0, 0);
+            clip-path: inset(0 0 0 0);
+            animation: glitchShift2 2.8s infinite steps(12);
+            mix-blend-mode: screen;
+            filter: drop-shadow(0 0 2px rgba(51,224,255,.6));
+        }
+
+        @keyframes glitchShift1 {
+            0% { transform: translate(0, 0); }
+            10% { transform: translate(-1px, -1px); }
+            20% { transform: translate(1px, 1px); }
+            30% { transform: translate(-2px, 1px); }
+            40% { transform: translate(2px, -1px); }
+            50% { transform: translate(0, 0); }
+            60% { transform: translate(1px, -2px); }
+            70% { transform: translate(-1px, 2px); }
+            80% { transform: translate(2px, 0); }
+            90% { transform: translate(-2px, 0); }
+            100% { transform: translate(0, 0); }
+        }
+        @keyframes glitchShift2 {
+            0% { transform: translate(0, 0); }
+            12% { transform: translate(1px, -1px); }
+            24% { transform: translate(-1px, 1px); }
+            36% { transform: translate(2px, -1px); }
+            48% { transform: translate(-2px, 1px); }
+            60% { transform: translate(0, 0); }
+            72% { transform: translate(-1px, -2px); }
+            84% { transform: translate(1px, 2px); }
+            96% { transform: translate(-2px, 0); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .app-header:hover .app-title-glitch::before { filter: drop-shadow(0 0 3px rgba(255,51,102,.9)); }
+        .app-header:hover .app-title-glitch::after  { filter: drop-shadow(0 0 3px rgba(51,224,255,.9)); }
+
+        .app-title-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .app-title-icon img {
+            height: 32px;
+            width: auto;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,.35));
+        }
+        .app-title-percent {
+            font-weight: 800;
+            color: #e9e9e9;
+            text-shadow: 0 1px 2px rgba(0,0,0,.5);
+            margin-left: .25rem;
+        }
+
+        .language-switcher {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .language-switcher button {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            transition: var(--transition);
+        }
+
+        .language-switcher button.active {
+            background: var(--accent-primary);
+            color: var(--bg-dark);
+        }
+
+
+        .total-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+
+
+        .filter-container {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+
+            gap: 1.5rem;
+
+            margin-bottom: 1.25rem;
+
+        }
+
+
+
+        .filters-hidden .filter-container { display: none; }
+
+        .filters-hidden .toolbar-toggle-text { content: 'Показать фильтры'; }
+
+        .toolbar-spacer { flex: 1; }
+
+
+
+        .toolbar {
+
+            display: flex;
+
+            gap: 0.5rem;
+
+            align-items: center;
+
+            margin: 0 0 0.75rem 0;
+
+            position: sticky;
+
+            top: 68px;
+
+            z-index: 999;
+
+            background: rgba(18, 18, 18, 0.6);
+
+            backdrop-filter: blur(6px);
+
+            padding: 0.25rem 0;
+
+        }
+
+
+
+        .toolbar .btn {
+
+            border-radius: 20px;
+
+            padding: 0.35rem 0.9rem;
+
+        }
+
+
+
+        .filter-group {
+
+            background: var(--bg-surface);
+
+            border-radius: var(--border-radius);
+
+            padding: 1.25rem;
+
+            box-shadow: var(--shadow);
+
+            transition: var(--transition);
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+
+
+        .filter-group:hover {
+
+            box-shadow: var(--shadow-hover);
+
+        }
+
+
+
+        .filter-group-title {
+
+            font-size: 1.1rem;
+
+            font-weight: 600;
+
+            margin-bottom: 1rem;
+
+            color: var(--accent-secondary);
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+        }
+
+
+
+        .filter-group-title i {
+
+            font-size: 1.1rem;
+
+        }
+
+
+
+        .form-control {
+
+            background: rgba(255, 255, 255, 0.05);
+
+            border: 1px solid rgba(255, 255, 255, 0.1);
+
+            color: var(--text-primary);
+
+            border-radius: var(--border-radius);
+
+            padding: 0.75rem 1rem;
+
+            transition: var(--transition);
+
+        }
+
+
+
+        .form-control:focus {
+
+            background: rgba(255, 255, 255, 0.08);
+
+            border-color: var(--accent-primary);
+
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+
+            color: var(--text-primary);
+
+        }
+
+
+
+        .form-control::placeholder {
+
+            color: var(--text-muted);
+
+        }
+
+
+
+        .slider-group {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.75rem;
+
+            margin-top: 0.75rem;
+
+        }
+
+
+
+        .slider-input {
+
+            width: 80px;
+
+            flex-shrink: 0;
+
+        }
+
+
+
+        .noUi-target {
+            background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            height: 8px;
+            flex-grow: 1;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
+        }
+
+
+
+        .noUi-connect {
+            background: var(--accent-primary);
+            box-shadow: 0 0 10px rgba(76,175,80,0.35), 0 0 2px rgba(76,175,80,0.9) inset;
+        }
+
+
+
+        .noUi-handle {
+            width: 22px !important;
+            height: 22px !important;
+            right: -11px !important;
+            top: -8px !important;
+            border-radius: 50%;
+            background: var(--bg-card, #1f1f1f);
+            border: 2px solid var(--accent-primary);
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), 0 0 0 2px rgba(76,175,80,0.15);
+            transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background-color .12s ease;
+        }
+
+
+
+        .noUi-handle:hover {
+            transform: scale(1.12);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.5), 0 0 0 3px rgba(76,175,80,0.2);
+        }
+
+        .noUi-state-drag .noUi-handle,
+        .noUi-handle.noUi-active,
+        .noUi-handle:active {
+            transform: scale(1.18);
+            border-color: var(--accent-hover);
+            background-color: #232323;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.6), 0 0 0 4px rgba(102,187,106,0.28);
+        }
+
+        .noUi-handle:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(33,150,243,0.35), 0 6px 14px rgba(0,0,0,0.55);
+        }
+
+
+
+        .noUi-handle:after, .noUi-handle:before {
+
+            content: none;
+
+        }
+
+
+
+        .platform-filters {
+
+            display: flex;
+
+            gap: 1rem;
+
+            margin-bottom: 1rem;
+
+            flex-wrap: wrap;
+
+        }
+
+
+
+        .platform-checkbox, .additional-filter {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            cursor: pointer;
+
+            transition: var(--transition);
+
+            padding: 0.5rem;
+
+            border-radius: var(--border-radius);
+
+        }
+
+
+
+        .platform-checkbox:hover, .additional-filter:hover {
+
+            background: rgba(255, 255, 255, 0.05);
+
+        }
+
+
+
+        .platform-checkbox img {
+
+            width: 24px;
+
+            height: 24px;
+
+            filter: grayscale(0.8);
+
+            transition: var(--transition);
+
+        }
+
+
+
+        input[type="checkbox"]:checked + img {
+
+            filter: grayscale(0);
+
+        }
+
+
+
+        .additional-filters {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 1rem;
+
+        }
+
+
+
+        .tags-filter-container {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 0.5rem;
+
+            padding: 0.5rem;
+
+            min-height: 48px;
+
+            border-radius: var(--border-radius);
+
+            background: rgba(255, 255, 255, 0.03);
+
+        }
+
+
+
+        .filter-tag {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            padding: 0.5rem 0.75rem;
+
+            border-radius: var(--border-radius);
+
+            background: rgba(33, 150, 243, 0.15);
+
+            color: var(--text-primary);
+
+            font-size: 0.9rem;
+
+            cursor: pointer;
+
+            transition: var(--transition);
+
+            animation: fadeIn 0.3s ease;
+
+        }
+
+
+
+        @keyframes fadeIn {
+
+            from { opacity: 0; transform: translateY(5px); }
+
+            to { opacity: 1; transform: translateY(0); }
+
+        }
+
+
+
+        .filter-tag:hover {
+
+            background: rgba(33, 150, 243, 0.25);
+
+            transform: translateY(-2px);
+
+        }
+
+
+
+        .remove-tag {
+
+            margin-left: 0.5rem;
+
+            font-size: 1rem;
+
+            transition: var(--transition);
+
+        }
+
+
+
+        .remove-tag:hover {
+
+            color: #ff6b6b;
+
+            transform: scale(1.2);
+
+        }
+
+
+
+        .add-tag {
+
+            background: rgba(255, 255, 255, 0.05);
+
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+        }
+
+
+
+        .add-tag:hover {
+
+            background: rgba(255, 255, 255, 0.1);
+
+            border-color: var(--accent-secondary);
+
+        }
+
+
+
+        .game-list {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+
+            gap: 1.5rem;
+
+            margin-bottom: 2rem;
+
+        }
+
+
+
+        .game-card {
+
+            background: var(--bg-card);
+
+            border-radius: var(--border-radius);
+
+            overflow: hidden;
+
+            transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+
+            box-shadow: var(--shadow);
+
+            display: flex;
+
+            flex-direction: column;
+
+            height: 100%;
+
+            position: relative;
+
+            border: 1px solid rgba(192,147,88,0.18);
+            transform: translateY(0);
+
+        }
+
+
+
+        .game-card:hover {
+
+            transform: translateY(-6px);
+
+            box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+
+            border-color: rgba(192,147,88,0.35);
+
+        }
+
+        .game-card:active { transform: translateY(-2px) scale(0.997); }
+
+        .game-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(120% 60% at 50% 0%, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0) 50%),
+                        linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 100%);
+            opacity: .6;
+            transition: opacity .25s ease;
+        }
+        .game-card:hover::after { opacity: .85; }
+
+
+
+        .game-header {
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 0.75rem 1rem;
+
+            min-height: 70px;
+
+        }
+
+
+
+        .game-image-container {
+
+            flex-shrink: 0;
+
+            width: 120px;
+
+            height: 45px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+            border-radius: 4px;
+
+            background: rgba(0, 0, 0, 0.2);
+
+        }
+
+
+
+        .game-image {
+
+            max-width: 100%;
+
+            max-height: 100%;
+
+            object-fit: contain;
+
+            transition: transform .35s ease;
+
+        }
+
+        .game-card:hover .game-image { transform: scale(1.06); }
+
+
+
+        .game-discount-container {
+
+            padding-left: 1rem;
+
+            flex-grow: 1;
+
+        }
+
+
+
+        .game-discount {
+
+            font-weight: 700;
+
+            font-size: 1.2rem;
+
+            color: white;
+
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+        }
+
+        @keyframes hueMove {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+        @keyframes megaPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(0, 255, 170, 0.0); }
+            50% { box-shadow: 0 0 24px rgba(0, 255, 170, 0.35); }
+        }
+        .game-discount.mega-discount {
+            background: linear-gradient(90deg, #ff0044, #ffea00, #00ff99, #00ccff, #a066ff, #ff0044);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.35)) drop-shadow(0 0 16px rgba(0,255,170,0.4));
+            animation: hueMove 2.75s linear infinite;
+        }
+        .game-header.mega-discount { position: relative; }
+        .game-header.mega-discount::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #ff0044, #ffea00, #00ff99, #00ccff, #a066ff, #ff0044);
+            background-size: 400% 100%;
+            filter: blur(10px);
+            opacity: .45;
+            animation: hueMove 6s linear infinite;
+            pointer-events: none;
+        }
+
+
+
+        .game-price {
+
+            font-size: 0.9rem;
+
+            font-weight: 500;
+
+            color: rgba(255, 255, 255, 0.9);
+
+            margin-top: 0.2rem;
+
+        }
+
+        .game-price .price-old {
+            color: rgba(255,255,255,0.6);
+            text-decoration: line-through;
+            text-decoration-color: #e53935;
+            text-decoration-thickness: 2px;
+        }
+        .game-price .price-new {
+            color: #a5d6a7;
+            font-weight: 600;
+        }
+        .game-price .price-arrow {
+            opacity: 0.65;
+            margin: 0 6px;
+        }
+
+
+
+        .game-body {
+
+            padding: 1.25rem;
+
+            flex-grow: 1;
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+
+
+        .game-name {
+
+            font-size: 1.25rem;
+
+            font-weight: 600;
+
+            margin-bottom: 1rem;
+
+            color: var(--text-primary);
+
+            line-height: 1.3;
+
+            transition: var(--transition);
+
+        }
+
+
+
+        .game-card:hover .game-name {
+
+            color: var(--accent-secondary);
+
+        }
+
+
+
+        .game-meta {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            margin-bottom: 1rem;
+
+            font-size: 0.9rem;
+
+        }
+
+
+
+        .platform-icons {
+
+            display: flex;
+
+            gap: 0.5rem;
+
+        }
+
+
+
+        .platform-icon {
+
+            width: 20px;
+
+            height: 20px;
+
+            opacity: 0.8;
+
+            transition: var(--transition);
+
+        }
+
+
+
+        .game-card:hover .platform-icon {
+
+            opacity: 1;
+
+            transform: translateY(-2px);
+
+        }
+
+
+
+        .game-release {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            margin-bottom: 0.5rem;
+
+            color: var(--text-secondary);
+
+            font-size: 0.9rem;
+
+        }
+
+
+
+        .game-release i {
+
+            color: var(--text-muted);
+
+            width: 16px;
+
+            text-align: center;
+
+        }
+
+
+
+        .game-reviews {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            margin-bottom: 1rem;
+
+            font-size: 0.9rem;
+
+        }
+
+
+
+        .review-icon {
+
+            width: 16px;
+
+            height: 16px;
+
+        }
+
+
+
+        .vr-badge {
+
+            background: rgba(106, 53, 184, 0.3);
+
+            color: #b39ddb;
+
+            padding: 0.2rem 0.5rem;
+
+            border-radius: 20px;
+
+            font-size: 0.75rem;
+
+            font-weight: 600;
+
+        }
+
+
+
+        .content-type {
+
+            background: rgba(255, 255, 255, 0.08);
+
+            color: var(--text-secondary);
+
+            padding: 0.25rem 0.75rem;
+
+            border-radius: 20px;
+
+            font-size: 0.8rem;
+
+            font-weight: 500;
+
+        }
+
+
+
+        .tags-container {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 0.5rem;
+
+            padding-top: 1rem;
+
+        }
+
+
+
+        .tags-container::-webkit-scrollbar {
+
+            width: 4px;
+
+        }
+
+
+
+        .tags-container::-webkit-scrollbar-thumb {
+
+            background: var(--accent-secondary);
+
+            border-radius: 2px;
+
+        }
+
+
+
+        .game-tag {
+
+            display: inline-block;
+
+            padding: 0.3rem 0.6rem;
+
+            border-radius: 20px;
+
+            background: rgba(255, 255, 255, 0.08);
+
+            color: var(--text-secondary);
+
+            font-size: 0.75rem;
+
+            font-weight: 500;
+
+            transition: var(--transition);
+
+            white-space: nowrap;
+
+        }
+
+
+
+        .game-tag-selected {
+
+            background: rgba(76, 175, 80, 0.2);
+
+            color: var(--accent-primary);
+
+        }
+
+
+
+        .game-tag-not-selected {
+
+            background: rgba(255, 107, 107, 0.15);
+
+            color: #ff6b6b;
+
+            opacity: 0.6;
+
+        }
+
+
+
+        .game-tag:hover {
+
+            background: rgba(33, 150, 243, 0.2);
+
+            color: var(--accent-secondary);
+
+            transform: translateY(-2px);
+
+        }
+
+
+
+        .pagination-container {
+
+            display: flex;
+
+            justify-content: center;
+
+            margin: 2rem 0;
+
+            position: sticky;
+
+            bottom: 8px;
+
+            z-index: 900;
+
+            background: linear-gradient(180deg, rgba(18,18,18,0) 0%, rgba(18,18,18,0.9) 40%, rgba(18,18,18,1) 100%);
+
+            padding-top: 0.5rem;
+
+        }
+
+
+
+        .pagination {
+
+            display: flex;
+
+            gap: 0.5rem;
+
+            flex-wrap: wrap;
+
+        }
+
+
+
+        .page-item {
+
+            cursor: pointer;
+
+            list-style: none;
+
+        }
+
+
+
+        .page-link {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            width: 40px;
+
+            height: 40px;
+
+            border-radius: 50%;
+
+            background: var(--bg-surface);
+
+            color: var(--text-secondary);
+
+            text-decoration: none;
+
+            font-weight: 500;
+
+            transition: var(--transition);
+
+            border: none;
+
+        }
+
+
+
+        .page-link:hover {
+
+            background: rgba(33, 150, 243, 0.2);
+
+            color: var(--accent-secondary);
+
+            transform: translateY(-2px);
+
+        }
+
+
+
+        .page-item.active .page-link {
+
+            background: var(--accent-primary);
+
+            color: white;
+
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+
+        }
+
+
+
+        .page-item.disabled .page-link {
+
+            opacity: 0.5;
+
+            cursor: not-allowed;
+
+            transform: none;
+
+        }
+
+
+
+        .app-footer {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            padding-top: 1.5rem;
+
+            margin-top: 2rem;
+
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+            color: var(--text-muted);
+
+            font-size: 0.9rem;
+
+        }
+
+
+
+        .github-link {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            color: var(--accent-secondary) !important;
+
+            text-decoration: none !important;
+
+            transition: var(--transition);
+
+            padding: 0.5rem 1rem;
+
+            border-radius: var(--border-radius);
+
+        }
+
+
+
+        .github-link:hover {
+
+            background: rgba(33, 150, 243, 0.1);
+
+            transform: translateY(-2px);
+
+        }
+
+
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        #agreementModal .modal-dialog { max-width: 760px; }
+        #agreementModal .modal-content {
+            background: rgba(20,20,20,0.92);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        #agreementModal .modal-body { color: #e0e0e0; }
+        #agreementModal .modal-body p,
+        #agreementModal .modal-body li { color: #e0e0e0; }
+        #agreementModal .modal-title { color: #fff; }
+        .modal-backdrop.show { background-color: rgba(0,0,0,0.75); }
+        #agreementModal .btn-primary { background-color: var(--accent); border-color: var(--accent); }
+        #agreementModal .btn-primary:hover { background-color: var(--accent-hover); border-color: var(--accent-hover); }
+        #agreementModal .btn-outline-secondary { color: #ddd; border-color: rgba(255,255,255,0.25); }
+        #agreementModal .btn-outline-secondary:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+        .modal-header .btn-close {
+            filter: invert(1);
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .modal-header .btn-close:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+
+
+        .modal-title {
+
+            font-weight: 600;
+
+            color: var(--text-primary);
+
+        }
+
+
+
+        .modal-header .btn-close {
+
+            filter: invert(1);
+
+            opacity: 0.7;
+
+            transition: var(--transition);
+
+        }
+
+
+
+        .modal-header .btn-close:hover {
+
+            opacity: 1;
+
+            transform: scale(1.1);
+
+        }
+
+
+
+        .tag-search-container {
+
+            padding: 1rem;
+
+            background: var(--bg-surface);
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 10;
+
+        }
+
+
+
+        .tags-alphabet-container {
+
+            padding: 0 1rem 1rem;
+
+            max-height: 60vh;
+
+            overflow-y: auto;
+
+        }
+
+
+
+        .letter-group {
+
+            margin-bottom: 1.5rem;
+
+        }
+
+
+
+        .letter-header {
+
+            font-size: 1.25rem;
+
+            font-weight: 700;
+
+            color: var(--accent-primary);
+
+            margin: 0.5rem 0 1rem;
+
+            padding-bottom: 0.5rem;
+
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        }
+
+
+
+        .tags-row {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 0.5rem;
+
+        }
+
+
+
+        .modal-tag {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            padding: 0.5rem 1rem;
+
+            border-radius: var(--border-radius);
+
+            background: var(--bg-surface);
+
+            color: var(--text-primary);
+
+            font-size: 0.9rem;
+
+            cursor: pointer;
+
+            transition: var(--transition);
+
+        }
+
+
+
+        .modal-tag:hover {
+
+            background: var(--accent-secondary);
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+
+        }
+
+
+
+        .modal-tag-selected {
+
+            background: var(--accent-primary);
+
+            cursor: default;
+
+        }
+
+
+
+        .modal-tag-selected:hover {
+
+            background: var(--accent-primary);
+
+            transform: none;
+
+            box-shadow: none;
+
+        }
+
+
+
+        .selected-check {
+
+            margin-left: 0.5rem;
+
+            font-weight: 700;
+
+        }
+
+
+
+        .filter-container .stretched-link::after {
+
+            display: none !important;
+
+        }
+
+
+
+        @media (max-width: 768px) {
+
+            .app-header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 1rem;
+
+            }
+
+            .toolbar { top: 96px; }
+
+            
+
+            .game-header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+            }
+
+            
+
+            .game-discount {
+
+                margin-top: 0.5rem;
+
+            }
+
+            
+
+            .filter-container {
+
+                grid-template-columns: 1fr;
+
+            }
+
+            
+
+            .game-list {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+
+
+        @keyframes float {
+
+            0%, 100% { transform: translateY(0); }
+
+            50% { transform: translateY(-5px); }
+
+        }
+
+
+
+        .pulse {
+
+            animation: pulse 2s infinite;
+
+        }
+
+
+
+        @keyframes pulse {
+
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+
+        }
+
+        body {
+
+            background: radial-gradient(1200px 800px at 20% 0%, #1a140d 0%, #0f0d0a 50%, #0b0a08 100%) fixed;
+
+        }
+
+        :root {
+
+            --steam-brass: #b08d57;
+
+            --steam-brass-2: #c7a66b;
+
+            --steam-copper: #bf6f3e;
+
+            --steam-iron: #3b3b3b;
+
+            --steam-iron-2: #2a2a2a;
+
+            --steam-leather: #4a2f21;
+
+            --accent-primary: #4caf50;
+
+        }
+
+        .layout {
+
+            display: grid;
+
+            grid-template-columns: 360px 1fr;
+
+            gap: 1rem;
+
+        }
+
+        .sidebar {
+
+            position: sticky;
+
+            top: 68px;
+
+            height: calc(100vh - 84px);
+
+            overflow: auto;
+
+            background: linear-gradient(180deg, rgba(58,45,32,0.95) 0%, rgba(36,28,21,0.95) 100%);
+
+            border: 1px solid rgba(192, 147, 88, 0.35);
+
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.35);
+
+            border-radius: 10px;
+
+            padding: 0.75rem;
+
+        }
+
+        .sidebar-header {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            font-weight: 700;
+
+            letter-spacing: 0.5px;
+
+            color: var(--steam-brass-2);
+
+            padding: 0.25rem 0.5rem 0.5rem 0.5rem;
+
+            border-bottom: 1px dashed rgba(192,147,88,0.45);
+
+            margin-bottom: 0.5rem;
+
+        }
+
+        .sidebar .filter-group {
+
+            background: linear-gradient(180deg, rgba(26,20,13,0.7) 0%, rgba(26,20,13,0.4) 100%);
+
+            border: 1px solid rgba(192, 147, 88, 0.35);
+
+        }
+
+        .sidebar .filter-group-title {
+
+            color: var(--steam-brass-2);
+
+        }
+
+        .sidebar .filter-container { display: flex; flex-direction: column; gap: 1rem; margin: 0; }
+
+        .content { min-width: 0; }
+
+        .game-card { border: 1px solid rgba(192,147,88,0.25); background: linear-gradient(180deg, rgba(25,25,25,0.95) 0%, rgba(20,20,20,0.95) 100%); }
+
+        .app-header { background: linear-gradient(180deg, rgba(20,17,14,0.85) 0%, rgba(14,12,10,0.85) 100%); border-bottom: 1px solid rgba(192,147,88,0.25); }
+
+        .toolbar { background: linear-gradient(180deg, rgba(26,20,13,0.6) 0%, rgba(19,15,11,0.6) 100%); border-bottom: 1px solid rgba(192,147,88,0.2); }
+
+
+
+        body.sidebar-collapsed .sidebar { transform: translateX(-110%); opacity: 0; pointer-events: none; }
+
+        body.sidebar-collapsed .layout { grid-template-columns: 0 1fr; }
+
+
+
+        @media (max-width: 992px) {
+
+            .layout { grid-template-columns: 1fr; }
+
+            .sidebar { position: fixed; left: 0; top: 68px; width: 85%; max-width: 360px; z-index: 1100; height: calc(100vh - 84px); transform: translateX(-110%); transition: transform 0.3s ease; }
+
+            body.sidebar-open .sidebar { transform: translateX(0); }
+
+            body.sidebar-open::after { content: ""; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; }
+
+        }
+
+    </style>
+
+    <style>
+        .free100-banner {
+            display: none;
+            margin: 0.5rem 0 1rem 0;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            background: rgba(76, 175, 80, 0.12);
+            border: 1px solid rgba(76, 175, 80, 0.35);
+            color: #b6f2c0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+        }
+        .free100-banner .count {
+            color: #8be69b;
+            font-weight: 700;
+        }
+        .free-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            z-index: 2;
+            background: linear-gradient(135deg, #00c853 0%, #64dd17 100%);
+            color: #0a120a;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+        }
+        .game-header { position: relative; }
+    </style>
+
+    <style>
+
+        body.compact .game-header { padding: 0.5rem 0.75rem; min-height: 56px; }
+
+        body.compact .game-image-container { width: 96px; height: 36px; }
+
+        body.compact .game-discount { font-size: 1rem; }
+
+        body.compact .game-body { padding: 0.9rem; }
+
+        body.compact .game-name { font-size: 1.05rem; margin-bottom: 0.6rem; }
+
+        body.compact .game-meta { font-size: 0.85rem; margin-bottom: 0.6rem; }
+
+        body.compact .game-tag { font-size: 0.7rem; }
+
+    </style>
+
+    <style>
+
+        .bundle-games-container {
+
+            margin-top: 1rem;
+
+            padding-top: 1rem;
+
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+        }
+
+
+
+        .bundle-games-title {
+
+            font-size: 1rem;
+
+            font-weight: 600;
+
+            margin-bottom: 0.75rem;
+
+            color: var(--accent-secondary);
+
+        }
+
+
+
+        .bundle-games {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+        }
+
+
+
+        .bundle-game {
+
+            position: relative;
+
+            width: 120px;
+
+            height: 45  px;
+
+            border-radius: 4px;
+
+            overflow: hidden;
+
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+
+            transition: var(--transition);
+
+        }
+
+
+
+        .bundle-game:hover {
+
+            transform: translateY(-3px);
+
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+
+        }
+
+
+
+        .bundle-game img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+        }
+
+
+
+        .bundle-game .bundle-game-name {
+
+            position: absolute;
+
+            bottom: 0;
+
+            left: 0;
+
+            right: 0;
+
+            background: rgba(0, 0, 0, 0.8);
+
+            color: white;
+
+            font-size: 10px;
+
+            padding: 3px;
+
+            text-align: center;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            display: none;
+
+        }
+
+
+
+        .bundle-game:hover .bundle-game-name {
+
+            display: block;
+
+        }
+
+    </style>
+
+    <style>
+
+        .loading {
+
+            top: 0;
+
+            left: 0;
+
+            z-index: 999999;
+
+            position: absolute;
+
+            height: 100%;
+
+            width: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background-color: #0e0e0e;
+
+        }
+
+
+
+        .loading-gif {
+
+            width: 20%;
+
+        }
+
+    </style>
+
+    <style>
+
+        .form-select {
+
+            background-color: rgba(255, 255, 255, 0.03);
+
+            color: var(--text-primary);
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+        }
+
+
+
+        .form-select option {
+
+            background-color: #2b2a2a;
+
+        }
+
+
+
+        .form-select option:checked {
+
+            background-color: #363636;
+
+        }
+
+
+
+        .form-select option:hover {
+
+            background-color: #484848;
+
+        }
+
+
+
+        .sort-direction.active {
+
+            background-color: var(--accent-primary);
+
+            color: white;
+
+            border-color: var(--accent-primary);
+
+        }
+
+    </style>
+
+    <style>
+
+        .btn, .page-link, .github-link, .filter-tag {
+
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+
+            transform-origin: center;
+
+        }
+
+
+
+        .btn:active, .page-link:active, .filter-tag:active {
+
+            transform: scale(0.95);
+
+        }
+
+
+
+        .game-card {
+
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+        }
+
+
+
+        @keyframes tagPop {
+
+            0% { transform: scale(0.8); opacity: 0; }
+
+            70% { transform: scale(1.1); }
+
+            100% { transform: scale(1); opacity: 1; }
+
+        }
+
+
+
+        .filter-tag {
+
+            animation: tagPop 0.3s ease forwards;
+
+        }
+
+
+
+        i.fas {
+
+            transition: transform 0.3s ease;
+
+        }
+
+
+
+        .platform-icon:hover, 
+
+        .filter-group-title i:hover, 
+
+        .game-name:hover + i {
+
+            animation: float 1.5s ease-in-out infinite;
+
+        }
+
+
+
+        .form-select {
+
+            transition: all 0.3s ease;
+
+            transform-origin: top;
+
+        }
+
+
+
+        .form-select:focus {
+
+            transform: scale(1.02);
+
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+
+        }
+
+
+
+        .form-control {
+
+            transition: all 0.3s ease;
+
+        }
+
+
+
+        .form-control:focus {
+
+            transform: translateY(-1px);
+
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+        }
+
+
+
+        .page-link {
+
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        }
+
+
+
+        .page-link:hover {
+
+            transform: translateY(-3px) scale(1.05);
+
+            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.25);
+
+        }
+
+
+
+        .noUi-handle {
+
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+
+        }
+
+
+
+        .noUi-handle:hover {
+
+            transform: scale(1.2);
+
+            box-shadow: 0 0 12px rgba(76, 175, 80, 0.6);
+
+        }
+
+    </style>
+
+    <style>
+
+        @keyframes countPulse {
+
+            0% { transform: scale(1); }
+
+            50% { transform: scale(1.1); }
+
+            100% { transform: scale(1); }
+
+        }
+
+
+
+        .total-count {
+
+            transition: all 0.3s ease;
+
+        }
+
+
+
+        .total-count.updated {
+
+            animation: countPulse 0.5s ease;
+
+        }
+
+
+
+        @keyframes filterFlash {
+
+            0% { background: transparent; }
+
+            50% { background: rgba(76, 175, 80, 0.3); }
+
+            100% { background: transparent; }
+
+        }
+
+
+
+        .filter-group.updated {
+
+            animation: filterFlash 1s ease;
+
+        }
+
+
+
+        .fa-tags.pulse {
+
+            animation: spin 4s linear infinite, pulse 2s infinite;
+
+        }
+
+
+
+        .modal.fade .modal-content {
+
+            transform: translateY(20px);
+
+            opacity: 0;
+
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        }
+
+
+
+        .modal.show .modal-content {
+
+            transform: translateY(0);
+
+            opacity: 1;
+
+        }
+
+    </style>
+
+    <style>
+
+        .magic-button {
+
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+
+            color: white;
+
+            border: none;
+
+            border-radius: var(--border-radius);
+
+            padding: 0.5rem 1.25rem;
+
+            font-weight: 600;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            transition: var(--transition);
+
+            box-shadow: 0 4px 15px rgba(37, 117, 252, 0.3);
+
+        }
+
+
+
+        .magic-button:hover {
+
+            transform: translateY(-3px) scale(1.05);
+
+            box-shadow: 0 8px 25px rgba(37, 117, 252, 0.5);
+
+        }
+
+
+
+        .magic-button:active {
+
+            transform: scale(0.95);
+
+        }
+
+
+
+        .magic-modal .modal-dialog {
+
+            max-width: 700px;
+
+        }
+
+
+
+        .magic-modal .modal-content {
+
+            background: var(--bg-card);
+
+            border-radius: var(--border-radius);
+
+            border: none;
+
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
+
+            overflow: hidden;
+
+        }
+
+
+
+        .magic-modal .modal-header {
+
+            background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+
+            border-bottom: none;
+
+            padding: 1rem;
+
+        }
+
+
+
+        .magic-modal .modal-title {
+
+            font-weight: 700;
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            font-size: 1.1rem;
+
+        }
+
+
+
+        .magic-modal .modal-body {
+
+            padding: 1.5rem;
+
+        }
+
+
+
+        .magic-modal .modal-footer {
+
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+            padding: 1rem;
+
+            display: flex;
+
+            justify-content: space-between;
+
+        }
+
+
+
+        .magic-card {
+
+            background: var(--bg-surface);
+
+            border-radius: var(--border-radius);
+
+            overflow: hidden;
+
+            box-shadow: var(--shadow);
+
+        }
+
+
+
+        .magic-card-header {
+
+            display: flex;
+
+            padding: 1rem;
+
+            background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+
+        }
+
+
+
+        .magic-card-image-container {
+
+            flex-shrink: 0;
+
+            width: 120px;
+
+            height: 45px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+            border-radius: 4px;
+
+            background: rgba(0, 0, 0, 0.2);
+
+        }
+
+
+
+        .magic-card-image {
+
+            max-width: 100%;
+
+            max-height: 100%;
+
+            object-fit: contain;
+
+        }
+
+
+
+        .magic-card-discount-container {
+
+            padding-left: 1rem;
+
+            flex-grow: 1;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+        }
+
+
+
+        .magic-card-discount {
+
+            font-weight: 800;
+
+            font-size: 1.5rem;
+
+            color: white;
+
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+        }
+
+
+
+        .magic-card-price {
+
+            font-size: 0.9rem;
+
+            font-weight: 600;
+
+            color: rgba(255, 255, 255, 0.9);
+
+            margin-top: 0.3rem;
+
+        }
+
+
+
+        .magic-card-body {
+
+            padding: 1.2rem;
+
+        }
+
+
+
+        .magic-card-name {
+
+            font-size: 1.3rem;
+
+            font-weight: 700;
+
+            margin-bottom: 1rem;
+
+            color: var(--text-primary);
+
+            line-height: 1.3;
+
+        }
+
+
+
+        .magic-card-meta {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            margin-bottom: 1rem;
+
+            font-size: 0.9rem;
+
+            align-items: center;
+
+        }
+
+
+
+        .magic-card-platform-icons {
+
+            display: flex;
+
+            gap: 0.5rem;
+
+        }
+
+
+
+        .magic-card-platform-icon {
+
+            width: 22px;
+
+            height: 22px;
+
+            opacity: 0.9;
+
+        }
+
+
+
+        .magic-card-content-type {
+
+            background: rgba(255, 255, 255, 0.1);
+
+            color: var(--text-secondary);
+
+            padding: 0.3rem 0.8rem;
+
+            border-radius: 20px;
+
+            font-size: 0.85rem;
+
+            font-weight: 600;
+
+        }
+
+
+
+        .magic-card-vr-badge {
+
+            background: rgba(106, 53, 184, 0.4);
+
+            color: #b39ddb;
+
+            padding: 0.2rem 0.6rem;
+
+            border-radius: 20px;
+
+            font-size: 0.8rem;
+
+            font-weight: 700;
+
+        }
+
+
+
+        .magic-card-details {
+
+            display: flex;
+
+            gap: 1rem;
+
+            margin-top: 1rem;
+
+        }
+
+
+
+        .magic-card-section {
+
+            flex: 1;
+
+        }
+
+
+
+        .magic-card-section-title {
+
+            font-size: 0.95rem;
+
+            font-weight: 600;
+
+            margin-bottom: 0.5rem;
+
+            color: var(--accent-secondary);
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.3rem;
+
+        }
+
+
+
+        .magic-card-tags-container {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 0.5rem;
+
+            margin-top: 0.5rem;
+
+        }
+
+
+
+        .magic-card-tag {
+
+            padding: 0.3rem 0.7rem;
+
+            border-radius: 20px;
+
+            background: rgba(33, 150, 243, 0.15);
+
+            color: var(--accent-secondary);
+
+            font-size: 0.8rem;
+
+            font-weight: 500;
+
+        }
+
+
+
+        .feeling-lucky-btn {
+
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+
+            color: #121212;
+
+            border: none;
+
+            font-weight: 700;
+
+            padding: 0.5rem 1rem;
+
+            border-radius: 50px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            transition: var(--transition);
+
+            font-size: 0.9rem;
+
+        }
+
+
+
+        @media (max-width: 768px) {
+
+            .magic-modal .modal-dialog {
+
+                margin: 0 auto;
+
+            }
+
+            
+
+            .magic-card-header {
+
+                flex-direction: column;
+
+                align-items: center;
+
+                text-align: center;
+
+                padding: 1rem 0.5rem;
+
+            }
+
+            
+
+            .magic-card-image-container {
+
+                margin-bottom: 0.5rem;
+
+            }
+
+            
+
+            .magic-card-discount-container {
+
+                padding-left: 0;
+
+            }
+
+            
+
+            .magic-card-name {
+
+                font-size: 1.2rem;
+
+            }
+
+            
+
+            .magic-card-meta {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 0.5rem;
+
+            }
+
+            
+
+            .magic-card-details {
+
+                flex-direction: column;
+
+                gap: 0.8rem;
+
+            }
+
+            
+
+            .magic-modal .modal-footer {
+
+                flex-direction: column;
+
+                gap: 0.5rem;
+
+            }
+
+            
+
+            .feeling-lucky-btn {
+
+                order: -1;
+
+                margin-bottom: 0.5rem;
+
+            }
+
+        }
+
+
+
+        @media (max-width: 576px) {
+
+            .magic-card-discount {
+
+                font-size: 1.3rem;
+
+            }
+
+            
+
+            .magic-card-name {
+
+                font-size: 1.1rem;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZP7K8BBV1G"></script>
+
+    <script>
+
+        window.addEventListener('error', function (e) {
+            const t = e.target;
+            if (t && t.tagName === 'IMG') {
+                try { console.warn('[FreeSteam][IMG error]', t.src); } catch(_) {}
+            }
+        }, true);
+
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag(){dataLayer.push(arguments);}
+
+      gtag('js', new Date());
+
+    
+
+      gtag('config', 'G-ZP7K8BBV1G');
+
+    </script>
+
+    <script type="text/javascript" >
+
+       (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+
+       m[i].l=1*new Date();
+
+       for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+
+       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+
+       (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+    
+
+       ym(101470207, "init", {
+
+            clickmap:true,
+
+            trackLinks:true,
+
+            accurateTrackBounce:true,
+
+            webvisor:true
+
+       });
+
+    </script>
+
+    <noscript><div><img src="https://mc.yandex.ru/watch/101470207" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+    <div class="container">
+
+        <div class="loading">
+
+            <img class="loading-gif" src="loading.gif" />
+
+        </div>
+
+        <header class="app-header">
+
+            <div class="app-title">
+
+                <div class="app-title-icon">
+
+                    <img src="steamfreeico.png" alt="FreeSteam">
+
+                </div>
+
+                <span class="app-title-glitch" data-text="FreeSteam">FreeSteam</span>
+
+            </div>
+
+            <div class="header-links">
+                <a href="checker.html" class="btn-steam-top" id="headerSteamBtn" title="Проверка профиля Steam">
+                    <i class="fab fa-steam-symbol"></i>
+                    <span id="headerSteamBtnText">Steam</span>
+                </a>
+            </div>
+
+            <div class="language-switcher">
+                <button id="langRu" class="btn btn-sm btn-outline-secondary active" data-lang="ru">RU</button>
+                <button id="langEn" class="btn btn-sm btn-outline-secondary" data-lang="en">EN</button>
+            </div>
+
+            <div class="total-count" style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
+                <span id="totalcount">Показано <strong>0</strong> из <strong>0</strong> (всего <strong>0</strong>) • Страница <strong>0</strong> из <strong>0</strong></span>
+                <button id="notifyBtn" type="button" class="btn btn-sm btn-outline-light" title="Включить уведомления о 100% скидках">
+                    <i class="fas fa-bell"></i> <span class="notify-text">Уведомления</span>
+                </button>
+                <!-- Language/Currency selectors removed: English/US fixed -->
+            </div>
+
+        </header>
+
+
+
+        <div class="layout">
+
+          <aside class="sidebar">
+
+            <div class="sidebar-header">
+
+                <i class="fas fa-gears"></i>
+
+                <span data-translate-key="filters">Filters</span>
+
+            </div>
+
+            <div class="filter-container">
+
+            <div class="filter-group">
+
+                <div class="filter-group-title">
+
+                    <i class="fas fa-search"></i>
+
+                    <span data-translate-key="search">Search</span>
+
+                </div>
+
+                <input type="text" class="form-control" id="nameFilter" placeholder="Поиск игры...">
+
+            </div>
+
+
+
+            <div class="filter-group">
+
+                <div class="filter-group-title">
+
+                    <i class="fas fa-percentage"></i>
+
+                    <span data-translate-key="discount_range">Discount range</span>
+
+                </div>
+
+                <div class="slider-group">
+
+                    <input type="number" class="form-control slider-input" id="minDiscount" placeholder="Мин %">
+
+                    <div id="discountSlider" style="flex-grow:1;"></div>
+
+                    <input type="number" class="form-control slider-input" id="maxDiscount" placeholder="Макс %">
+
+                </div>
+
+            </div>
+
+
+
+            <div class="filter-group">
+
+                <div class="filter-group-title">
+
+                    <i class="fas fa-dollar-sign"></i>
+
+                    <span data-translate-key="price_range">Price range</span>
+
+                </div>
+
+                <div class="slider-group">
+
+                    <input type="number" class="form-control slider-input" id="minPrice" placeholder="Мин $">
+
+                    <div id="priceSlider" style="flex-grow:1;"></div>
+
+                    <input type="number" class="form-control slider-input" id="maxPrice" placeholder="Макс $">
+
+                </div>
+
+            </div>
+
+
+
+            <div class="filter-group">
+
+                <div class="filter-group-title">
+
+                    <i class="fas fa-percent"></i>
+
+                    <span data-translate-key="review_percent">Positive review percentage</span>
+
+                </div>
+
+                <div class="slider-group">
+
+                    <input type="number" class="form-control slider-input" id="minReviewPercent" placeholder="Мин %">
+
+                    <div id="reviewPercentSlider" style="flex-grow:1;"></div>
+
+                    <input type="number" class="form-control slider-input" id="maxReviewPercent" placeholder="Макс %">
+
+                </div>
+
+            </div>
+
+
+
+            <div class="filter-group">
+
+                <div class="filter-group-title">
+
+                    <i class="fas fa-users"></i>
+
+                    <span data-translate-key="review_users">Review count</span>
+
+                </div>
+
+                <div class="slider-group">
+
+                    <input type="number" class="form-control slider-input" id="minReviewUsers" placeholder="Мин">
+
+                    <div id="reviewUsersSlider" style="flex-grow:1;"></div>
+
+                    <input type="number" class="form-control slider-input" id="maxReviewUsers" placeholder="Макс">
+
+                </div>
+
+            </div>
+
+
+
+            <div class="filter-group">
+
+                <div class="filter-group-title">
+
+                    <i class="fas fa-tags"></i>
+
+                    <span data-translate-key="tags">Tags</span>
+
+                </div>
+
+                <div id="tagsFilterContainer" class="tags-filter-container"></div>
+
+            </div>
+
+
+
+            <div class="filter-group">
+
+                <div class="filter-group-title">
+
+                    <i class="fas fa-filter"></i>
+
+                    <span data-translate-key="platforms">Platforms</span>
+
+                </div>
+
+                
+
+                <div class="platform-filters">
+
+                    <label class="platform-checkbox">
+
+                        <input type="checkbox" id="winFilter">
+
+                        <img src="https://store.fastly.steamstatic.com/public/images/v6/icon_platform_win.png" alt="Windows" onerror="this.style.display='none';">
+
+                        <span>Windows</span>
+
+                    </label>
+
+                    <label class="platform-checkbox">
+
+                        <input type="checkbox" id="macFilter">
+
+                        <img src="https://store.fastly.steamstatic.com/public/images/v6/icon_platform_mac.png" alt="Mac" onerror="this.style.display='none';">
+
+                        <span>Mac</span>
+
+                    </label>
+
+                    <label class="platform-checkbox">
+
+                        <input type="checkbox" id="linuxFilter">
+
+                        <img src="https://store.fastly.steamstatic.com/public/images/v6/icon_platform_linux.png" alt="Linux" onerror="this.style.display='none';">
+
+                        <span>Linux</span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="filter-group">
+
+                <div class="filter-group-title">
+
+                    <i class="fas fa-filter"></i>
+
+                    <span data-translate-key="type">Type</span>
+
+                </div>
+
+
+
+                <div class="additional-filters">
+
+                    <label class="additional-filter">
+
+                        <input type="checkbox" id="appFilter" checked>
+
+                        <i class="fas fa-gamepad"></i>
+
+                        <span data-translate-key="games">Games</span>
+
+                    </label>
+
+                    <label class="additional-filter">
+
+                        <input type="checkbox" id="bundleFilter" checked>
+
+                        <i class="fas fa-box"></i>
+
+                        <span data-translate-key="bundles">Bundles</span>
+
+                    </label>
+
+                    <label class="additional-filter">
+
+                        <input type="checkbox" id="soundtrackFilter" checked>
+
+                        <i class="fas fa-music"></i>
+
+                        <span data-translate-key="soundtracks">Soundtracks</span>
+
+                    </label>
+
+                    <label class="additional-filter">
+
+                        <input type="checkbox" id="dlcFilter" checked>
+
+                        <i class="fas fa-puzzle-piece"></i>
+
+                        <span data-translate-key="dlc">DLC</span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="filter-group">
+
+                <div class="filter-group-title">
+
+                    <i class="fas fa-filter"></i>
+
+                    <span data-translate-key="vr">VR</span>
+
+                </div>
+
+
+
+                <div class="additional-filters">
+
+                    <label class="additional-filter">
+
+                        <input type="checkbox" id="vrFilter">
+
+                        <i class="fas fa-vr-cardboard"></i>
+
+                        <span data-translate-key="vr">VR</span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="filter-group">
+
+                <div class="filter-group-title">
+
+                    <i class="fas fa-sort"></i>
+
+                    <span data-translate-key="sort_by">Sort by</span>
+
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    <select class="form-select" id="sortField">
+
+                        <option value="popularity" selected>Popularity</option>
+
+                        <option value="title">Title</option>
+
+                        <option value="discount">Discount</option>
+
+                        <option value="base_price">Base price</option>
+
+                        <option value="final_price">Final price</option>
+
+                        <option value="review_users">Review users</option>
+
+                        <option value="review_percent">Review percent</option>
+
+                    </select>
+
+                    <div class="btn-group">
+
+                        <button type="button" class="btn btn-outline-secondary sort-direction active" data-direction="desc">
+
+                            <i class="fas fa-arrow-down-wide-short"></i> <span data-translate-key="desc">Desc</span>
+
+                        </button>
+
+                        <button type="button" class="btn btn-outline-secondary sort-direction" data-direction="asc">
+
+                            <i class="fas fa-arrow-up-wide-short"></i> <span data-translate-key="asc">Asc</span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+          </aside>
+
+          <main class="content">
+
+            <div class="toolbar">
+
+                <button id="toggleFiltersBtn" class="btn btn-outline-secondary">
+
+                    <i class="fas fa-filter"></i>
+
+                    <span class="toolbar-toggle-text" data-translate-key="toggle_filters">Toggle filters</span>
+
+                </button>
+
+                <button id="resetFiltersBtn" class="btn btn-outline-warning">
+
+                    <i class="fas fa-rotate"></i>
+
+                    <span data-translate-key="reset">Reset</span>
+
+                </button>
+
+                <div class="toolbar-spacer"></div>
+                <button id="magicButton" class="btn btn-outline-success">
+
+                    <i class="fas fa-wand-magic-sparkles"></i>
+
+                    <span data-translate-key="randomly">Randomly</span>
+
+                </button>
+
+                <button id="densityBtn" class="btn btn-outline-success">
+
+                    <i class="fas fa-compress"></i>
+
+                    <span data-translate-key="compact">Compact</span>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- Глобальный баннер про игры со 100% скидкой -->
+            <div id="free100Banner" class="free100-banner" style="display: none;">
+                <i class="fas fa-gift me-2"></i>
+                <span data-translate-key="free_games">Free games:</span> <span class="count">0</span>
+            </div>
+
+            <div class="game-list" id="listcontent"></div>
+
+
+
+            <div id="pagination" class="pagination-container"></div>
+
+
+
+            <footer class="app-footer">
+
+                <div>
+
+                    <span data-translate-key="last_update">Last update (UTC+3):</span> <span id="uptime" style="color: var(--accent-primary);"></span>
+
+                </div>
+
+                <a href="https://github.com/tipasofteri" class="github-link" target="_blank" rel="noopener noreferrer">
+
+                    <i class="fab fa-github"></i>
+
+                    <span data-translate-key="open_github">Open on GitHub</span>
+
+                </a>
+
+            </footer>
+
+          </main>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="modal fade magic-modal" id="magicModal" tabindex="-1" aria-hidden="true">
+
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+
+                        <i class="fas fa-wand-magic-sparkles"></i>
+
+                        <span data-translate-key="randomly">Randomly</span>
+
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                </div>
+
+                <div class="modal-body" id="magicModalBody">
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+
+                        <i class="fas fa-times"></i> <span data-translate-key="close">Close</span>
+
+                    </button>
+
+                    <button type="button" class="feeling-lucky-btn" id="tryAnotherButton">
+
+                        <i class="fas fa-dice"></i> <span data-translate-key="try_another">Me lucky</span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Модальное окно Пользовательского соглашения (после magicModal) -->
+    <div class="modal fade" id="agreementModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-file-contract me-2"></i>Agreement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Using this site, you agree that information about offers and discounts is provided "as is", without warranties. You assume responsibility for checking the accuracy of offers in the Steam store.</p>
+                    <ul>
+                        <li>We do not sell games and are not affiliated with Steam.</li>
+                        <li>Information is collected from open sources.</li>
+                        <li>For a better experience, cookies/LocalStorage may be used.</li>
+                    </ul>
+                    <p>By clicking "Agree", you confirm your acceptance of the terms.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" id="disagreeBtn">Disagree</button>
+                    <button type="button" class="btn btn-primary" id="agreeBtn">Agree</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/nouislider.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <script>
+
+        $(window).scrollTop(0);
+
+
+
+        let allGames = [];
+
+        let discountSlider, priceSlider;
+
+        let filterTimeout;
+
+        let selectedTags = [];
+
+        let allAvailableTags = [];
+
+        let modalEventHandlersAttached = false;
+
+        let reviewPercentSlider, reviewUsersSlider;
+
+        let defaultMaxPrice = 0;
+        let defaultMaxReviewUsers = 0;
+
+
+
+        const DEBOUNCE_DELAY = 500;
+        let dataLoadSeq = 0;
+
+        const LS_KEY_LANG = 'fs_ui_lang_v1';
+        const LS_KEY_CC = 'fs_ui_cc_v1';
+        const DEFAULT_LANG = 'ru';
+        const DEFAULT_CC = 'us';
+
+        function getStoredLang() { try { return localStorage.getItem(LS_KEY_LANG) || DEFAULT_LANG; } catch(_) { return DEFAULT_LANG; } }
+        function getStoredCC()   { try { return localStorage.getItem(LS_KEY_CC)   || DEFAULT_CC; }   catch(_) { return DEFAULT_CC; } }
+        function setStoredLang(v){ try { localStorage.setItem(LS_KEY_LANG, v); } catch(_) {} }
+        function setStoredCC(v)  { try { localStorage.setItem(LS_KEY_CC, v); }   catch(_) {} }
+
+        function getSelectedLang() { return 'english'; }
+        function getSelectedCC() { return 'us'; }
+
+        function buildDataUrls(bustStamp) {
+            const addBust = (u) => `${u}?t=${bustStamp}`;
+            const p1 = [ './free_goods_detail_part1.json' ];
+            const p2 = [ './free_goods_detail_part2.json' ];
+            try { console.info('[FreeSteam] Canonical data files only (EN/US)'); } catch(_) {}
+            return { part1: p1.map(addBust), part2: p2.map(addBust) };
+        }
+
+        function fetchFirstAvailableJson(candidates) {
+            const tryNext = (idx) => {
+                if (idx >= candidates.length) return $.Deferred().reject('no candidates').promise();
+                return $.getJSON(candidates[idx]).then(
+                    (data) => $.Deferred().resolve(data).promise(),
+                    () => tryNext(idx + 1)
+                );
+            };
+            return tryNext(0);
+        }
+
+        const applyFiltersDebounced = () => applyFilters && applyFilters();
+
+
+        let currentPage = 1;
+
+        const itemsPerPage = 24;
+
+        let filteredGames = [];
+
+        const pageBorder = 2;
+
+
+
+        let platformFilters = {
+
+            win: false,
+
+            mac: false,
+
+            linux: false
+
+        };
+
+        let vrFilter = false;
+
+        let appFilter = true;
+
+        let bundleFilter = true;
+
+        let soundtrackFilter = true;
+
+        let dlcFilter = true;
+
+        
+
+        let sortField = 'popularity';
+
+        let sortDirection = 'desc';
+
+        const sortFunctions = {
+            'popularity': (a, b) => b.popularity - a.popularity,
+            'title': (a, b) => a.title.localeCompare(b.title),
+            'discount': (a, b) => b.discount - a.discount,
+            'base_price': (a, b) => b.base_price_numeric - a.base_price_numeric,
+            'final_price': (a, b) => a.price_numeric - b.price_numeric,
+            'review_users': (a, b) => b.review_users - a.review_users,
+            'review_percent': (a, b) => b.review_percent - a.review_percent
+        };
+
+        const NOTIF_ENABLED_KEY = 'fs_notify_enabled_v1';
+        const NOTIF_SEEN_IDS_KEY = 'fs_notify_seen_ids_v1';
+
+        function getStoredSeenIds() {
+            try {
+                const raw = localStorage.getItem(NOTIF_SEEN_IDS_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch (_) { return []; }
+        }
+
+        function storeSeenIds(ids) {
+            try { localStorage.setItem(NOTIF_SEEN_IDS_KEY, JSON.stringify(ids)); } catch(_) {}
+        }
+
+        function isNotifyEnabled() {
+            try { return localStorage.getItem(NOTIF_ENABLED_KEY) === '1'; } catch(_) { return false; }
+        }
+
+        function setNotifyEnabled(v) {
+            try { localStorage.setItem(NOTIF_ENABLED_KEY, v ? '1' : '0'); } catch(_) {}
+        }
+
+        function updateNotifyBtnUI() {
+            const btn = document.getElementById('notifyBtn'); if (!btn) return;
+            const enabled = isNotifyEnabled();
+            const icon = btn.querySelector('i');
+            const text = btn.querySelector('.notify-text');
+            btn.classList.toggle('btn-outline-light', !enabled);
+            btn.classList.toggle('btn-success', enabled);
+            if (icon) icon.className = enabled ? 'fas fa-bell-on' : 'fas fa-bell';
+            try {
+                const t = (typeof translations !== 'undefined' && translations[currentLang]) ? translations[currentLang] : null;
+                if (text) text.textContent = enabled
+                    ? (t && t['notifications_on'] ? t['notifications_on'] : 'Notifications: On')
+                    : (t && t['notifications'] ? t['notifications'] : 'Notifications');
+            } catch(_) {
+                if (text) text.textContent = enabled ? 'Notifications: On' : 'Notifications';
+            }
+        }
+
+        async function ensureNotificationPermission() {
+            if (!('Notification' in window)) return false;
+            if (Notification.permission === 'granted') return true;
+            if (Notification.permission === 'denied') return false;
+            try {
+                const perm = await Notification.requestPermission();
+                return perm === 'granted';
+            } catch { return false; }
+        }
+
+        function collectFreebieIds(list) {
+            return (list || []).filter(g => Number(g.discount) >= 100).map(g => g.id);
+        }
+
+        function uniq(arr) { return Array.from(new Set(arr)); }
+
+        function sendFreebiesNotification(newGames) {
+            if (!('Notification' in window)) return;
+            if (!newGames || newGames.length === 0) return;
+            const count = newGames.length;
+            const titles = newGames.slice(0, 3).map(g => g.title).join(', ');
+            const body = count === 1
+                ? `Бесплатно: ${newGames[0].title}`
+                : `Новые бесплатные игры (${count}): ${titles}${count > 3 ? ' и другие' : ''}`;
+            try {
+                let iconUrl = 'steamfreeico.png';
+                try {
+                    const g0 = newGames[0];
+                    const alts = buildAltUrls(g0.image, g0.id);
+                    if (alts && alts.length) iconUrl = alts[0];
+                } catch(_) {}
+                const n = new Notification('FreeSteam — 100% скидка', {
+                    body,
+                    icon: iconUrl,
+                    silent: false
+                });
+                setTimeout(() => { try { n.close(); } catch(_) {} }, 6000);
+            } catch(_) {}
+        }
+
+
+        function applySorting(games) {
+
+            const sorted = [...games];
+
+            const comparator = sortFunctions[sortField];
+
+            
+
+            sorted.sort(comparator);
+
+            
+
+            if (sortDirection === (sortField !== 'popularity' ? 'asc' : 'desc')) {
+
+                return sorted.reverse();
+
+            }
+
+            return sorted;
+
+        }
+
+
+
+        function getReviewIcon(score) {
+
+            const positive = 'https://store.fastly.steamstatic.com/public/images/v6/user_reviews_positive.png';
+
+            const mixed = 'https://store.fastly.steamstatic.com/public/images/v6/user_reviews_mixed.png';
+
+            const negative = 'https://store.fastly.steamstatic.com/public/images/v6/user_reviews_negative.png';
+
+            
+
+            const positiveScores = [
+
+                'Overwhelmingly Positive', 
+
+                'Very Positive', 
+
+                'Mostly Positive'
+
+            ];
+
+            
+
+            const negativeScores = [
+
+                'Mostly Negative',
+
+                'Overwhelmingly Negative',
+
+                'Very Negative',
+
+                'Negative'
+
+            ];
+
+            
+
+            return positiveScores.includes(score) ? positive : (negativeScores.includes(score) ? negative : mixed);
+
+        }
+
+
+
+        function getReviewColor(score) {
+
+            const positiveColor = '#66c1f5';
+
+            const mixedColor = '#cbb181';
+
+            const negativeColor = '#c35b2c';
+
+            
+
+            const positiveScores = [
+
+                'Overwhelmingly Positive', 
+
+                'Very Positive', 
+
+                'Mostly Positive'
+
+            ];
+
+            
+
+            const negativeScores = [
+
+                'Mostly Negative',
+
+                'Overwhelmingly Negative',
+
+                'Very Negative',
+
+                'Negative'
+
+            ];
+
+            
+
+            return positiveScores.includes(score) ? positiveColor : negativeScores.includes(score) ? negativeColor : mixedColor;
+
+        }
+
+
+
+        function getColor(percent) {
+
+            percent = Math.max(1, Math.min(100, percent));
+
+            const hue = (percent * 120 / 100).toString(10);
+
+            return `hsl(${hue}, 80%, 50%)`;
+
+        }
+
+        function handleImgError(img) {
+            try {
+                const src0 = img.dataset.src0 || img.getAttribute('src') || '';
+                const appid = img.dataset.appid || '';
+                const cands = buildAltUrls(src0, appid);
+                const i = parseInt(img.dataset.failIndex || '0', 10);
+                if (i < cands.length) {
+                    img.dataset.failIndex = String(i + 1);
+                    img.src = cands[i];
+                } else {
+                    img.onerror = null;
+                    img.src = 'steamfreeico.png';
+                }
+            } catch(_) {
+                try { img.onerror = null; img.src = 'steamfreeico.png'; } catch(_) {}
+            }
+        }
+
+        function buildAltUrls(src, id) {
+            try {
+                const alts = [];
+                if (src) alts.push(src);
+                if (id) {
+                    const hosts = [
+                        'https://cdn.cloudflare.steamstatic.com',
+                        'https://shared.akamai.steamstatic.com',
+                        'https://shared.fastly.steamstatic.com',
+                        'https://store.fastly.steamstatic.com',
+                        'https://steamcdn-a.akamaihd.net'
+                    ];
+                    const baseJpgPaths = [
+                        `steam/apps/${id}/header.jpg`,
+                        `store_item_assets/steam/apps/${id}/header.jpg`,
+                        `steam/apps/${id}/header_292x136.jpg`,
+                        `store_item_assets/steam/apps/${id}/header_292x136.jpg`,
+                        `steam/apps/${id}/header_460x215.jpg`,
+                        `store_item_assets/steam/apps/${id}/header_460x215.jpg`,
+                        `steam/apps/${id}/header_586x281.jpg`,
+                        `store_item_assets/steam/apps/${id}/header_586x281.jpg`,
+                        `steam/apps/${id}/header_1200x450.jpg`,
+                        `store_item_assets/steam/apps/${id}/header_1200x450.jpg`,
+                        `steam/apps/${id}/capsule_sm_120.jpg`,
+                        `store_item_assets/steam/apps/${id}/capsule_sm_120.jpg`,
+                        `steam/apps/${id}/capsule_231x87.jpg`,
+                        `store_item_assets/steam/apps/${id}/capsule_231x87.jpg`,
+                        `steam/apps/${id}/capsule_184x69.jpg`,
+                        `store_item_assets/steam/apps/${id}/capsule_184x69.jpg`,
+                        `steam/apps/${id}/capsule_467x181.jpg`,
+                        `store_item_assets/steam/apps/${id}/capsule_467x181.jpg`,
+                        `steam/apps/${id}/capsule_616x353.jpg`,
+                        `store_item_assets/steam/apps/${id}/capsule_616x353.jpg`,
+                        `steam/apps/${id}/library_600x900.jpg`,
+                        `store_item_assets/steam/apps/${id}/library_600x900.jpg`
+                    ];
+                    const webpPaths = baseJpgPaths.map(p => p.endsWith('.jpg') ? p.replace('.jpg', '.webp') : p + '.webp');
+                    const paths = [...baseJpgPaths, ...webpPaths];
+                    hosts.forEach(h => paths.forEach(p => alts.push(`${h}/${p}`)));
+                }
+                const uniq = [...new Set(alts.filter(Boolean))];
+                const stamp = Date.now();
+                return uniq.map(u => u.includes('?') ? `${u}&v=${stamp}` : `${u}?v=${stamp}`);
+            } catch(_) { return src ? [src] : []; }
+        }
+
+        function renderGames(games, page = 1) {
+
+            $(window).scrollTop(0);
+
+
+
+            const start = (page - 1) * itemsPerPage;
+
+            const end = start + itemsPerPage;
+
+            const pagedGames = games.slice(start, end);
+
+            if (!games || games.length === 0) {
+                const emptyHtml = `
+                    <div class="py-5 d-flex flex-column justify-content-center align-items-center" style="min-height:45vh;">
+                        <h4 class="mb-2" style="color:#fff; text-align:center;">🤷‍♂️ Ничего не найдено по текущим фильтрам</h4>
+                        <p class="mt-2" style="color: var(--text-secondary); text-align:center;">Попробуйте изменить параметры поиска или сбросить фильтры.</p>
+                    </div>
+                `;
+                $('#listcontent').empty().html(emptyHtml);
+                $('#free100Banner').slideUp(150);
+                updatePagination(0);
+                return;
+            }
+
+
+
+            const fragment = document.createDocumentFragment();
+
+
+
+            pagedGames.forEach(game => {
+
+                const gameCard = document.createElement('div');
+
+                gameCard.className = 'game-card';
+
+                
+
+                const discountColor = getColor(game.discount);
+
+                
+
+                const toNum = v => {
+                    if (v === null || v === undefined) return NaN;
+                    const s = String(v).replace(/\s/g, '').replace(',', '.').replace(/[^0-9.\-]/g, '');
+                    const n = parseFloat(s);
+                    return isNaN(n) ? NaN : n;
+                };
+                const oldPriceNum = toNum(game.price);
+                const newPriceNum = toNum(game.price_final);
+                const priceHTML = (isFinite(oldPriceNum) && isFinite(newPriceNum) && oldPriceNum > newPriceNum)
+                    ? `<div class="game-price"><span class="price-old">${game.price}</span><span class="price-arrow">→</span><span class="price-new">${game.price_final}</span></div>`
+                    : `<div class="game-price"><span class="price-new">${game.price_final ?? game.price}</span></div>`;
+
+                const isMega = Number(game.discount) >= 100;
+                const reviewsCount = Number(game.review_users) || 0;
+                const isLeader = reviewsCount >= 1000000;
+                const isPopular = !isLeader && reviewsCount >= 200000;
+                const isCheap = isFinite(newPriceNum) && newPriceNum > 0 && newPriceNum < 1;
+                const badgeHTML = isLeader
+                    ? `<div class="badge-leader" title="≥ 1M отзывов"><span class="emoji">🥇</span><span>Лидеры</span></div>`
+                    : (isPopular
+                        ? `<div class="badge-popular" title="≥ 200k отзывов"><span class="emoji">🔥</span><span>Популярно</span></div>`
+                        : '');
+
+                gameCard.innerHTML = `
+
+                    ${badgeHTML}
+
+                    <div class="game-header ${isMega ? 'mega-discount' : ''}" style="background: linear-gradient(90deg, ${discountColor} 0%, #1e1e1e 100%)">
+
+                        ${isMega ? '<div class="free-badge">Бесплатно</div>' : ''}
+                ${isCheap ? '<div class="badge-cheap" title="Цена < $1" style="position:absolute; top:4px; left:10px; background:#ffcc00; color:#000; padding:4px 8px; border-radius:12px; font-weight:700; font-size:12px; display:flex; gap:6px; align-items:center; box-shadow: var(--shadow); z-index:2;">LOL price <span class="emoji">🤑</span></div>' : ''}
+                <div class="game-image-container">
+                            <img class="game-image" src="${game.image}"
+                                 alt="${game.title}"
+                                 loading="lazy"
+                                 onerror="handleImgError(this)"
+                                 data-appid="${game.id}"
+                                 data-src0="${game.image}"
+                                 data-alt1="${(buildAltUrls(game.image, game.id)[1]||'')}"
+                                 data-alt2="${(buildAltUrls(game.image, game.id)[2]||'')}"
+                                 data-alt3="${(buildAltUrls(game.image, game.id)[3]||'')}"
+                                 data-alt4="${(buildAltUrls(game.image, game.id)[4]||'')}"
+                                 data-alt5="${(buildAltUrls(game.image, game.id)[5]||'')}"
+                            >
+
+                        </div>
+
+                        <div class="game-discount-container">
+
+                            <div class="game-discount ${isMega ? 'mega-discount' : ''}">-${game.discount}%</div>
+
+                            ${priceHTML}
+
+                        </div>
+
+                    </div>
+
+                    <div class="game-body">
+
+                        <h3 class="game-name">${game.title}</h3>
+
+                        
+
+                        <div class="game-meta">
+
+                            <div class="platform-icons">
+
+                                ${game.for_win ? '<img src="https://store.fastly.steamstatic.com/public/images/v6/icon_platform_win.png" class="platform-icon" title="Windows" loading="lazy" onerror="this.style.display=\'none\';">' : ''}
+
+                                ${game.for_mac ? '<img src="https://store.fastly.steamstatic.com/public/images/v6/icon_platform_mac.png" class="platform-icon" title="Mac" loading="lazy" onerror="this.style.display=\'none\';">' : ''}
+
+                                ${game.for_linux ? '<img src="https://store.fastly.steamstatic.com/public/images/v6/icon_platform_linux.png" class="platform-icon" title="Linux" loading="lazy" onerror="this.style.display=\'none\';">' : ''}
+
+                            </div>
+
+                            <div style="display: flex; flex-direction: row; align-items: center; gap: 0.5rem;">
+
+                                ${game.vr_support ? '<span class="vr-badge">VR</span>' : ''}
+
+                                <div class="content-type">
+
+                                    ${game.is_bundle ? 'Bundle' : game.is_soundtrack ? 'Soundtrack' : (((typeof game.is_dlc !== 'undefined') ? Boolean(game.is_dlc) : isDLC(game)) ? 'DLC' : 'App')}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        ${game.release ? `
+
+                        <div class="game-release">
+
+                            <i class="fas fa-calendar-alt"></i>
+
+                            <span>${game.release}</span>
+
+                        </div>
+
+                        ` : ''}
+
+
+
+                        ${game.review_users > 0 ? `
+
+                        <div class="game-reviews">
+
+                            <img src="${getReviewIcon(game.review_score)}" class="review-icon" loading="lazy" onerror="this.style.display='none';">
+
+                            <span class="review-text" style="color: ${getReviewColor(game.review_score)};">
+
+                                ${game.review_percent}% (${game.review_users})
+
+                            </span>
+
+                            <div class="review-bar mt-2">
+
+                                <div class="progress" style="height: 6px; background: rgba(255,255,255,0.1)">
+
+                                    <div class="progress-bar" role="progressbar" style="width: ${game.review_percent}%; background: ${getReviewColor(game.review_score)}">
+
+                                </div>
+
+                            </div>
+
+                                <div class="d-flex justify-content-between mt-1">
+
+                                    <small>${game.review_percent}% positive of ${game.review_users} reviews</small>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        ` : ''}
+
+                        
+
+                        ${game.tags && game.tags.length > 0 ? `
+
+                            <div class="tags-container">
+
+                                ${game.tags.map(tag => {
+
+                                    const tagId = parseInt(Object.keys(allAvailableTags).find(
+
+                                        key => allAvailableTags[key] === tag
+
+                                    ));
+
+                                    const isSelected = selectedTags.includes(tagId);
+
+
+
+                                    let tagClass = 'game-tag';
+
+                                    if (selectedTags.length > 0) {
+
+                                        tagClass = 'game-tag ' + (isSelected ? 'game-tag-selected' : 'game-tag-not-selected');
+
+                                    }
+
+
+
+                                    return `<span class="${tagClass}">${tag}</span>`;
+
+                                }).join('')}
+
+                            </div>
+
+                        ` : ''}
+
+
+
+                        ${game.is_bundle && game.bundle_data && game.bundle_data.m_rgItems ? `
+
+                            <div class="bundle-games-container">
+
+                                <div class="bundle-games-title">В составе: ${game.bundle_data.m_rgItems.length} игр:</div>
+
+                                <div class="bundle-games">
+
+                                    ${game.bundle_data.m_rgItems.map(item => {
+
+                                        const appID = item.m_rgIncludedAppIDs[0];
+
+                                        const discount = Math.round((1 - item.m_nFinalPriceInCents / item.m_nBasePriceInCents) * 100);
+
+
+
+                                        const foundGame = allGames.find(game => game.id === appID);
+
+
+
+                                        if (foundGame === undefined) { return ''; }
+
+                                        return `
+
+                                            <div class="bundle-game">
+
+                                                <img src="${foundGame.image}"
+                                                     alt="${foundGame.title}"
+                                                     loading="lazy"
+                                                     onerror="handleImgError(this)"
+                                                     data-appid="${appID}"
+                                                     data-src0="${foundGame.image}"
+                                                     data-alt1="${(buildAltUrls(foundGame.image, appID)[1]||'')}"
+                                                     data-alt2="${(buildAltUrls(foundGame.image, appID)[2]||'')}"
+                                                     data-alt3="${(buildAltUrls(foundGame.image, appID)[3]||'')}"
+                                                     data-alt4="${(buildAltUrls(foundGame.image, appID)[4]||'')}"
+                                                     data-alt5="${(buildAltUrls(foundGame.image, appID)[5]||'')}"
+                                                >
+
+                                                <span class="bundle-game-name">${foundGame.title} -${discount}%</span>
+
+                                            </div>
+
+                                        `;
+
+                                    }).join('')}
+
+                                </div>
+
+                            </div>
+
+                        ` : ''}
+
+                    </div>
+
+                    <a href="${game.link}" class="stretched-link" target="_blank"></a>
+
+                `;
+
+                
+
+                fragment.appendChild(gameCard);
+
+            });
+
+
+
+            try {
+                const freebiesCount = (games || []).filter(g => Number(g.discount) >= 100).length;
+                const $banner = $('#free100Banner');
+                if (freebiesCount > 0) {
+                    $banner.find('.count').text(freebiesCount.toLocaleString('ru-RU'));
+                    $banner.slideDown(150);
+                } else {
+                    $banner.slideUp(150);
+                }
+            } catch (e) { console.warn('Free banner update error:', e); }
+
+            $('#listcontent').empty().append(fragment);
+
+            const fmtInt = n => Number(n).toLocaleString('ru-RU');
+            $('#totalcount').html(
+                `<i class="fas fa-list-ul me-1"></i> ` +
+                `Показано <strong>${fmtInt(pagedGames.length)}</strong> ` +
+                `из <strong>${fmtInt(filteredGames.length)}</strong> ` +
+                `(всего <strong>${fmtInt(allGames.length)}</strong>) ` +
+                `• Страница <strong>${fmtInt(page)}</strong> ` +
+                `из <strong>${fmtInt(Math.ceil(filteredGames.length/itemsPerPage))}</strong>`
+            );
+
+
+
+            if ($('.loading').is(':visible')) {
+
+                $(".loading").css({ opacity: 1 }).fadeTo(500, 0, function() {
+
+                    $(this).hide();
+
+                });
+
+            }
+
+            try { $('.loading').fadeOut(); } catch(_) {}
+
+        }
+
+
+
+        function updatePagination(totalItems) {
+
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            const pagination = $('#pagination');
+
+            pagination.empty();
+
+
+
+            const paginationList = $('<ul>').addClass('pagination');
+
+
+
+            const prevItem = $('<li>').addClass('page-item' + (currentPage === 1 ? ' disabled' : ''));
+
+            prevItem.append($('<a>').addClass('page-link')
+
+                .html('<i class="fas fa-chevron-left"></i>')
+
+                .click(() => {
+
+                    if(currentPage > 1) {
+
+                        currentPage--;
+
+                        renderGames(filteredGames, currentPage);
+
+                        updatePagination(filteredGames.length);
+
+                    }
+
+                }));
+
+            paginationList.append(prevItem);
+
+
+
+            const startPage = Math.max(1, currentPage - pageBorder);
+
+            const endPage = Math.min(totalPages, currentPage + pageBorder);
+
+
+
+            if (currentPage > (pageBorder + 1)) {
+
+                const firstPage = $('<li>').addClass('page-item' + (1 === currentPage ? ' active' : ''));
+
+                firstPage.append($('<a>').addClass('page-link')
+
+                    .text(1)
+
+                    .click(() => {
+
+                        currentPage = 1;
+
+                        renderGames(filteredGames, currentPage);
+
+                        updatePagination(filteredGames.length);
+
+                    }));
+
+                paginationList.append(firstPage);
+
+            }
+
+            if (currentPage > (pageBorder + 2)) {
+
+                const firstEmptyPage = $('<li>').addClass('page-item');
+
+                firstEmptyPage.append($('<a>').addClass('page-link').text('...'));
+
+                paginationList.append(firstEmptyPage);
+
+            }
+
+
+
+            for(let i = startPage; i <= endPage; i++) {
+
+                const pageItem = $('<li>').addClass('page-item' + (i === currentPage ? ' active' : ''));
+
+                pageItem.append($('<a>').addClass('page-link')
+
+                    .text(i)
+
+                    .click(() => {
+
+                        currentPage = i;
+
+                        renderGames(filteredGames, currentPage);
+
+                        updatePagination(filteredGames.length);
+
+                    }));
+
+                paginationList.append(pageItem);
+
+            }
+
+
+
+            if (currentPage < (totalPages - pageBorder - 1)) {
+
+                const lastEmptyPage = $('<li>').addClass('page-item');
+
+                lastEmptyPage.append($('<a>').addClass('page-link').text('...'));
+
+                paginationList.append(lastEmptyPage);
+
+            }
+
+            if (currentPage < (totalPages - pageBorder - 0)) {
+
+                const lastPage = $('<li>').addClass('page-item' + (totalPages === currentPage ? ' active' : ''));
+
+                lastPage.append($('<a>').addClass('page-link')
+
+                    .text(totalPages)
+
+                    .click(() => {
+
+                        currentPage = totalPages;
+
+                        renderGames(filteredGames, currentPage);
+
+                        updatePagination(filteredGames.length);
+
+                    }));
+
+                paginationList.append(lastPage);
+
+            }
+
+
+
+            const nextItem = $('<li>').addClass('page-item' + (currentPage === totalPages ? ' disabled' : ''));
+
+            nextItem.append($('<a>').addClass('page-link')
+
+                .html('<i class="fas fa-chevron-right"></i>')
+
+                .click(() => {
+
+                    if(currentPage < totalPages) {
+
+                        currentPage++;
+
+                        renderGames(filteredGames, currentPage);
+
+                        updatePagination(filteredGames.length);
+
+                    }
+
+                }));
+
+            paginationList.append(nextItem);
+
+
+
+            pagination.append(paginationList);
+
+        }
+
+
+
+        function initSliders(maxPrice, maxReviewUsers) {
+            defaultMaxPrice = maxPrice;
+            defaultMaxReviewUsers = maxReviewUsers;
+
+            discountSlider = noUiSlider.create(document.getElementById('discountSlider'), {
+
+                start: [0, 100],
+
+                connect: true,
+
+                range: { min: 0, max: 100 },
+
+                step: 1,
+
+                format: {
+
+                    to: value => Math.round(value),
+
+                    from: value => Number(value)
+
+                },
+
+                behaviour: 'drag-tap'
+
+            });
+
+
+
+            priceSlider = noUiSlider.create(document.getElementById('priceSlider'), {
+
+                start: [0, maxPrice],
+
+                connect: true,
+
+                range: { min: 0, max: maxPrice },
+
+                step: 0.01,
+
+                format: {
+
+                    to: value => value.toFixed(2),
+
+                    from: value => Number(value)
+
+                }
+
+            });
+
+
+
+            reviewPercentSlider = noUiSlider.create(document.getElementById('reviewPercentSlider'), {
+
+                start: [0, 100],
+
+                connect: true,
+
+                range: { min: 0, max: 100 },
+
+                step: 1,
+
+                format: {
+
+                    to: value => Math.round(value),
+
+                    from: value => Number(value)
+
+                }
+
+            });
+
+
+
+            reviewUsersSlider = noUiSlider.create(document.getElementById('reviewUsersSlider'), {
+
+                start: [0, maxReviewUsers],
+
+                connect: true,
+
+                range: { min: 0, max: maxReviewUsers },
+
+                step: 1,
+
+                format: {
+
+                    to: value => Math.round(value),
+
+                    from: value => Number(value)
+
+                }
+
+            });
+
+
+
+            setupSliderSync(discountSlider, 'minDiscount', 'maxDiscount');
+
+            setupSliderSync(priceSlider, 'minPrice', 'maxPrice');
+
+            setupSliderSync(reviewPercentSlider, 'minReviewPercent', 'maxReviewPercent');
+
+            setupSliderSync(reviewUsersSlider, 'minReviewUsers', 'maxReviewUsers');
+
+        }
+
+
+
+        function setupSliderSync(slider, minId, maxId) {
+
+            const minInput = document.getElementById(minId);
+
+            const maxInput = document.getElementById(maxId);
+
+
+
+            slider.on('update', values => {
+
+                minInput.value = values[0];
+
+                maxInput.value = values[1];
+
+                debouncedFilter();
+
+            });
+
+
+
+            [minInput, maxInput].forEach(input => {
+
+                input.addEventListener('change', () => {
+
+                    slider.set([minInput.value || 0, maxInput.value || slider.options.range.max]);
+
+                });
+
+            });
+
+        }
+
+
+
+        function debouncedFilter() {
+
+            clearTimeout(filterTimeout);
+
+            filterTimeout = setTimeout(filterGames, DEBOUNCE_DELAY);
+
+        }
+
+
+
+        function isDLC(game) {
+            if (!game || !game.title) return false;
+            const t = String(game.title).toLowerCase();
+            if (game.is_bundle === true || game.is_soundtrack === true) return false;
+            const needles = [
+                'dlc',
+                'дополн',           
+                'доп. контент',
+                'expansion',
+                'season pass',
+                ' expansion pass',
+                ' story pack',
+                ' content pack'
+            ];
+            return needles.some(n => t.includes(n));
+        }
+
+
+
+        function filterGames() {
+
+            const searchText = $('#nameFilter').val().toLowerCase();
+
+            const [minDiscount, maxDiscount] = discountSlider.get();
+
+            const [minPrice, maxPrice] = priceSlider.get();
+
+            const [minReviewPercent, maxReviewPercent] = reviewPercentSlider.get();
+
+            const [minReviewUsers, maxReviewUsers] = reviewUsersSlider.get();
+
+
+
+            filteredGames = allGames.filter(game => {
+
+                const nameMatch = game.title.toLowerCase().includes(searchText);
+
+                const discountMatch = game.discount >= minDiscount && game.discount <= maxDiscount;
+
+                const priceMatch = game.price_numeric >= minPrice && game.price_numeric <= maxPrice;
+
+                const reviewPercentMatch = game.review_percent >= minReviewPercent && game.review_percent <= maxReviewPercent;
+
+                const reviewUsersMatch = game.review_users >= minReviewUsers && game.review_users <= maxReviewUsers;
+
+                
+
+                let tagsMatch = true;
+
+                if (selectedTags.length > 0) {
+
+                    if (!game.tags || !game.tags_numeric) return false;
+
+                    tagsMatch = selectedTags.every(tagId => 
+
+                        game.tags_numeric.includes(tagId)
+
+                    );
+
+                }
+
+                
+
+                const platformMatch = 
+
+                    (!platformFilters.win || game.for_win) &&
+
+                    (!platformFilters.mac || game.for_mac) &&
+
+                    (!platformFilters.linux || game.for_linux);
+
+                
+
+                const vrMatch = !vrFilter || game.vr_support;
+
+                
+
+                let matchApp = false;
+
+                let matchBundle = false;
+
+                let matchSoundtrack = false;
+                let matchDLC = false;
+
+                const dlc = (typeof game.is_dlc !== 'undefined') ? Boolean(game.is_dlc) : isDLC(game);
+
+                if (appFilter && (game.is_bundle == false && game.is_soundtrack == false && !dlc)) {
+                    matchApp = true;
+                }
+
+                if (bundleFilter && (game.is_bundle == true)) {
+                    matchBundle = true;
+                }
+
+                if (soundtrackFilter && (game.is_bundle == false && game.is_soundtrack == true)) {
+                    matchSoundtrack = true;
+                }
+
+                if (dlcFilter && dlc) {
+                    matchDLC = true;
+                }
+
+                const contentMatch = matchApp || matchBundle || matchSoundtrack || matchDLC;
+
+                
+
+                return nameMatch && discountMatch && priceMatch && tagsMatch && platformMatch && vrMatch && contentMatch && reviewPercentMatch && reviewUsersMatch;
+
+            });
+
+
+
+            filteredGames = applySorting(filteredGames);
+
+
+
+            currentPage = 1;
+
+            renderGames(filteredGames, currentPage);
+
+            updatePagination(filteredGames.length);
+
+            renderTagFilter();
+
+        }
+
+
+
+        function showTagModal() {
+
+            const availableTags = allAvailableTags;
+
+
+
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+
+
+            const groupedTags = {};
+
+            alphabet.forEach(letter => {
+
+                groupedTags[letter] = Object.entries(availableTags)
+
+                    .filter(([id, tag]) => tag.charAt(0).toUpperCase() === letter)
+
+                    .sort((a, b) => a[1].localeCompare(b[1]));
+
+            });
+
+
+
+            let modal = $('#tagsModal');
+            if (!modal.length) {
+                modal = $(`
+                    <div class="modal fade" id="tagsModal" tabindex="-1" role="dialog">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Выбор тегов</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body"></div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                $('body').append(modal);
+            }
+
+            const bodyHtml = `
+                <div class="tag-search-container">
+                    <input type="text" class="form-control tag-search-input" placeholder="Поиск по тегам...">
+                </div>
+                <div class="tags-alphabet-container">
+                    ${alphabet.map(letter => `
+                        <div class="letter-group" data-letter="${letter}">
+                            <div class="letter-header">${letter}</div>
+                            <div class="tags-row">
+                                ${groupedTags[letter].length > 0 ? 
+                                    groupedTags[letter].map(([id, tag]) => {
+                                        const isSelected = selectedTags.includes(parseInt(id));
+                                        return `
+                                            <span class="modal-tag ${isSelected ? 'modal-tag-selected' : ''}" 
+                                                  data-tag="${id}" ${isSelected ? 'data-selected="true"' : ''}>
+                                                ${tag}
+                                                ${isSelected ? '<span class="selected-check">✓</span>' : ''}
+                                            </span>
+                                        `;
+                                    }).join('') : 
+                                    '<div class="no-tags">Нет тегов</div>'
+                                }
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>`;
+            modal.find('.modal-body').html(bodyHtml);
+
+
+
+            if (typeof window !== 'undefined' && typeof window.modalEventHandlersAttached === 'undefined') {
+                window.modalEventHandlersAttached = false;
+            }
+
+            if (!window.modalEventHandlersAttached) {
+
+                $('body').on('input', '.tag-search-input', function() {
+
+                    const searchText = $(this).val().toLowerCase();
+
+
+
+                    if (searchText.length === 0) {
+
+                        $('.letter-group').show();
+
+                        $('.modal-tag').show();
+
+                        return;
+
+                    }
+
+
+
+                    $('.letter-group').each(function() {
+
+                        const $group = $(this);
+
+                        let hasMatches = false;
+
+
+
+                        $group.find('.modal-tag').each(function() {
+
+                            const tagText = $(this).text().toLowerCase();
+
+                            const isMatch = tagText.includes(searchText);
+
+                            $(this).toggle(isMatch);
+
+                            if (isMatch) hasMatches = true;
+
+                        });
+
+
+
+                        $group.toggle(hasMatches || $group.find('.letter-header').text().toLowerCase().includes(searchText));
+
+                    });
+
+                });
+
+
+
+                $('body').on('click', '.modal-tag:not(.modal-tag-selected)', function() {
+
+                    const tagId = parseInt($(this).data('tag'));
+
+                    console.log(selectedTags);
+
+                    if (!selectedTags.includes(tagId)) {
+
+                        selectedTags.push(tagId);
+
+                        $(this)
+
+                            .addClass('modal-tag-selected')
+
+                            .attr('data-selected', 'true')
+
+                            .append('<span class="selected-check">✓</span>');
+
+
+
+                        filterGames();
+
+                    }
+
+                });
+
+
+
+                window.modalEventHandlersAttached = true;
+            }
+
+
+
+
+
+            const modalEl = new bootstrap.Modal(document.getElementById('tagsModal'));
+
+            modalEl.show();
+
+        }
+
+
+
+        function renderTagFilter() {
+
+            const tagsContainer = $('#tagsFilterContainer');
+
+            if (!tagsContainer.length) {
+
+                $('.filter-container').append(`
+
+                    <div class="filter-group">
+
+                        <div id="tagsFilterContainer" class="tags-filter-container"></div>
+
+                    </div>
+
+                `);
+
+            }
+
+
+
+            const container = $('#tagsFilterContainer');
+
+            container.empty();
+
+
+
+            selectedTags.forEach(tagId => {
+
+                const tagName = (typeof allAvailableTagsMap !== 'undefined' && allAvailableTagsMap instanceof Map)
+                    ? (allAvailableTagsMap.get(Number(tagId)) || allAvailableTags[tagId] || tagId)
+                    : (allAvailableTags[tagId] || tagId);
+
+                container.append(`
+
+                    <span class="filter-tag" data-tag="${tagId}">
+
+                        ${tagName} <span class="remove-tag"><i class="fas fa-times"></i></span>
+
+                    </span>
+
+                `);
+
+            });
+
+
+
+            container.append(`
+
+                <span class="filter-tag add-tag" id="addTagButton">
+
+                    <i class="fas fa-plus"></i> <span class="add-tag-text">Добавить тег</span>
+
+                </span>
+
+            `);
+
+
+
+            $('.remove-tag').on('click', function(e) {
+
+                e.stopPropagation();
+
+                const tagId = $(this).parent().data('tag');
+
+                selectedTags = selectedTags.filter(id => id !== tagId);
+
+                filterGames();
+
+            });
+
+
+
+            $('.modal-tag-selected').on('click', function(e) {
+
+                if (!$(this).hasClass('modal-tag-selected')) { return; }
+
+                e.stopPropagation();
+
+                const tagId = $(this).data('tag');
+
+                selectedTags = selectedTags.filter(id => id !== tagId);
+
+                filterGames();
+
+
+
+                $(this).removeClass('modal-tag-selected');
+
+                $(this).children()[0].remove()
+
+            })
+
+
+
+            $('#addTagButton').on('click', showTagModal);
+
+        }
+
+
+
+        function getRandomGame() {
+
+            if (filteredGames.length === 0) {
+
+                return null;
+
+            }
+
+            const randomIndex = Math.floor(Math.random() * filteredGames.length);
+
+            return filteredGames[randomIndex];
+
+        }
+
+
+
+        function renderGameInModal(game) {
+
+            if (!game) {
+
+                return '<div class="text-center py-5"><h4>Нет игр по текущим фильтрам</h4><p>Попробуйте изменить параметры фильтрации.</p></div>';
+
+            }
+
+
+
+            const discountColor = getColor(game.discount);
+
+            let bundleGamesHTML = '';
+
+            if (game.is_bundle && game.bundle_data && game.bundle_data.m_rgItems) {
+
+                bundleGamesHTML = `
+
+                    <div class="bundle-games-container">
+
+                        <div class="bundle-games-title">В составе: ${game.bundle_data.m_rgItems.length} игр:</div>
+
+                        <div class="bundle-games">
+
+                            ${game.bundle_data.m_rgItems.map(item => {
+
+                                const appID = item.m_rgIncludedAppIDs[0];
+
+                                const discount = Math.round((1 - item.m_nFinalPriceInCents / item.m_nBasePriceInCents) * 100);
+
+                                const foundGame = allGames.find(g => g.id === appID);
+
+                                return foundGame ? `
+
+                                    <div class="bundle-game">
+
+                                        <img src="${foundGame.image}" alt="${foundGame.title}">
+
+                                        <span class="bundle-game-name">${foundGame.title} -${discount}%</span>
+
+                                    </div>
+
+                                ` : '';
+
+                            }).join('')}
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+
+
+            return `
+
+                <div class="magic-card">
+
+                    <div class="magic-card-header" style="background: linear-gradient(90deg, ${discountColor} 0%, #1e1e1e 100%)">
+
+                        <div class="magic-card-image-container">
+
+                            <img class="magic-card-image" src="${game.image}"
+                                 alt="${game.title}"
+                                 loading="lazy"
+                                 onerror="handleImgError(this)"
+                                 data-appid="${game.id}"
+                                 data-src0="${game.image}"
+                                 data-alt1="${(buildAltUrls(game.image, game.id)[1]||'')}"
+                                 data-alt2="${(buildAltUrls(game.image, game.id)[2]||'')}"
+                                 data-alt3="${(buildAltUrls(game.image, game.id)[3]||'')}"
+                                 data-alt4="${(buildAltUrls(game.image, game.id)[4]||'')}"
+                                 data-alt5="${(buildAltUrls(game.image, game.id)[5]||'')}"
+                            >
+
+                        </div>
+
+                        <div class="magic-card-discount-container">
+
+                            <div class="magic-card-discount">-${game.discount}%</div>
+
+                            <div class="magic-card-price">${game.price} → ${game.price_final}</div>
+
+                        </div>
+
+                    </div>
+
+                    
+
+                    <div class="magic-card-body">
+
+                        <h2 class="magic-card-name">${game.title}</h2>
+
+                        
+
+                        <div class="magic-card-meta">
+
+                            <div class="magic-card-platform-icons">
+
+                                ${game.for_win ? '<img src="https://store.fastly.steamstatic.com/public/images/v6/icon_platform_win.png" class="magic-card-platform-icon" title="Windows" loading="lazy" onerror="this.style.display=\'none\';">' : ''}
+
+                                ${game.for_mac ? '<img src="https://store.fastly.steamstatic.com/public/images/v6/icon_platform_mac.png" class="magic-card-platform-icon" title="Mac" loading="lazy" onerror="this.style.display=\'none\';">' : ''}
+
+                                ${game.for_linux ? '<img src="https://store.fastly.steamstatic.com/public/images/v6/icon_platform_linux.png" class="magic-card-platform-icon" title="Linux" loading="lazy" onerror="this.style.display=\'none\';">' : ''}
+
+                            </div>
+
+                            <div style="display: flex; flex-direction: row; align-items: center; gap: 0.75rem;">
+
+                                ${game.vr_support ? '<span class="magic-card-vr-badge">VR</span>' : ''}
+
+                                <div class="magic-card-content-type">
+
+                                    ${game.is_bundle ? 'Bundle' : game.is_soundtrack ? 'Soundtrack' : (isDLC(game) ? 'DLC' : 'App')}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        
+
+                        <div class="magic-card-details">
+
+                            <div class="magic-card-section">
+
+                                <div class="magic-card-section-title">
+
+                                    <i class="fas fa-calendar-alt"></i>
+
+                                    <span>Дата выхода</span>
+
+                                </div>
+
+                                <div>${game.release || 'Н/Д'}</div>
+
+                            </div>
+
+                            
+
+                            ${game.review_users > 0 ? `
+
+                            <div class="magic-card-section">
+
+                                <div class="magic-card-section-title">
+
+                                    <i class="fas fa-star"></i>
+
+                                    <span>Обзоры</span>
+
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <img src="${getReviewIcon(game.review_score)}" class="review-icon" loading="lazy" onerror="this.style.display='none';">
+
+                                    <span style="color: ${getReviewColor(game.review_score)};">
+
+                                        ${game.review_percent}% (${game.review_users})
+
+                                    </span>
+
+                                </div>
+
+                                <div class="progress mt-2" style="height: 8px; background: rgba(255,255,255,0.1)">
+
+                                    <div class="progress-bar" role="progressbar" 
+
+                                         style="width: ${game.review_percent}%; background: ${getReviewColor(game.review_score)}">
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            ` : ''}
+
+                        </div>
+
+                        
+
+                        ${game.tags && game.tags.length > 0 ? `
+
+                            <div class="magic-card-section">
+
+                                <div class="magic-card-section-title">
+
+                                    <i class="fas fa-tags"></i>
+
+                                    <span>Теги</span>
+
+                                </div>
+
+                                <div class="magic-card-tags-container">
+
+                                    ${game.tags.map(tag => `<span class="magic-card-tag">${tag}</span>`).join('')}
+
+                                </div>
+
+                            </div>
+
+                        ` : ''}
+
+                        
+
+                        ${bundleGamesHTML}
+
+                        
+
+                        <div class="mt-4 text-center">
+
+                            <a href="${game.link}" class="btn btn-primary btn-lg" target="_blank" style="padding: 0.75rem 2rem;">
+
+                                <i class="fas fa-external-link-alt"></i> Открыть в Steam
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+
+
+        function showRandomGameModal() {
+
+            const randomGame = getRandomGame();
+
+            const modalBody = $('#magicModalBody');
+
+            
+
+            if (!randomGame) {
+
+                modalBody.html('<div class="text-center py-5"><h4>Нет игр по текущим фильтрам</h4><p>Попробуйте изменить параметры фильтрации.</p></div>');
+
+            } else {
+
+                modalBody.html(renderGameInModal(randomGame));
+
+            }
+
+            
+
+            const magicModal = new bootstrap.Modal(document.getElementById('magicModal'));
+
+            magicModal.show();
+
+        }
+
+
+
+        $(document).ready(() => {
+
+            const AGREEMENT_KEY = 'fs_agreement_accepted_v1';
+            try {
+                const agreed = localStorage.getItem(AGREEMENT_KEY) === '1';
+                const modalEl = document.getElementById('agreementModal');
+                if (modalEl) {
+                    const agreementModal = new bootstrap.Modal(modalEl, { backdrop: true, keyboard: true });
+                    if (!agreed) {
+                        agreementModal.show();
+                    }
+                    $('#agreeBtn').off('click').on('click', function() {
+                        try { localStorage.setItem(AGREEMENT_KEY, '1'); } catch(e) {}
+                        agreementModal.hide();
+                    });
+                    $('#disagreeBtn').off('click').on('click', function() {
+                        agreementModal.hide();
+                    });
+                    $('.language-switcher button').on('click', function() {
+                        $('.language-switcher button').removeClass('active');
+                        $(this).addClass('active');
+                        const newLang = $(this).data('lang');
+                        applyTranslations(newLang);
+                    });
+                }
+            } catch (e) {
+                console.warn('Agreement modal init error:', e);
+            }
+
+            try {
+                updateNotifyBtnUI();
+                $('#notifyBtn').off('click').on('click', async function() {
+                    const enabled = isNotifyEnabled();
+                    if (!enabled) {
+                        const ok = await ensureNotificationPermission();
+                        if (!ok) { return; }
+                        setNotifyEnabled(true);
+                        const currentIds = collectFreebieIds(allGames);
+                        storeSeenIds(currentIds);
+                    } else {
+                        setNotifyEnabled(false);
+                    }
+                    updateNotifyBtnUI();
+                });
+            } catch (_) {}
+
+            $('#winFilter').change(function() {
+
+                platformFilters.win = $(this).is(':checked');
+
+                filterGames();
+
+            });
+
+            
+
+            $('#macFilter').change(function() {
+
+                platformFilters.mac = $(this).is(':checked');
+
+                filterGames();
+
+            });
+
+            
+
+            $('#linuxFilter').change(function() {
+
+                platformFilters.linux = $(this).is(':checked');
+
+                filterGames();
+
+            });
+
+            
+
+            $('#vrFilter').change(function() {
+
+                vrFilter = $(this).is(':checked');
+
+                filterGames();
+
+            });
+
+            
+
+            $('#appFilter').change(function() {
+
+                appFilter = $(this).is(':checked');
+
+                filterGames();
+
+            });
+
+
+
+            $('#bundleFilter').change(function() {
+
+                bundleFilter = $(this).is(':checked');
+
+                filterGames();
+
+            });
+
+            
+
+            $('#soundtrackFilter').change(function() {
+
+                soundtrackFilter = $(this).is(':checked');
+
+                filterGames();
+
+            });
+
+
+
+            $('#dlcFilter').change(function() {
+                dlcFilter = $(this).is(':checked');
+                filterGames();
+            });
+
+
+
+            $('#sortField').change(function() {
+
+                sortField = $(this).val();
+
+                filterGames();
+
+            });
+
+
+
+            $('.sort-direction').click(function() {
+
+                $('.sort-direction').removeClass('active');
+
+                $(this).addClass('active');
+
+                
+
+                sortDirection = $(this).data('direction');
+
+                filterGames();
+
+            });
+
+
+
+            $('#magicButton').click(showRandomGameModal);
+
+
+
+            $('#tryAnotherButton').click(function() {
+
+                $('#tryAnotherButton').parent().parent().parent().parent().scrollTop(0);
+
+                const randomGame = getRandomGame();
+
+                if (randomGame) {
+
+                    $('#magicModalBody').html(renderGameInModal(randomGame));
+
+                }
+
+            });
+
+
+
+            $('#magicModal').on('click', function(e) {
+
+                if ($(e.target).is('#magicModal')) {
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('magicModal'));
+
+                    modal.hide();
+
+                }
+
+            });
+
+
+
+            $('#toggleFiltersBtn').on('click', function() {
+
+                const isMobile = window.matchMedia('(max-width: 992px)').matches;
+
+                if (isMobile) {
+
+                    $('body').toggleClass('sidebar-open');
+
+                    return;
+
+                }
+
+                $('body').toggleClass('sidebar-collapsed');
+
+                const textEl = $(this).find('.toolbar-toggle-text');
+
+                if ($('body').hasClass('sidebar-collapsed')) {
+
+                    textEl.text('Показать фильтры');
+
+                } else {
+
+                    textEl.text('Свернуть фильтры');
+
+                }
+
+            });
+
+
+
+            $('#densityBtn').on('click', function() {
+
+                $('body').toggleClass('compact');
+
+            });
+
+
+
+            $('#resetFiltersBtn').on('click', function() {
+
+                try {
+
+                    $('#nameFilter').val('');
+
+                    $('#minDiscount, #maxDiscount, #minPrice, #maxPrice, #minReviewPercent, #maxReviewPercent, #minReviewUsers, #maxReviewUsers').val('');
+
+                    if (discountSlider) discountSlider.set([0, 100]);
+                    if (priceSlider)    priceSlider.set([0, defaultMaxPrice]);
+                    if (reviewPercentSlider) reviewPercentSlider.set([0, 100]);
+                    if (reviewUsersSlider)   reviewUsersSlider.set([0, defaultMaxReviewUsers]);
+
+
+
+                    const uncheckIds = ['#winFilter','#macFilter','#linuxFilter','#vrFilter'];
+
+                    uncheckIds.forEach(sel => { const el = $(sel); if (el.length) el.prop('checked', false); });
+
+
+
+                    const checkIds = ['#appFilter','#bundleFilter','#soundtrackFilter'];
+
+                    checkIds.forEach(sel => { const el = $(sel); if (el.length) el.prop('checked', true); });
+
+
+
+                    const sortSel = $('#sortField');
+
+                    if (sortSel.length) { sortSel.val('popularity'); sortField = 'popularity'; }
+
+                    $('.sort-direction').removeClass('active');
+
+                    $('.sort-direction[data-direction="desc"]').addClass('active');
+
+                    sortDirection = 'desc';
+
+
+
+                    selectedTags = [];
+
+                    if (typeof renderTagFilters === 'function') renderTagFilters();
+
+
+
+                    if (typeof window !== 'undefined') window.currentPage = 1;
+
+                    if (typeof applyFilters === 'function') applyFilters(); else filterGames();
+
+                } catch (e) {
+
+                    console.error('Reset filters error:', e);
+
+                }
+
+            });
+
+
+
+            (function initLangCurrencySelectors(){
+                try {
+                    const langSel = document.getElementById('langSelect');
+                    const ccSel = document.getElementById('ccSelect');
+                    if (langSel) langSel.value = getStoredLang();
+                    if (ccSel) ccSel.value = getStoredCC();
+                    if (langSel) langSel.addEventListener('change', () => {
+                        setStoredLang(langSel.value);
+                        initialAsyncLoad(true);
+                    });
+                    if (ccSel) ccSel.addEventListener('change', () => {
+                        setStoredCC(ccSel.value);
+                        initialAsyncLoad(true);
+                    });
+                } catch(_) {}
+            })();
+
+            function initialAsyncLoad(forceShowLoading = false) {
+                const bust = Date.now();
+                const mySeq = ++dataLoadSeq;
+                if (forceShowLoading) { try { $('.loading').fadeIn(); } catch(_) {} }
+                const pTags = $.getJSON(`./tags.json?t=${bust}`);
+                const urls = buildDataUrls(bust);
+                const p1 = fetchFirstAvailableJson(urls.part1);
+                const p2 = fetchFirstAvailableJson(urls.part2);
+
+                $.when(pTags, p1, p2)
+                    .done((tagsResp, data1, data2) => {
+                        if (mySeq !== dataLoadSeq) { try { console.warn('[FreeSteam] Stale load ignored (initial)'); } catch(_) {} return; }
+                        const steamTags = (tagsResp && tagsResp[0]) || tagsResp || {};
+                        data1 = data1 || { free_list: [] };
+                        data2 = data2 || { free_list: [] };
+
+                        allAvailableTags = steamTags;
+                        window.allAvailableTagsMap = new Map(
+                            Object.entries(steamTags).map(([k, v]) => [Number(k), v])
+                        );
+
+                        const merged = {
+                            ...data1,
+                            free_list: (data1.free_list || []).concat(data2.free_list || []),
+                            update_time: data2.update_time || data1.update_time || ''
+                        };
+
+                        if (merged.update_time) {
+                            $('#uptime').text(merged.update_time);
+                        }
+
+                        let maxPrice = 0;
+                        let maxReviewUsers = 0;
+
+                        allGames = merged.free_list.map(item => {
+                            item.price_numeric = parseFloat((item.price_final || '').replace(/[^\d.]/g, '')) || 0;
+                            item.base_price_numeric = parseFloat((item.price || '').replace(/[^\d.]/g, '')) || 0;
+                            item.tags_numeric = item.tags;
+                            item.tags = (item.tags_numeric || []).map(id => (allAvailableTagsMap.get(Number(id)) || allAvailableTags[id] || String(id)));
+
+                            maxPrice = Math.max(maxPrice, item.price_numeric);
+                            maxReviewUsers = Math.max(maxReviewUsers, item.review_users || 0);
+                            return item;
+                        });
+
+                        try {
+                            if (discountSlider && typeof discountSlider.destroy === 'function') discountSlider.destroy();
+                        } catch(_) {}
+                        try {
+                            if (priceSlider && typeof priceSlider.destroy === 'function') priceSlider.destroy();
+                        } catch(_) {}
+                        try {
+                            if (reviewPercentSlider && typeof reviewPercentSlider.destroy === 'function') reviewPercentSlider.destroy();
+                        } catch(_) {}
+                        try {
+                            if (reviewUsersSlider && typeof reviewUsersSlider.destroy === 'function') reviewUsersSlider.destroy();
+                        } catch(_) {}
+
+                        initSliders(maxPrice, maxReviewUsers);
+
+                        $('#nameFilter').off('input', debouncedFilter).on('input', debouncedFilter);
+                        filterGames();
+                        $(document.body).css('overflow', 'auto');
+                        try { if (mySeq === dataLoadSeq) $('.loading').fadeOut(); } catch(_) {}
+                    })
+                    .fail(() => {
+                        if (mySeq !== dataLoadSeq) return;
+                        console.error('Error loading initial data');
+                        try { $('.loading').fadeOut(); } catch(_) {}
+                    });
+            }
+            initialAsyncLoad(false);
+
+            (function setupAutoRefresh() {
+                const AUTO_REFRESH_MINUTES = 10;
+
+                function refreshData() {
+                    const bust = Date.now();
+                    const mySeq = ++dataLoadSeq;
+                    const urls = buildDataUrls(bust);
+                    const p1 = fetchFirstAvailableJson(urls.part1);
+                    const p2 = fetchFirstAvailableJson(urls.part2);
+
+                    $.when(p1, p2)
+                        .done((data1, data2) => {
+                            if (mySeq !== dataLoadSeq) { try { console.warn('[FreeSteam] Stale load ignored (refresh)'); } catch(_) {} return; }
+
+                            const merged = {
+                                ...data1,
+                                free_list: (data1.free_list || []).concat(data2.free_list || []),
+                                update_time: data2.update_time || data1.update_time || ''
+                            };
+
+                            if (merged.update_time) {
+                                $('#uptime').text(merged.update_time);
+                            }
+
+                            allGames = merged.free_list.map(item => {
+                                item.price_numeric = parseFloat((item.price_final || '').replace(/[^\d.]/g, '')) || 0;
+                                item.base_price_numeric = parseFloat((item.price || '').replace(/[^\d.]/g, '')) || 0;
+                                item.tags_numeric = item.tags;
+                                item.tags = (item.tags_numeric || []).map(id => (allAvailableTagsMap.get(Number(id)) || allAvailableTags[id] || String(id)));
+                                return item;
+                            });
+
+                            try {
+                                if (isNotifyEnabled() && ('Notification' in window) && Notification.permission === 'granted') {
+                                    const currentFreebies = allGames.filter(g => Number(g.discount) >= 100);
+                                    const currentIds = currentFreebies.map(g => g.id);
+                                    let seen = getStoredSeenIds();
+                                    const newIds = currentIds.filter(id => !seen.includes(id));
+                                    if (newIds.length > 0) {
+                                        const newGames = currentFreebies.filter(g => newIds.includes(g.id));
+                                        sendFreebiesNotification(newGames);
+                                        seen = uniq(seen.concat(newIds));
+                                        storeSeenIds(seen);
+                                    }
+                                }
+                            } catch (_) {}
+
+                            if (typeof applyFilters === 'function') applyFilters(); else filterGames();
+                        })
+                        .fail(() => {
+                            if (mySeq !== dataLoadSeq) return;
+                            console.error('Auto-refresh: error loading games data');
+                        });
+                }
+
+                setInterval(refreshData, AUTO_REFRESH_MINUTES * 60 * 1000);
+            })();
+
+        });
+
+
+        const translations = {
+            'ru': {
+                'filters': 'Фильтры',
+                'search': 'Поиск',
+                'search_placeholder': 'Поиск игры...',
+                'discount_range': 'Диапазон скидок',
+                'price_range': 'Диапазон цен',
+                'review_percent': 'Процент положительных обзоров',
+                'review_users': 'Количество обзоров',
+                'tags': 'Теги',
+                'platforms': 'Платформы',
+                'type': 'Тип',
+                'vr': 'VR',
+                'sort_by': 'Сортировать по',
+                'desc': 'По убыванию',
+                'asc': 'По возрастанию',
+                'toggle_filters': 'Свернуть/показать фильтры',
+                'reset': 'Сбросить',
+                'randomly': 'Случайная',
+                'compact': 'Компактный',
+                'free_games': 'Бесплатные игры:',
+                'leader': 'Лидеры',
+                'popular': 'Популярно',
+                'no_games': '🤷‍♂️ Ничего не найдено',
+                'change_filters': 'Попробуйте изменить фильтры.',
+                'last_update': 'Последнее обновление (UTC+3):',
+                'open_github': 'Открыть на GitHub',
+                'close': 'Закрыть',
+                'try_another': 'Мне повезёт',
+                'agree': 'Согласен',
+                'disagree': 'Не согласен',
+                'games': 'Игры',
+                'bundles': 'Наборы',
+                'soundtracks': 'Саундтреки',
+                'in_bundle': 'В составе:',
+                'open_on_steam': 'Открыть в Steam',
+                'agreement_title': 'Пользовательское соглашение',
+                'agreement_body': 'Используя этот сайт, вы соглашаетесь, что информация о скидках предоставляется «как есть». Вы самостоятельно несёте ответственность за проверку актуальности предложений в магазине Steam.',
+                'notifications_on': 'Уведомления: Вкл',
+                'notifications': 'Уведомления',
+                'app': 'Приложение',
+                'dlc': 'DLC'
+            },
+            'en': {
+                'filters': 'Filters',
+                'search': 'Search',
+                'search_placeholder': 'Search game...',
+                'discount_range': 'Discount range',
+                'price_range': 'Price range',
+                'review_percent': 'Positive review percentage',
+                'review_users': 'Review count',
+                'tags': 'Tags',
+                'platforms': 'Platforms',
+                'type': 'Type',
+                'vr': 'VR',
+                'sort_by': 'Sort by',
+                'desc': 'Desc',
+                'asc': 'Asc',
+                'toggle_filters': 'Toggle filters',
+                'reset': 'Reset',
+                'randomly': 'Randomly',
+                'compact': 'Compact',
+                'free_games': 'Free games:',
+                'leader': 'Leader',
+                'popular': 'Popular',
+                'no_games': '🤷‍♂️ Nothing found',
+                'change_filters': 'Try changing the filters.',
+                'last_update': 'Last update (UTC+3):',
+                'open_github': 'Open on GitHub',
+                'close': 'Close',
+                'try_another': 'Me lucky',
+                'agree': 'Agree',
+                'disagree': 'Disagree',
+                'games': 'Games',
+                'bundles': 'Bundles',
+                'soundtracks': 'Soundtracks',
+                'in_bundle': 'In bundle:',
+                'open_on_steam': 'Open on Steam',
+                'agreement_title': 'Agreement',
+                'agreement_body': 'Using this site, you agree that information about offers and discounts is provided "as is", without warranties. You assume responsibility for checking the accuracy of offers in the Steam store.',
+                'notifications_on': 'Notifications: On',
+                'notifications': 'Notifications',
+                'app': 'App',
+                'dlc': 'DLC'
+            }
+        };
+
+        let currentLang = (typeof getStoredLang === 'function' ? getStoredLang() : 'ru');
+
+        function applyTranslations(lang) {
+            currentLang = lang;
+            
+            document.querySelectorAll('[data-translate-key]').forEach(el => {
+                const key = el.getAttribute('data-translate-key');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+
+            document.getElementById('nameFilter').placeholder = translations[lang]['search_placeholder'];
+    
+            const isSidebarCollapsed = $('body').hasClass('sidebar-collapsed');
+            $('#toggleFiltersBtn span').text(isSidebarCollapsed ? translations[lang]['toggle_filters'] : translations[lang]['toggle_filters']);
+    
+            
+            $('#magicModal .modal-title span').text(translations[lang]['randomly']);
+            $('#magicModal .btn-secondary span').text(translations[lang]['close']);
+            $('#tryAnotherButton span').text(translations[lang]['try_another']);
+
+            const $agreeTitle = $('#agreementModal .modal-title');
+            if ($agreeTitle.length) {
+                $agreeTitle.html(`<i class="fas fa-file-contract me-2"></i>${translations[lang]['agreement_title']}`);
+            }
+            $('#agreementModal .modal-body p:first-child').text(translations[lang]['agreement_body']);
+            $('#agreeBtn').text(translations[lang]['agree']);
+            $('#disagreeBtn').text(translations[lang]['disagree']);
+
+            updateNotifyBtnUI();
+
+            if (lang === 'ru') { $('#langRu').addClass('active'); $('#langEn').removeClass('active'); }
+            else { $('#langEn').addClass('active'); $('#langRu').removeClass('active'); }
+        }
+
+        function setLanguage(lang) {
+            try { setStoredLang && setStoredLang(lang); } catch(_) {}
+            try { applyTranslations && applyTranslations(lang); } catch(_) {}
+        }
+
+        
+        try {
+            const btnRu = document.getElementById('langRu');
+            const btnEn = document.getElementById('langEn');
+            if (btnRu) btnRu.addEventListener('click', () => setLanguage('ru'));
+            if (btnEn) btnEn.addEventListener('click', () => setLanguage('en'));
+        } catch(_) {}
+
+        try { applyTranslations(currentLang); } catch (_) {}
+
+    </script>
+
+</body>
+
+</html>
