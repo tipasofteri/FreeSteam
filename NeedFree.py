@@ -286,21 +286,29 @@ if __name__ == "__main__":
     parser.add_argument("--cc", default="us", help="Код страны Steam для валюты (например: ru, us, de, gb, tr, kz)")
     parser.add_argument("--lang", default="english", help="Язык интерфейса Steam (например: russian, english, german, spanish, french, turkish)")
     parser.add_argument("--interval", type=int, default=3600, help="Интервал обновления в секундах (по умолчанию: 3600 = 1 час)")
+    parser.add_argument("--once", action="store_true", help="Выполнить один прогон и выйти")
     args = parser.parse_args()
 
     # Построить сессию с нужным языком
     session = build_session(args.lang)
 
     try:
-        while True:
-            try:
-                total = run_crawl(session, args.cc, args.lang)
-                now = datetime.datetime.now(tz=pytz.timezone("Europe/Moscow")).strftime('%Y-%m-%d %H:%M:%S')
-                print(f"[{now}] FreeSteam: обновление завершено, найдено записей: {total}")
-            except Exception as ex:
-                print(f"FreeSteam: ошибка выполнения: {ex}")
-            # Пауза до следующего запуска
-            time.sleep(args.interval)
+        if args.once:
+            # Одноразовый запуск
+            total = run_crawl(session, args.cc, args.lang)
+            now = datetime.datetime.now(tz=pytz.timezone("Europe/Moscow")).strftime('%Y-%m-%d %H:%M:%S')
+            print(f"[{now}] FreeSteam: одноразовое обновление завершено, найдено записей: {total}")
+        else:
+            # Непрерывный режим
+            while True:
+                try:
+                    total = run_crawl(session, args.cc, args.lang)
+                    now = datetime.datetime.now(tz=pytz.timezone("Europe/Moscow")).strftime('%Y-%m-%d %H:%M:%S')
+                    print(f"[{now}] FreeSteam: обновление завершено, найдено записей: {total}")
+                except Exception as ex:
+                    print(f"FreeSteam: ошибка выполнения: {ex}")
+                # Пауза до следующего запуска
+                time.sleep(args.interval)
     except KeyboardInterrupt:
         print("FreeSteam: остановлено пользователем (KeyboardInterrupt)")
 
