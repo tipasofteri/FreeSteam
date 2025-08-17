@@ -43,7 +43,6 @@ jobs:
           git fetch origin
           git pull --rebase origin main || true
           # Не делаем reset --hard, чтобы не потерять сгенерированные файлы перед коммитом
-          
           # ВНИМАНИЕ: добавляем только частичные файлы, чтобы избежать лимита GitHub (>100MB)
           git add free_goods_detail_part*.json || true
           git add data/**/free_goods_detail_part*.json || true
@@ -53,3 +52,16 @@ jobs:
             git commit -m "chore: update free goods $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
             git push
           fi
+
+      - name: Trigger Vercel deploy hook (if changes were pushed)
+        if: ${{ success() }}
+        run: |
+          LAST_MSG="$(git log -1 --pretty=%B || true)"
+          if echo "$LAST_MSG" | grep -q "chore: update free goods"; then
+            curl -X POST "$VERCEL_DEPLOY_HOOK_URL"
+            echo "Deploy hook triggered."
+          else
+            echo "No new commit; skipping deploy hook."
+          fi
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
