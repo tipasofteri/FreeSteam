@@ -43,7 +43,8 @@ jobs:
           git fetch origin
           git pull --rebase origin main || true
           
-          git add free_goods_detail*.json data/** || true
+          # ВНИМАНИЕ: не добавляем монолитный free_goods_detail.json (>100MB)
+          git add free_goods_detail_part*.json data/** || true
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
