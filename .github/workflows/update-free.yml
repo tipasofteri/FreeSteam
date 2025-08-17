@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # нужна полная история для rebase
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -33,10 +35,14 @@ jobs:
         run: |
           python NeedFree.py --cc us --lang english --once
 
-      - name: Commit and push changes if any
+      - name: Commit and push changes if any (with rebase)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # подтянуть последние изменения, чтобы избежать non-fast-forward
+          git fetch origin
+          git pull --rebase origin main || true
+          
           git add free_goods_detail*.json data/** || true
           if git diff --cached --quiet; then
             echo "No data changes to commit."
