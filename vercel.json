@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/index", "destination": "/", "permanent": true },
+    { "source": "/index.html", "destination": "/", "permanent": true }
+  ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.py" }
   ]
