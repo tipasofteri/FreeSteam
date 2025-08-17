@@ -235,10 +235,9 @@ def run_crawl(session: requests.Session, cc: str, lang: str):
     final_free_list_part1 = final_free_list[:len(final_free_list)//2]
     final_free_list_part2 = final_free_list[len(final_free_list)//2:]
 
-    # Базовые файлы (обратная совместимость)
+    # Базовые файлы (обратная совместимость): сохраняем только частичные файлы
     base_part1 = "free_goods_detail_part1.json"
     base_part2 = "free_goods_detail_part2.json"
-    base_full  = "free_goods_detail.json"
 
     with open(base_part1, "w", encoding="utf-8") as fp:
         json.dump({
@@ -254,12 +253,7 @@ def run_crawl(session: requests.Session, cc: str, lang: str):
             "update_time": today.strftime('%Y-%m-%d %H:%M:%S')
         }, fp, ensure_ascii=False)
 
-    with open(base_full, "w", encoding="utf-8") as fp:
-        json.dump({
-            "total_count": len(final_free_list),
-            "free_list": final_free_list,
-            "update_time": today.strftime('%Y-%m-%d %H:%M:%S')
-        }, fp, ensure_ascii=False)
+    # Не создаём монолитный файл free_goods_detail.json, чтобы не превышать лимиты GitHub
 
     # Языкоспецифичные копии
     out_dir = os.path.join("data", lang)
@@ -271,12 +265,11 @@ def run_crawl(session: requests.Session, cc: str, lang: str):
 
     payload_part1 = {"total_count": len(final_free_list_part1), "free_list": final_free_list_part1, "update_time": today.strftime('%Y-%m-%d %H:%M:%S')}
     payload_part2 = {"total_count": len(final_free_list_part2), "free_list": final_free_list_part2, "update_time": today.strftime('%Y-%m-%d %H:%M:%S')}
-    payload_full  = {"total_count": len(final_free_list),       "free_list": final_free_list,       "update_time": today.strftime('%Y-%m-%d %H:%M:%S')}
 
     # Папка data/<lang>/...
     save_json(os.path.join(out_dir, "free_goods_detail_part1.json"), payload_part1)
     save_json(os.path.join(out_dir, "free_goods_detail_part2.json"), payload_part2)
-    save_json(os.path.join(out_dir, "free_goods_detail.json"),      payload_full)
+    # Не создаём монолитный файл data/<lang>/free_goods_detail.json
 
     return len(final_free_list)
 
