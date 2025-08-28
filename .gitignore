@@ -1,4 +1,1 @@
-.vercel
-# Игнорировать монолитные JSON (слишком большие для GitHub)
-free_goods_detail.json
-data/**/free_goods_detail.json
+
