@@ -2,10 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="theme-color" content="#1b2838">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Бесплатные игры - FreeSteam</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -28,10 +25,9 @@
             background: rgba(42, 63, 90, 0.6);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             overflow: hidden;
             height: 100%;
-            margin-bottom: 1rem;
         }
         
         .game-card:hover {
@@ -42,7 +38,7 @@
         
         .game-image {
             width: 100%;
-            height: 160px;
+            height: 180px;
             object-fit: cover;
             border-bottom: 1px solid var(--border-color);
         }
@@ -69,14 +65,12 @@
             color: var(--primary);
             font-weight: 600;
             border-radius: 0 0 6px 6px;
-            padding: 0.75rem 0.5rem;
+            padding: 0.5rem;
             transition: all 0.2s;
             width: 100%;
             text-align: center;
             text-decoration: none;
             display: block;
-            font-size: 0.95rem;
-            -webkit-tap-highlight-color: transparent;
         }
         
         .btn-steam:hover {
@@ -98,68 +92,14 @@
         }
         
         .spinner {
-            width: 150px;
-            height: 150px;
-            background: url('loading1.gif') center/contain no-repeat;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('loading1.gif') center/cover no-repeat;
+            background-color: #1b2838;
             z-index: 10000;
-        }
-        
-        /* Mobile optimizations */
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 10px;
-            }
-            
-            .game-card {
-                margin-bottom: 0.75rem;
-            }
-            
-            .game-image {
-                height: 140px;
-            }
-            
-            .game-title {
-                font-size: 0.9rem;
-                margin: 0.75rem 0.75rem 0.5rem;
-            }
-            
-            .btn-back {
-                padding: 0.5rem 1rem;
-                font-size: 0.9rem;
-                margin: 1rem 0;
-            }
-            
-            .page-title {
-                font-size: 1.5rem;
-                margin: 0.75rem 0;
-            }
-            
-            .spinner {
-                width: 120px;
-                height: 120px;
-            }
-        }
-        
-        /* Very small devices */
-        @media (max-width: 400px) {
-            .game-image {
-                height: 120px;
-            }
-            
-            .game-title {
-                font-size: 0.85rem;
-                margin: 0.5rem 0.5rem 0.25rem;
-            }
-            
-            .game-price {
-                font-size: 0.9rem;
-                padding: 0 0.5rem 0.75rem;
-            }
-        }
-        
-        .loading-overlay {
-            background: rgba(23, 26, 33, 0.95);
         }
         
         /* Fallback in case GIF doesn't load */
@@ -184,7 +124,7 @@
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="m-0">
-                    <i class="fas fa-gamepad me-3"></i>100% бесплатные игры
+                    <i class="fas fa-gamepad me-3"></i>Бесплатные игры
                 </h1>
                 <a href="index.html" class="btn btn-outline-light">
                     <i class="fas fa-arrow-left me-2"></i>На главную
