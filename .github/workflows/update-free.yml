@@ -40,7 +40,7 @@ jobs:
 
       - name: Run crawler (one-shot)
         run: |
-          python NeedFree.py --cc us --lang english --once
+          python NeedFree.py
 
       - name: Commit and push changes if any (safe rebase)
         run: |
