@@ -20,7 +20,6 @@ THREAD_CNT = 4
 
 free_list = queue.Queue()
 
-# Глобальная сессия с ретраями и куки
 _DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
     "Accept": "application/json, text/javascript, */*; q=0.01",
@@ -44,14 +43,11 @@ def build_session(lang: str):
     adapter = HTTPAdapter(max_retries=retries)
     session.mount("http://", adapter)
     session.mount("https://", adapter)
-    # Базовые заголовки
     session.headers.update(_DEFAULT_HEADERS)
-    # Подменим Accept-Language под выбранный язык
     lang_to_accept = {
         "english": "en-US,en;q=0.9",
     }
     session.headers["Accept-Language"] = lang_to_accept.get(lang, "en-US,en;q=0.9")
-    # Язык кукой влияет на ответы магазина
     cookies = dict(_DEFAULT_COOKIES)
     cookies["Steam_Language"] = lang
     session.cookies.update(cookies)
@@ -63,16 +59,13 @@ def fetch_Steam_json_response(url, session: requests.Session):
 
     return:         json content
     '''
-    # Заголовки и куки уже заданы на уровне сессии
     max_retries = 5
-    # Короткий контрольный бэкофф
     backoffs = [1, 2, 3, 5, 5]
     attempt = 0
     while attempt < max_retries:
         try:
             response = session.get(url, timeout=10)
             response.raise_for_status()
-            # Проверяем, что пришёл JSON; иначе — это, вероятно, защита и/или HTML.
             ctype = (response.headers.get("Content-Type") or "").lower()
             if "application/json" not in ctype:
                 preview = response.text[:200].replace("\n", " ")
@@ -98,11 +91,9 @@ def get_free_goods(start, append_list = False, session: requests.Session = None,
     '''
 
     global free_list
-    # Сокращаем внутренние повторы: основной ретрай уже внутри fetch_Steam_json_response
     retry_time = 0
 
     while retry_time >= 0:
-        # Небольшой джиттер, чтобы не дергать все страницы одновременно
         time.sleep(random.uniform(0.2, 0.6))
         print(f"[FreeSteam] Загрузка страницы start={start}")
         url = API_URL_TEMPLATE.format(pos=start, cc=cc, lang=lang)
@@ -177,16 +168,13 @@ def get_free_goods(start, append_list = False, session: requests.Session = None,
     return 0
 
 def run_crawl(session: requests.Session, cc: str, lang: str):
-    # Получить общее число записей (без добавления в очередь)
     tryget_first_page = get_free_goods(0, False, session, cc, lang)
     total_count = tryget_first_page
 
-    # Параллельная загрузка
     threads = ThreadPoolExecutor(max_workers=THREAD_CNT)
     futures = [threads.submit(get_free_goods, index, True, session, cc, lang) for index in range(0, total_count, 100)]
     wait(futures, return_when=ALL_COMPLETED)
 
-    # Сборка итогового списка
     final_free_list = []
     free_ids = set()
     while not free_list.empty():
@@ -230,12 +218,10 @@ def run_crawl(session: requests.Session, cc: str, lang: str):
         free_ids.add(game_id)
         final_free_list.append(free_item)
 
-    # Сохранение результатов: стандартные файлы + языкоспецифичные
     today = datetime.datetime.now(tz=pytz.timezone("Europe/Moscow"))
     final_free_list_part1 = final_free_list[:len(final_free_list)//2]
     final_free_list_part2 = final_free_list[len(final_free_list)//2:]
 
-    # Базовые файлы (обратная совместимость): сохраняем только частичные файлы
     base_part1 = "free_goods_detail_part1.json"
     base_part2 = "free_goods_detail_part2.json"
 
@@ -253,9 +239,7 @@ def run_crawl(session: requests.Session, cc: str, lang: str):
             "update_time": today.strftime('%Y-%m-%d %H:%M:%S')
         }, fp, ensure_ascii=False)
 
-    # Не создаём монолитный файл free_goods_detail.json, чтобы не превышать лимиты GitHub
 
-    # Языкоспецифичные копии
     out_dir = os.path.join("data", lang)
     os.makedirs(out_dir, exist_ok=True)
 
@@ -266,10 +250,8 @@ def run_crawl(session: requests.Session, cc: str, lang: str):
     payload_part1 = {"total_count": len(final_free_list_part1), "free_list": final_free_list_part1, "update_time": today.strftime('%Y-%m-%d %H:%M:%S')}
     payload_part2 = {"total_count": len(final_free_list_part2), "free_list": final_free_list_part2, "update_time": today.strftime('%Y-%m-%d %H:%M:%S')}
 
-    # Папка data/<lang>/...
     save_json(os.path.join(out_dir, "free_goods_detail_part1.json"), payload_part1)
     save_json(os.path.join(out_dir, "free_goods_detail_part2.json"), payload_part2)
-    # Не создаём монолитный файл data/<lang>/free_goods_detail.json
 
     return len(final_free_list)
 
@@ -282,17 +264,14 @@ if __name__ == "__main__":
     parser.add_argument("--once", action="store_true", help="Выполнить один прогон и выйти")
     args = parser.parse_args()
 
-    # Построить сессию с нужным языком
     session = build_session(args.lang)
 
     try:
         if args.once:
-            # Одноразовый запуск
             total = run_crawl(session, args.cc, args.lang)
             now = datetime.datetime.now(tz=pytz.timezone("Europe/Moscow")).strftime('%Y-%m-%d %H:%M:%S')
             print(f"[{now}] FreeSteam: одноразовое обновление завершено, найдено записей: {total}")
         else:
-            # Непрерывный режим
             while True:
                 try:
                     total = run_crawl(session, args.cc, args.lang)
@@ -300,7 +279,6 @@ if __name__ == "__main__":
                     print(f"[{now}] FreeSteam: обновление завершено, найдено записей: {total}")
                 except Exception as ex:
                     print(f"FreeSteam: ошибка выполнения: {ex}")
-                # Пауза до следующего запуска
                 time.sleep(args.interval)
     except KeyboardInterrupt:
         print("FreeSteam: остановлено пользователем (KeyboardInterrupt)")
