@@ -2,7 +2,7 @@ name: Update FreeSteam data
 
 on:
   schedule:
-    - cron: "0 * * * *"  # ежечасно
+    - cron: "0 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -46,22 +46,20 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # ВНИМАНИЕ: добавляем только частичные файлы, чтобы избежать лимита GitHub (>100MB)
           git add free_goods_detail_part*.json || true
           git add data/**/free_goods_detail_part*.json || true
+          git add free_goods_detail.json || true
+          git add data/**/free_goods_detail.json || true
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
-            # На случай, если за время генерации пришли новые коммиты: временно убираем локальные изменения
             git stash push -u -m "auto-stash-before-rebase" || true
             git fetch origin
             git pull --rebase origin main || true
-            # Вернём изменения и подготовим к коммиту
             git stash pop || true
             git add free_goods_detail_part*.json || true
             git add data/**/free_goods_detail_part*.json || true
             git commit -m "chore: update free goods $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
-            # Пробуем пуш; если non-fast-forward из-за гонки — подтянем и повторим
             git push || {
               echo "Push rejected, retrying after rebase...";
               git fetch origin;
@@ -80,5 +78,3 @@ jobs:
           else
             echo "No new commit; skipping deploy hook."
           fi
-        env:
-          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
