@@ -5985,6 +5985,34 @@ input::-webkit-inner-spin-button {
 
         try { applyTranslations(currentLang); } catch (_) {}
 
+        // Function to show notification on page load
+        function showPageLoadNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'slide-notification show';
+            notification.innerHTML = `
+                <div class="notif-header">
+                    <h3 class="notif-title"><i class="fas fa-gift"></i> FreeSteam</h3>
+                    <button class="notif-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+                </div>
+                <div class="notif-meta">Новые бесплатные игры</div>
+                <div class="notif-desc">Проверьте список бесплатных игр, которые стали доступны!</div>
+                <a href="free_games.html" class="notif-link" target="_blank">
+                    Показать список <i class="fas fa-arrow-right"></i>
+                </a>
+            `;
+            document.body.appendChild(notification);
+            
+            // Auto-remove notification after 10 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 10000);
+        }
+
+        // Show notification when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Small delay to ensure all elements are loaded
+            setTimeout(showPageLoadNotification, 1000);
+        });
     </script>
 
 </body>
