@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бесплатные игры - FreeSteam</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #1b1f26;
+            color: #e9e9e9;
+        }
+        .modal-content {
+            background-color: #2d333b;
+            border: 1px solid #444c56;
+        }
+        .list-group-item {
+            background-color: #2d333b;
+            color: #e9e9e9;
+            border-color: #444c56;
+        }
+        .list-group-item:hover {
+            background-color: #373e47;
+        }
+    </style>
+</head>
+<body>
+    <!-- Free Games Modal -->
+    <div class="modal fade" id="freeGamesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title"><i class="fas fa-gamepad me-2"></i>Бесплатные игры</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="freeGamesList" class="list-group">
+                        <div class="d-flex justify-content-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Загрузка...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <small class="text-muted" id="lastUpdateTime"></small>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Function to load and show free games
+        async function loadAndShowFreeGames() {
+            try {
+                const response = await fetch('https://raw.githubusercontent.com/InJeCTrL/NeedFree/master/free_goods_detail.json');
+                const data = await response.json();
+                
+                const gamesList = document.getElementById('freeGamesList');
+                const lastUpdate = document.getElementById('lastUpdateTime');
+                
+                if (data.free_list && data.free_list.length > 0) {
+                    gamesList.innerHTML = data.free_list.map(game => `
+                        <a href="${game[1]}" target="_blank" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">${game[0]}</h6>
+                                <small class="text-success">Бесплатно</small>
+                            </div>
+                            <small class="text-muted">${new URL(game[1]).hostname}</small>
+                        </a>
+                    `).join('');
+                    
+                    if (data.update_time) {
+                        lastUpdate.textContent = `Обновлено: ${data.update_time}`;
+                    }
+                    
+                    // Show the modal
+                    const modal = new bootstrap.Modal(document.getElementById('freeGamesModal'));
+                    modal.show();
+                } else {
+                    gamesList.innerHTML = '<div class="text-center p-3">Нет доступных бесплатных игр</div>';
+                }
+            } catch (error) {
+                console.error('Ошибка при загрузке списка игр:', error);
+                if (gamesList) {
+                    gamesList.innerHTML = '<div class="alert alert-danger">Ошибка при загрузке списка игр</div>';
+                }
+            }
+        }
+
+        // Show modal when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize modal
+            const modal = new bootstrap.Modal(document.getElementById('freeGamesModal'));
+            modal.show();
+            
+            // Load games
+            loadAndShowFreeGames();
+        });
+    </script>
+</body>
+</html>
