@@ -22,12 +22,182 @@
 
 <style>
 
+/* Slide Notification Styles */
+.slide-notification {
+    position: fixed;
+    top: 20px;
+    right: -400px;
+    width: 380px;
+    background: linear-gradient(120deg, #1b1f26 0%, #0f1319 100%);
+    border-left: 4px solid #4caf50;
+    border-radius: 8px 0 0 8px;
+    box-shadow: -5px 5px 25px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    padding: 18px 20px;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    z-index: 1000;
+    transition: right 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    backdrop-filter: blur(10px);
+}
+
+.slide-notification.show {
+    right: 0;
+}
+
+.slide-notification .notif-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.slide-notification .notif-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #4caf50;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.01em;
+}
+
+.slide-notification .notif-title .fa-gift {
+    color: #ffe082;
+    filter: drop-shadow(0 0 4px #ffe08275);
+    font-size: 1.4rem;
+}
+
+.slide-notification .notif-close {
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.slide-notification .notif-close:hover {
+    color: #fff;
+}
+
+.slide-notification .notif-meta {
+    font-size: 0.85rem;
+    color: #8e9ba8;
+    margin-bottom: 10px;
+}
+
+.slide-notification .notif-desc {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.slide-notification .notif-link {
+    color: #4caf50;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.slide-notification .notif-link:hover {
+    color: #6fbf73;
+    text-decoration: underline;
+}
+
+.slide-notification .notif-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.slide-notification .notif-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+    text-align: center;
+}
+
+.slide-notification .btn-primary {
+    background: #4caf50;
+    color: white;
+}
+
+.slide-notification .btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+}
+
+.slide-notification .btn-primary:hover {
+    background: #3d8b40;
+}
+
+.slide-notification .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+.notification-freebie .notif-meta {
+    font-size: 0.97rem;
+    font-weight: 400;
+    color: #6dd3a7;
+    margin-bottom: .5rem;
+    opacity: .88;
+}
+.notification-freebie .notif-desc {
+    margin-bottom: 0.6rem;
+    font-size: 1.01rem;
+    color: #e0ffe8;
+    line-height: 1.5;
+}
+.notification-freebie .notif-link {
+    display: inline-block;
+    background: linear-gradient(90deg, #4CAF50 60%, #2196F3 100%);
+    color: #fff !important;
+    font-weight: 600;
+    padding: 0.52em 1.2em;
+    border-radius: 9999px;
+    font-size: 1rem;
+    text-decoration: none;
+    box-shadow: 0 2px 10px rgba(76,175,80,0.14);
+    margin-bottom: 0.3rem;
+    transition: background .2s, transform .13s;
+}
+.notification-freebie .notif-link:hover {
+    background: linear-gradient(90deg, #43a047 30%, #1976d2 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+.notification-freebie .notif-instruction {
+    margin-top: 0.8rem;
+    font-size: 0.98rem;
+    color: #8be7c8;
+    padding-left: 1.15rem;
+    position: relative;
+}
+.notification-freebie .notif-instruction::before {
+    content: "\f058";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    color: #4caf50;
+    position: absolute;
+    left: 0;
+    top: 0.06em;
+    font-size: 1.09em;
+    opacity: .86;
+}
+
 :root {
     --bg-dark: #121212;
     --bg-surface: #1E1E1E;
     --bg-elevated: #232323;
+    --bg-card: #1E1E1E;
     --accent: #4CAF50;
     --accent-hover: #66BB6A;
+    --accent-primary: #4CAF50;
 
     --accent-secondary: #2196F3;
 
@@ -329,9 +499,6 @@ input::-webkit-inner-spin-button {
             100% { transform: translate(0, 0); }
         }
 
-        .app-header:hover .app-title-glitch::before { filter: drop-shadow(0 0 3px rgba(255,51,102,.9)); }
-        .app-header:hover .app-title-glitch::after  { filter: drop-shadow(0 0 3px rgba(51,224,255,.9)); }
-
         .app-title-icon {
             display: inline-flex;
             align-items: center;
@@ -615,14 +782,6 @@ input::-webkit-inner-spin-button {
         .noUi-handle:focus-visible {
             outline: none;
             box-shadow: 0 0 0 4px rgba(33,150,243,0.35), 0 6px 14px rgba(0,0,0,0.55);
-        }
-
-
-
-        .noUi-handle:after, .noUi-handle:before {
-
-            content: none;
-
         }
 
 
@@ -981,7 +1140,7 @@ input::-webkit-inner-spin-button {
         .game-header.mega-discount::before {
             content: '';
             position: absolute;
-            inset: -1px;
+            inset: 0;
             border-radius: 6px;
             background: linear-gradient(90deg, #ff0044, #ffea00, #00ff99, #00ccff, #a066ff, #ff0044);
             background-size: 400% 100%;
@@ -2894,6 +3053,84 @@ input::-webkit-inner-spin-button {
 
 <body>
 
+    <!-- Slide Notification -->
+    <div class="slide-notification" id="slideNotification">
+        <div class="notif-header">
+            <div class="notif-title">
+                <i class="fas fa-gift"></i>
+                Бесплатная игра!
+            </div>
+            <button class="notif-close" id="closeNotification">&times;</button>
+        </div>
+        <div class="notif-meta">
+            <span>Доступно до: 31.12.2024</span>
+        </div>
+        <div class="notif-desc">
+            <p>Dead In Bermuda теперь доступна бесплатно в Steam! Успейте добавить игру в свою коллекцию.</p>
+            <p><a href="https://store.steampowered.com/app/384310/Dead_In_Bermuda/" class="notif-link" target="_blank">Перейти в магазин Steam</a></p>
+        </div>
+        <div class="notif-buttons">
+            <button class="notif-btn btn-secondary" id="laterBtn">Напомнить позже</button>
+            <button class="notif-btn btn-primary" id="getGameBtn">Получить игру</button>
+        </div>
+    </div>
+    <!-- /Slide Notification -->
+
+    <script>
+        // Slide Notification Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const notification = document.getElementById('slideNotification');
+            const closeBtn = document.getElementById('closeNotification');
+            const laterBtn = document.getElementById('laterBtn');
+            const getGameBtn = document.getElementById('getGameBtn');
+            
+            // Check if notification was closed before
+            const notificationClosed = localStorage.getItem('notificationClosed');
+            const notificationShown = localStorage.getItem('notificationShown');
+            const currentTime = new Date().getTime();
+            const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+            
+            // Show notification if it wasn't closed or if remind later was clicked more than 1 hour ago
+            if (!notificationClosed || (notificationShown && (currentTime - parseInt(notificationShown) > oneHour))) {
+                setTimeout(() => {
+                    notification.classList.add('show');
+                    localStorage.setItem('notificationShown', currentTime.toString());
+                }, 2000);
+                
+                // Auto-hide after 15 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 15000);
+            }
+            
+            // Close button handler
+            closeBtn.addEventListener('click', function() {
+                notification.classList.remove('show');
+                localStorage.setItem('notificationClosed', 'true');
+            });
+            
+            // Get game button handler
+            getGameBtn.addEventListener('click', function() {
+                window.open('https://store.steampowered.com/app/384310/Dead_In_Bermuda/', '_blank');
+                notification.classList.remove('show');
+                localStorage.setItem('notificationClosed', 'true');
+            });
+            
+            // Remind later handler
+            laterBtn.addEventListener('click', function() {
+                notification.classList.remove('show');
+                localStorage.setItem('notificationShown', currentTime.toString());
+            });
+            
+            // Close notification when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!notification.contains(event.target) && notification.classList.contains('show')) {
+                    notification.classList.remove('show');
+                    localStorage.setItem('notificationClosed', 'true');
+                }
+            });
+        });
+    </script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZP7K8BBV1G"></script>
 
