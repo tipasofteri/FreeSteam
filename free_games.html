@@ -7,97 +7,199 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #66c0f4;
+            --bg-dark: #1b2838;
+            --bg-darker: #171a21;
+            --text-primary: #e9e9e9;
+            --border-color: #2a3f5a;
+        }
+        
         body {
-            background-color: #1b1f26;
-            color: #e9e9e9;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-        .modal-content {
-            background-color: #2d333b;
-            border: 1px solid #444c56;
+        
+        .game-card {
+            background: rgba(42, 63, 90, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            height: 100%;
         }
-        .list-group-item {
-            background-color: #2d333b;
-            color: #e9e9e9;
-            border-color: #444c56;
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            border-color: var(--primary);
         }
-        .list-group-item:hover {
-            background-color: #373e47;
+        
+        .game-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .game-title {
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 1rem 1rem 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .game-price {
+            color: #a1cd44;
+            font-weight: 700;
+            padding: 0 1rem 1rem;
+        }
+        
+        .btn-steam {
+            background: linear-gradient(135deg, #1b2838 0%, #2a3f5a 100%);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+            border-radius: 0 0 6px 6px;
+            padding: 0.5rem;
+            transition: all 0.2s;
+            width: 100%;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .btn-steam:hover {
+            background: var(--primary);
+            color: #1b2838;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(23, 26, 33, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(102, 192, 244, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #1b2838 0%, #2a3f5a 100%);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
         }
     </style>
 </head>
 <body>
-    <!-- Free Games Modal -->
-    <div class="modal fade" id="freeGamesModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title"><i class="fas fa-gamepad me-2"></i>Бесплатные игры</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="freeGamesList" class="list-group">
-                        <div class="d-flex justify-content-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Загрузка...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-secondary">
-                    <small class="text-muted" id="lastUpdateTime"></small>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                </div>
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <header class="page-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="m-0">
+                    <i class="fas fa-gamepad me-3"></i>Бесплатные игры
+                </h1>
+                <a href="index.html" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>На главную
+                </a>
             </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="gamesContainer">
+            <!-- Games will be loaded here -->
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Function to load and show free games
         async function loadAndShowFreeGames() {
             try {
                 const response = await fetch('https://raw.githubusercontent.com/InJeCTrL/NeedFree/master/free_goods_detail.json');
                 const data = await response.json();
                 
-                const gamesList = document.getElementById('freeGamesList');
-                const lastUpdate = document.getElementById('lastUpdateTime');
+                const gamesContainer = document.getElementById('gamesContainer');
                 
                 if (data.free_list && data.free_list.length > 0) {
-                    gamesList.innerHTML = data.free_list.map(game => `
-                        <a href="${game[1]}" target="_blank" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">${game[0]}</h6>
-                                <small class="text-success">Бесплатно</small>
+                    gamesContainer.innerHTML = data.free_list.map(game => `
+                        <div class="col">
+                            <div class="game-card h-100 d-flex flex-column">
+                                <img src="${getGameImageUrl(game[1])}" 
+                                     class="game-image" 
+                                     onerror="this.onerror=null; this.src='steamfreeico.png'" 
+                                     alt="${game[0]}"
+                                     loading="lazy">
+                                <h3 class="game-title" title="${game[0]}">${game[0]}</h3>
+                                <div class="mt-auto">
+                                    <div class="game-price">Бесплатно</div>
+                                    <a href="${game[1]}" target="_blank" class="btn-steam">
+                                        <i class="fab fa-steam me-2"></i>В Steam
+                                    </a>
+                                </div>
                             </div>
-                            <small class="text-muted">${new URL(game[1]).hostname}</small>
-                        </a>
+                        </div>
                     `).join('');
-                    
-                    if (data.update_time) {
-                        lastUpdate.textContent = `Обновлено: ${data.update_time}`;
-                    }
-                    
-                    // Show the modal
-                    const modal = new bootstrap.Modal(document.getElementById('freeGamesModal'));
-                    modal.show();
                 } else {
-                    gamesList.innerHTML = '<div class="text-center p-3">Нет доступных бесплатных игр</div>';
+                    gamesContainer.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-gamepad fa-3x text-muted mb-3"></i>
+                            <h4>Нет доступных игр</h4>
+                            <p class="text-muted">Попробуйте обновить страницу позже</p>
+                        </div>
+                    `;
                 }
             } catch (error) {
                 console.error('Ошибка при загрузке списка игр:', error);
-                if (gamesList) {
-                    gamesList.innerHTML = '<div class="alert alert-danger">Ошибка при загрузке списка игр</div>';
-                }
+                document.getElementById('gamesContainer').innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="alert alert-danger">Ошибка при загрузке списка игр</div>
+                        <button onclick="window.location.reload()" class="btn btn-primary mt-2">
+                            <i class="fas fa-sync-alt me-2"></i>Обновить
+                        </button>
+                    </div>
+                `;
+            } finally {
+                document.querySelector('.loading-overlay').style.display = 'none';
             }
+        }
+
+        function getGameImageUrl(steamUrl) {
+            // Extract app ID from Steam URL
+            const match = steamUrl.match(/app\/(\d+)/);
+            if (match && match[1]) {
+                return `https://cdn.cloudflare.steamstatic.com/steam/apps/${match[1]}/header.jpg`;
+            }
+            return 'steamfreeico.png';
         }
 
         // Show modal when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize modal
-            const modal = new bootstrap.Modal(document.getElementById('freeGamesModal'));
-            modal.show();
-            
-            // Load games
             loadAndShowFreeGames();
         });
     </script>
