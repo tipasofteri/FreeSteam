@@ -100,14 +100,14 @@
             height: 300px;
             max-width: 90vw;
             max-height: 90vh;
-            background: url('loading1.gif') center/contain no-repeat;
+            background: url('https://github.com/tipasofteri/FreeSteam/blob/main/loading1.gif')
             background-color: #1b2838;
             z-index: 10000;
             border-radius: 50%;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
         }
         
-        /* Fallback in case GIF doesn't load */
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
@@ -140,7 +140,6 @@
 
     <div class="container">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="gamesContainer">
-            <!-- Games will be loaded here -->
         </div>
     </div>
 
@@ -203,7 +202,6 @@
         }
 
         function getGameImageUrl(steamUrl) {
-            // Extract app ID from Steam URL
             const match = steamUrl.match(/app\/(\d+)/);
             if (match && match[1]) {
                 return `https://cdn.cloudflare.steamstatic.com/steam/apps/${match[1]}/header.jpg`;
@@ -211,23 +209,21 @@
             return 'steamfreeico.png';
         }
 
-        // Show modal when page loads
         document.addEventListener('DOMContentLoaded', function() {
             const startTime = Date.now();
-            const minLoadTime = 2000; // 2 seconds in milliseconds
+            const minLoadTime = 2000;
             
             loadAndShowFreeGames().finally(() => {
                 const elapsed = Date.now() - startTime;
                 const remainingTime = Math.max(0, minLoadTime - elapsed);
                 
-                // Hide loading overlay after the remaining time
                 setTimeout(() => {
                     const overlay = document.querySelector('.loading-overlay');
                     if (overlay) {
                         overlay.style.opacity = '0';
                         setTimeout(() => {
                             overlay.style.display = 'none';
-                        }, 300); // Fade out duration
+                        }, 300);
                     }
                 }, remainingTime);
             });
