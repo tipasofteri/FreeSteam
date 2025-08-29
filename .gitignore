@@ -1,1 +1,9 @@
-
+.DS_Store
+node_modules/
+.env
+*.log
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+.venv/
