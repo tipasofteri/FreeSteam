@@ -2,7 +2,7 @@ name: Update FreeSteam data RU
 
 on:
   schedule:
-    - cron: "3 * * * *"  # каждые 1.5 часа
+    - cron: "*/30 * * * *" 
   workflow_dispatch:
 
 permissions:
