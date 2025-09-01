@@ -20,11 +20,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # нужна полная история для rebase
-
       - name: Sync with remote before generation (rebase)
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "FreeSteam AutoUpdater"
+          git config user.email "autoupdater@freesteam.com"
           git fetch origin
           git pull --rebase origin main || true
 
