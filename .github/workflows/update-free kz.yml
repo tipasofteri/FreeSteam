@@ -2,7 +2,7 @@ name: Update FreeSteam data KZ
 
 on:
   schedule:
-    - cron: "1 * * * *"  # каждые 1.2 часа
+    - cron: "2 * * * *"  # каждые 2 часа
   workflow_dispatch:
 
 permissions:
