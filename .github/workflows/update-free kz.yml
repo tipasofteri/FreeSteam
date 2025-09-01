@@ -44,7 +44,7 @@ jobs:
 
       - name: Commit and push changes if any (safe rebase)
         run: |
-          git config user.name "github-actions[botkz]"
+          git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # ВНИМАНИЕ: добавляем только частичные файлы, чтобы избежать лимита GitHub (>100MB)
           git add free_goods_kz_detail_part*.json || true
