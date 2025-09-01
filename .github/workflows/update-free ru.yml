@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: update-freesteam-ru
+  group: update-freesteam
   cancel-in-progress: false
 
 jobs:
