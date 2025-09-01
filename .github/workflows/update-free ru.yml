@@ -41,13 +41,29 @@ jobs:
       - name: Run crawler (one-shot)
         run: |
           python NeedFree.py --cc ru --lang english --once
+          # Move files from data/english/ to root directory
+          mkdir -p data/english
+          mv -f data/english/free_goods_detail_part*.json . || true
+          # Rename files to include region code
+          for f in free_goods_detail_part*.json; do
+            mv "$f" "${f/_detail/_ru_detail}" 2>/dev/null || true
+          done
 
       - name: Commit and push changes if any (safe rebase)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # ВНИМАНИЕ: добавляем только частичные файлы, чтобы избежать лимита GitHub (>100MB)
-          git add free_goods_ru_detail_part*.json || true
+          # Проверяем наличие файлов в корне и копируем их, если нужно
+          if [ -f "free_goods_ru_detail_part1.json" ]; then
+            git add free_goods_ru_detail_part*.json
+          elif [ -f "data/russian/free_goods_ru_detail_part1.json" ]; then
+            # Если файлы в подкаталоге, копируем их в корень
+            cp data/russian/free_goods_ru_detail_part*.json .
+            git add free_goods_ru_detail_part*.json
+          else
+            echo "No Russian data files found in root or data/russian/"
+          fi
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
