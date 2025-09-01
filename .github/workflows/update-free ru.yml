@@ -1,0 +1,84 @@
+name: Update FreeSteam data
+
+on:
+  schedule:
+    - cron: "1.5 * * * *"  # каждые 1.5 часа
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-freesteam
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # нужна полная история для rebase
+
+      - name: Sync with remote before generation (rebase)
+        run: |
+          git config user.name "github-actions[botru]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+          git pull --rebase origin main || true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run crawler (one-shot)
+        run: |
+          python NeedFree.py --cc ru --lang english --once
+
+      - name: Commit and push changes if any (safe rebase)
+        run: |
+          git config user.name "github-actions[botru]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # ВНИМАНИЕ: добавляем только частичные файлы, чтобы избежать лимита GitHub (>100MB)
+          git add free_goods_ru_detail_part*.json || true
+          git add data/**/free_goods_ru_detail_part*.json || true
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+          else
+            # На случай, если за время генерации пришли новые коммиты: временно убираем локальные изменения
+            git stash push -u -m "auto-stash-before-rebase" || true
+            git fetch origin
+            git pull --rebase origin main || true
+            # Вернём изменения и подготовим к коммиту
+            git stash pop || true
+            git add free_goods_ru_detail_part*.json || true
+            git add data/**/free_goods_ru_detail_part*.json || true
+            git commit -m "chore: update free goods $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            # Пробуем пуш; если non-fast-forward из-за гонки — подтянем и повторим
+            git push || {
+              echo "Push rejected, retrying after rebase...";
+              git fetch origin;
+              git pull --rebase origin main || true;
+              git push;
+            }
+          fi
+
+      - name: Trigger Vercel deploy hook (if changes were pushed)
+        if: ${{ success() }}
+        run: |
+          LAST_MSG="$(git log -1 --pretty=%B || true)"
+          if echo "$LAST_MSG" | grep -q "chore: update free goods"; then
+            curl -X POST "$VERCEL_DEPLOY_HOOK_URL"
+            echo "Deploy hook triggered."
+          else
+            echo "No new commit; skipping deploy hook."
+          fi
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
