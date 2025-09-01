@@ -3078,30 +3078,49 @@ input::-webkit-inner-spin-button {
             const laterBtn = document.getElementById('laterBtn');
             const getGameBtn = document.getElementById('getGameBtn');
             
-            // Check if notification was closed before
-            const notificationClosed = localStorage.getItem('notificationClosed');
-            const notificationShown = localStorage.getItem('notificationShown');
-            const currentTime = new Date().getTime();
-            const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
-            
-            // Show notification if it wasn't closed or if remind later was clicked more than 1 hour ago
-            if (!notificationClosed || (notificationShown && (currentTime - parseInt(notificationShown) > oneHour))) {
-                setTimeout(() => {
-                    notification.classList.add('show');
-                    localStorage.setItem('notificationShown', currentTime.toString());
-                }, 2000);
+            // Check if notification elements exist
+            if (notification && closeBtn) {
+                // Check if notification was closed before
+                const notificationClosed = localStorage.getItem('notificationClosed');
+                const notificationShown = localStorage.getItem('notificationShown');
+                const currentTime = new Date().getTime();
+                const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
                 
-                // Auto-hide after 15 seconds
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 15000);
+                // Show notification if it wasn't closed or if remind later was clicked more than 1 hour ago
+                if (!notificationClosed || (notificationShown && (currentTime - parseInt(notificationShown) > oneHour))) {
+                    // Make sure notification is visible
+                    notification.style.display = 'block';
+                    
+                    // Small delay for better UX
+                    setTimeout(() => {
+                        notification.classList.add('show');
+                        localStorage.setItem('notificationShown', currentTime.toString());
+                    }, 2000);
+                    
+                    // Auto-hide after 15 seconds
+                    setTimeout(() => {
+                        if (notification) {
+                            notification.classList.remove('show');
+                            // Hide completely after animation
+                            setTimeout(() => {
+                                if (notification) notification.style.display = 'none';
+                            }, 500);
+                        }
+                    }, 15000);
+                }
+                
+                // Close button handler
+                closeBtn.addEventListener('click', function() {
+                    if (notification) {
+                        notification.classList.remove('show');
+                        // Hide completely after animation
+                        setTimeout(() => {
+                            if (notification) notification.style.display = 'none';
+                        }, 500);
+                        localStorage.setItem('notificationClosed', 'true');
+                    }
+                });
             }
-            
-            // Close button handler
-            closeBtn.addEventListener('click', function() {
-                notification.classList.remove('show');
-                localStorage.setItem('notificationClosed', 'true');
-            });
             
             // Get game button handler
             getGameBtn.addEventListener('click', function() {
@@ -3198,9 +3217,14 @@ input::-webkit-inner-spin-button {
             <div class="app-title">
                 <span class="app-title-glitch" data-text="FreeSteam">FreeSteam</span>
             </div>
-            <div class="language-switcher">
-                <button id="langRu" class="btn btn-sm btn-outline-secondary active" data-lang="ru">RU</button>
-                <button id="langEn" class="btn btn-sm btn-outline-secondary" data-lang="en">EN</button>
+            <div class="language-switcher" style="display: flex; align-items: center; gap: 10px;">
+                <a href="landing.html" class="btn btn-sm btn-outline-light" style="text-decoration: none;">
+                    <i class="fas fa-info-circle"></i> О нас
+                </a>
+                <div style="display: flex; gap: 5px;">
+                    <button id="langRu" class="btn btn-sm btn-outline-secondary active" data-lang="ru">RU</button>
+                    <button id="langEn" class="btn btn-sm btn-outline-secondary" data-lang="en">EN</button>
+                </div>
             </div>
 
             <div class="total-count" style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
@@ -3629,6 +3653,18 @@ input::-webkit-inner-spin-button {
     </div>
 
 
+
+    <div class="slide-notification" id="slideNotification" style="display: none;">
+        <div class="notif-header">
+            <h3 class="notif-title"><i class="fas fa-gift"></i> <span id="notifTitle"></span></h3>
+            <button class="notif-close" id="closeNotification">×</button>
+        </div>
+        <div class="notif-meta" id="notifMeta"></div>
+        <div class="notif-desc" id="notifDesc"></div>
+        <a href="free_games.html" class="notif-link" target="_blank" id="notifAction">
+            <span id="notifActionText"></span> <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
 
     <div class="modal fade magic-modal" id="magicModal" tabindex="-1" aria-hidden="true">
 
@@ -5883,7 +5919,8 @@ input::-webkit-inner-spin-button {
                 'filters': 'Фильтры',
                 'search': 'Поиск',
                 'notification_title': 'Бесплатные игры',
-                'notification_message': 'Новые бесплатные игры',
+                'notification_message': 'Доступны новые бесплатные игры',
+                'notification_subtitle': 'Проверьте список, чтобы не упустить интересные предложения',
                 'notification_action': 'Показать список',
                 'search_placeholder': 'Поиск игры...',
                 'discount_range': 'Диапазон скидок',
@@ -5929,6 +5966,7 @@ input::-webkit-inner-spin-button {
                 'search': 'Search',
                 'notification_title': 'Free Games',
                 'notification_message': 'New free games available',
+                'notification_subtitle': 'Check the list to find interesting offers',
                 'notification_action': 'Show list',
                 'search_placeholder': 'Search game...',
                 'discount_range': 'Discount range',
@@ -6037,7 +6075,7 @@ input::-webkit-inner-spin-button {
                     <button class="notif-close" onclick="this.parentElement.parentElement.remove()">×</button>
                 </div>
                 <div class="notif-meta">${translations[currentLang]['notification_message']}</div>
-                <div class="notif-desc">${translations[currentLang]['notification_message']}</div>
+                <div class="notif-desc">${translations[currentLang]['notification_subtitle'] || translations[currentLang]['notification_message']}</div>
                 <a href="free_games.html" class="notif-link" target="_blank">
                     ${translations[currentLang]['notification_action']} <i class="fas fa-arrow-right"></i>
                 </a>
@@ -6047,13 +6085,47 @@ input::-webkit-inner-spin-button {
             // Auto-remove notification after 10 seconds
             setTimeout(() => {
                 notification.remove();
-            }, 300000);
+            }, 10000);
         }
 
         // Show notification when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Small delay to ensure all elements are loaded
-            setTimeout(showPageLoadNotification, 1000);
+            // Initialize notification elements
+            const notification = document.getElementById('slideNotification');
+            const closeBtn = document.getElementById('closeNotification');
+            const titleEl = document.getElementById('notifTitle');
+            const metaEl = document.getElementById('notifMeta');
+            const descEl = document.getElementById('notifDesc');
+            const actionEl = document.getElementById('notifActionText');
+            
+            if (notification && closeBtn && titleEl && metaEl && descEl && actionEl) {
+                // Set notification content from translations
+                titleEl.textContent = translations[currentLang]['notification_title'];
+                metaEl.textContent = translations[currentLang]['notification_message'];
+                descEl.textContent = translations[currentLang]['notification_subtitle'];
+                actionEl.textContent = translations[currentLang]['notification_action'];
+                
+                // Show notification after a short delay
+                setTimeout(() => {
+                    notification.style.display = 'block';
+                    // Small delay for CSS transition
+                    setTimeout(() => notification.classList.add('show'), 10);
+                    
+                    // Auto-hide after 15 seconds
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                        // Hide completely after animation
+                        setTimeout(() => notification.style.display = 'none', 500);
+                    }, 15000);
+                }, 2000);
+                
+                // Close button handler
+                closeBtn.addEventListener('click', () => {
+                    notification.classList.remove('show');
+                    // Hide completely after animation
+                    setTimeout(() => notification.style.display = 'none', 500);
+                });
+            }
         });
     </script>
 
