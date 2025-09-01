@@ -3205,8 +3205,8 @@ input::-webkit-inner-spin-button {
 
             <div class="total-count" style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
                 <span id="totalcount">Показано <strong>0</strong> из <strong>0</strong> (всего <strong>0</strong>) • Страница <strong>0</strong> из <strong>0</strong></span>
-                <button id="notifyBtn" type="button" class="btn btn-sm btn-outline-light" title="Включить уведомления о 100% скидках">
-                    <i class="fas fa-bell"></i> <span class="notify-text">Уведомления</span>
+                <button id="notifyBtn" type="button" class="btn btn-sm btn-outline-light" data-translate-key="notify_title">
+                    <i class="fas fa-bell"></i> <span class="notify-text" data-translate-key="notifications"></span>
                 </button>
                 <!-- Language/Currency selectors removed: English/US fixed -->
             </div>
@@ -4396,14 +4396,35 @@ input::-webkit-inner-spin-button {
 
             $('#listcontent').empty().append(fragment);
 
-            const fmtInt = n => Number(n).toLocaleString('ru-RU');
+            const fmtInt = n => Number(n).toLocaleString(currentLang === 'ru' ? 'ru-RU' : 'en-US');
+            
+            // Get translations based on current language
+            const translations = {
+                ru: {
+                    showing: 'Показано',
+                    of: 'из',
+                    total: 'всего',
+                    page: 'Страница',
+                    ofTotal: 'из'
+                },
+                en: {
+                    showing: 'Showing',
+                    of: 'of',
+                    total: 'total',
+                    page: 'Page',
+                    ofTotal: 'of'
+                }
+            };
+            
+            const t = translations[currentLang] || translations['en'];
+            
             $('#totalcount').html(
-                `<i class="fas fa-list-ul me-1"></i> ` +
-                `Показано <strong>${fmtInt(pagedGames.length)}</strong> ` +
-                `из <strong>${fmtInt(filteredGames.length)}</strong> ` +
-                `(всего <strong>${fmtInt(allGames.length)}</strong>) ` +
-                `• Страница <strong>${fmtInt(page)}</strong> ` +
-                `из <strong>${fmtInt(Math.ceil(filteredGames.length/itemsPerPage))}</strong>`
+                `<i class=\"fas fa-list-ul me-1\"></i> ` +
+                `${t.showing} <strong>${fmtInt(pagedGames.length)}</strong> ` +
+                `${t.of} <strong>${fmtInt(filteredGames.length)}</strong> ` +
+                `(${t.total} <strong>${fmtInt(allGames.length)}</strong>) ` +
+                `• ${t.page} <strong>${fmtInt(page)}</strong> ` +
+                `${t.ofTotal} <strong>${fmtInt(Math.ceil(filteredGames.length/itemsPerPage))}</strong>`
             );
 
 
@@ -5861,6 +5882,9 @@ input::-webkit-inner-spin-button {
             'ru': {
                 'filters': 'Фильтры',
                 'search': 'Поиск',
+                'notification_title': 'Бесплатные игры',
+                'notification_message': 'Новые бесплатные игры',
+                'notification_action': 'Показать список',
                 'search_placeholder': 'Поиск игры...',
                 'discount_range': 'Диапазон скидок',
                 'price_range': 'Диапазон цен',
@@ -5903,6 +5927,9 @@ input::-webkit-inner-spin-button {
             'en': {
                 'filters': 'Filters',
                 'search': 'Search',
+                'notification_title': 'Free Games',
+                'notification_message': 'New free games available',
+                'notification_action': 'Show list',
                 'search_placeholder': 'Search game...',
                 'discount_range': 'Discount range',
                 'price_range': 'Price range',
@@ -5978,6 +6005,11 @@ input::-webkit-inner-spin-button {
 
             if (lang === 'ru') { $('#langRu').addClass('active'); $('#langEn').removeClass('active'); }
             else { $('#langEn').addClass('active'); $('#langRu').removeClass('active'); }
+            
+            // Refresh pagination text when language changes
+            if (typeof renderGames === 'function' && typeof currentPage !== 'undefined') {
+                renderGames(filteredGames, currentPage);
+            }
         }
 
         function setLanguage(lang) {
@@ -5998,16 +6030,16 @@ input::-webkit-inner-spin-button {
         // Function to show notification on page load
         function showPageLoadNotification() {
             const notification = document.createElement('div');
-            notification.className = 'slide-notification show';
+            notification.className = 'slide-notification';
             notification.innerHTML = `
                 <div class="notif-header">
-                    <h3 class="notif-title"><i class="fas fa-gift"></i> FreeSteam</h3>
-                    <button class="notif-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+                    <h3 class="notif-title"><i class="fas fa-gift"></i> ${translations[currentLang]['notification_title']}</h3>
+                    <button class="notif-close" onclick="this.parentElement.parentElement.remove()">×</button>
                 </div>
-                <div class="notif-meta">Новые бесплатные игры</div>
-                <div class="notif-desc">Проверьте список бесплатных игр, которые стали доступны!</div>
+                <div class="notif-meta">${translations[currentLang]['notification_message']}</div>
+                <div class="notif-desc">${translations[currentLang]['notification_message']}</div>
                 <a href="free_games.html" class="notif-link" target="_blank">
-                    Показать список <i class="fas fa-arrow-right"></i>
+                    ${translations[currentLang]['notification_action']} <i class="fas fa-arrow-right"></i>
                 </a>
             `;
             document.body.appendChild(notification);
