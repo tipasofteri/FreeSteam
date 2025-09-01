@@ -740,9 +740,29 @@ input::-webkit-inner-spin-button {
 
 
         .noUi-connect {
-            background: var(--accent-primary);
-            box-shadow: 0 0 10px rgba(76,175,80,0.35), 0 0 2px rgba(76,175,80,0.9) inset;
+            background: var(--accent);
         }
+        
+        .noUi-horizontal {
+            height: 6px;
+        }
+        
+        .noUi-horizontal .noUi-handle {
+            width: 18px;
+            height: 18px;
+            right: -9px;
+            top: -7px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid var(--accent);
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .noUi-handle:before,
+        .noUi-handle:after {
+            display: none;
+        }   
 
 
 
@@ -771,6 +791,7 @@ input::-webkit-inner-spin-button {
         .noUi-handle:active {
             transform: scale(1.18);
             border-color: var(--accent-hover);
+            box-shadow: 0 0 0 1px var(--accent-hover);
             background-color: #232323;
             box-shadow: 0 8px 18px rgba(0,0,0,0.6), 0 0 0 4px rgba(102,187,106,0.28);
         }
@@ -3167,19 +3188,16 @@ input::-webkit-inner-spin-button {
         </div>
 
         <header class="app-header">
-
-            <div class="app-title">
-
-                <div class="app-title-icon">
-
-                    <img src="steamfreeico.png" alt="FreeSteam">
-
-                </div>
-
-                <span class="app-title-glitch" data-text="FreeSteam">FreeSteam</span>
-
+            <div class="region-selector" style="margin-right: 15px;">
+                <select id="ccSelect" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+                    <option value="us">Global (US)</option>
+                    <option value="ru">Россия</option>
+                    <option value="kz">Казахстан</option>
+                </select>
             </div>
-
+            <div class="app-title">
+                <span class="app-title-glitch" data-text="FreeSteam">FreeSteam</span>
+            </div>
             <div class="language-switcher">
                 <button id="langRu" class="btn btn-sm btn-outline-secondary active" data-lang="ru">RU</button>
                 <button id="langEn" class="btn btn-sm btn-outline-secondary" data-lang="en">EN</button>
@@ -3731,14 +3749,28 @@ input::-webkit-inner-spin-button {
         function setStoredCC(v)  { try { localStorage.setItem(LS_KEY_CC, v); }   catch(_) {} }
 
         function getSelectedLang() { return 'english'; }
-        function getSelectedCC() { return 'us'; }
+        function getSelectedCC() { 
+            const cc = getStoredCC();
+            return ['us', 'ru', 'kz'].includes(cc) ? cc : 'us'; 
+        }
 
         function buildDataUrls(bustStamp) {
             const addBust = (u) => `${u}?t=${bustStamp}`;
-            const p1 = [ './free_goods_detail_part1.json' ];
-            const p2 = [ './free_goods_detail_part2.json' ];
-            try { console.info('[FreeSteam] Canonical data files only (EN/US)'); } catch(_) {}
-            return { part1: p1.map(addBust), part2: p2.map(addBust) };
+            const cc = getSelectedCC();
+            const prefix = cc === 'us' ? '' : `_${cc}`;
+            
+            const p1 = [`./free_goods${prefix}_detail_part1.json`];
+            const p2 = [`./free_goods${prefix}_detail_part2.json`];
+            
+            try { 
+                console.info(`[FreeSteam] Loading data for region: ${cc.toUpperCase()}`); 
+            } catch(_) {}
+            
+            return { 
+                part1: p1.map(addBust), 
+                part2: p2.map(addBust),
+                region: cc
+            };
         }
 
         function fetchFirstAvailableJson(candidates) {
@@ -5684,9 +5716,15 @@ input::-webkit-inner-spin-button {
                 const mySeq = ++dataLoadSeq;
                 if (forceShowLoading) { try { $('.loading').fadeIn(); } catch(_) {} }
                 const pTags = $.getJSON(`./tags.json?t=${bust}`);
-                const urls = buildDataUrls(bust);
-                const p1 = fetchFirstAvailableJson(urls.part1);
-                const p2 = fetchFirstAvailableJson(urls.part2);
+                const { part1, part2, region } = buildDataUrls(bust);
+                const p1 = fetchFirstAvailableJson(part1);
+                const p2 = fetchFirstAvailableJson(part2);
+                
+                // Обновляем отображение текущего региона
+                try {
+                    $(`[data-cc]`).removeClass('active');
+                    $(`[data-cc="${region}"]`).addClass('active');
+                } catch (e) { console.error('Error updating region display:', e); }
 
                 $.when(pTags, p1, p2)
                     .done((tagsResp, data1, data2) => {
@@ -5758,9 +5796,15 @@ input::-webkit-inner-spin-button {
                 function refreshData() {
                     const bust = Date.now();
                     const mySeq = ++dataLoadSeq;
-                    const urls = buildDataUrls(bust);
-                    const p1 = fetchFirstAvailableJson(urls.part1);
-                    const p2 = fetchFirstAvailableJson(urls.part2);
+                    const { part1, part2, region } = buildDataUrls(bust);
+                    const p1 = fetchFirstAvailableJson(part1);
+                    const p2 = fetchFirstAvailableJson(part2);
+                    
+                    // Обновляем отображение текущего региона при обновлении данных
+                    try {
+                        $(`[data-cc]`).removeClass('active');
+                        $(`[data-cc="${region}"]`).addClass('active');
+                    } catch (e) { console.error('Error updating region display:', e); }
 
                     $.when(p1, p2)
                         .done((data1, data2) => {
