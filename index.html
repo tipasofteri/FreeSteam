@@ -47,8 +47,423 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Display font to match landing aesthetics -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
 <style>
+
+/* Modern Design System - No Gradients */
+:root {
+    /* Color Palette */
+    --bg-primary: #0a0c10;
+    --bg-secondary: #141821;
+    --bg-tertiary: #1e2332;
+    --bg-card: #252b3d;
+    --bg-surface: #2a3142;
+    --bg-elevated: #323948;
+    
+    /* Accent Colors */
+    --accent-primary: #00d4aa;
+    --accent-secondary: #0099ff;
+    --accent-danger: #ff4757;
+    --accent-warning: #ffa502;
+    --accent-success: #26de81;
+    
+    /* Text Colors */
+    --text-primary: #ffffff;
+    --text-secondary: #b8c5d6;
+    --text-muted: #6b7785;
+    --text-inverse: #0a0c10;
+    
+    /* Border & Shadow */
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-hover: rgba(0, 212, 170, 0.3);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.35);
+    --shadow-glow: 0 0 24px rgba(0, 212, 170, 0.2);
+    
+    /* Animation */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Spacing & Sizing */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+}
+
+/* Reset old color system */
+:root {
+    --bg-dark: var(--bg-primary);
+    --bg-surface: var(--bg-card);
+    --bg-elevated: var(--bg-elevated);
+    --bg-card: var(--bg-card);
+    --accent: var(--accent-primary);
+    --accent-hover: var(--accent-primary);
+    --accent-primary: var(--accent-primary);
+    --accent-secondary: var(--accent-secondary);
+    --text-primary: var(--text-primary);
+    --text-secondary: var(--text-secondary);
+    --text-muted: var(--text-muted);
+    --border-radius: var(--radius-md);
+    --transition: var(--transition-normal);
+    --shadow: var(--shadow-md);
+    --shadow-hover: var(--shadow-lg);
+}
+
+/* Global element animations */
+.game-card {
+    animation: fadeInUp 0.6s var(--bounce) both;
+    animation-delay: calc(var(--index, 0) * 50ms);
+}
+
+.filter-group {
+    animation: slideInLeft 0.5s var(--bounce) both;
+    animation-delay: calc(var(--index, 0) * 100ms);
+}
+
+.sidebar-header {
+    animation: slideInDown 0.4s ease both;
+}
+
+.toolbar {
+    animation: slideInDown 0.5s ease both;
+    animation-delay: 0.2s;
+}
+
+.app-header {
+    animation: slideInDown 0.6s var(--bounce) both;
+}
+
+.btn {
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn:active {
+    transform: scale(0.96);
+    transition: transform 0.1s;
+}
+
+/* Global Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Free Games Panel Styles */
+.free-games-panel {
+    position: fixed;
+    right: -380px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 380px;
+    background: linear-gradient(120deg, #1b1f26 0%, #0f1319 100%);
+    border: 2px solid #4caf50;
+    border-right: none;
+    border-radius: 12px 0 0 12px;
+    box-shadow: -8px 5px 25px rgba(0, 0, 0, 0.4);
+    color: #fff;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    z-index: 1500;
+    transition: right 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    backdrop-filter: blur(12px);
+}
+
+.free-games-panel.show {
+    right: 0;
+}
+
+.free-games-panel .panel-trigger {
+    position: absolute;
+    left: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 80px;
+    background: linear-gradient(135deg, #4caf50, #66BB6A);
+    border: 2px solid #4caf50;
+    border-right: none;
+    border-radius: 12px 0 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
+}
+
+.free-games-panel .panel-trigger:hover {
+    background: linear-gradient(135deg, #66BB6A, #81C784);
+    transform: translateY(-50%) translateX(-5px);
+    box-shadow: -6px 0 16px rgba(0, 0, 0, 0.4);
+}
+
+.free-games-panel .panel-trigger i {
+    color: white;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.free-games-panel.show .panel-trigger i {
+    transform: rotate(180deg);
+}
+
+/* FREE Badge */
+.panel-free-badge {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-12deg);
+    background: linear-gradient(135deg, #ff1744, #d50000);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(255, 23, 68, 0.4);
+    z-index: 10;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    animation: freeBadgePulse 2s infinite;
+}
+
+@keyframes freeBadgePulse {
+    0%, 100% { 
+        transform: translateX(-50%) rotate(-12deg) scale(1);
+        box-shadow: 0 4px 12px rgba(255, 23, 68, 0.4);
+    }
+    50% { 
+        transform: translateX(-50%) rotate(-12deg) scale(1.05);
+        box-shadow: 0 6px 18px rgba(255, 23, 68, 0.6);
+    }
+}
+
+.free-games-panel .panel-content {
+    padding: 1.5rem;
+}
+
+.free-games-panel .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.free-games-panel .panel-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #4caf50;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.01em;
+}
+
+.free-games-panel .panel-title .fa-gift {
+    color: #ffe082;
+    filter: drop-shadow(0 0 4px #ffe08275);
+    font-size: 1.4rem;
+    animation: giftPulse 2s infinite;
+}
+
+@keyframes giftPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 8px #ffe08290); }
+}
+
+.free-games-panel .panel-close {
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 5px;
+    transition: all 0.2s;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.free-games-panel .panel-close:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.free-games-panel .panel-meta {
+    font-size: 0.95rem;
+    color: #8be7c8;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+}
+
+.free-games-panel .panel-desc {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+    color: #e0ffe8;
+}
+
+.free-games-panel .panel-link {
+    display: inline-block;
+    background: linear-gradient(90deg, #4CAF50 60%, #2196F3 100%);
+    color: #fff !important;
+    font-weight: 700;
+    padding: 0.65em 1.4em;
+    border-radius: 25px;
+    font-size: 1rem;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(76,175,80,0.25);
+    transition: all 0.3s ease;
+    text-align: center;
+    min-width: 200px;
+}
+
+.free-games-panel .panel-link:hover {
+    background: linear-gradient(90deg, #43a047 30%, #1976d2 100%);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(76,175,80,0.35);
+}
+
+.free-games-panel .panel-link i {
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.free-games-panel .panel-link:hover i {
+    transform: translateX(3px);
+}
+
+/* Анимация появления */
+@keyframes slideInFromLeft {
+    from {
+        left: -380px;
+        opacity: 0;
+    }
+    to {
+        left: 0;
+        opacity: 1;
+    }
+}
 
 /* Slide Notification Styles */
 .slide-notification {
@@ -63,7 +478,7 @@
     color: #fff;
     padding: 18px 20px;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    z-index: 1000;
+    z-index: 999;
     transition: right 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
     backdrop-filter: blur(10px);
 }
@@ -472,60 +887,103 @@ input::-webkit-inner-spin-button {
             display: inline-block;
             line-height: 1;
             text-shadow: none;
-        }
-        .app-title-glitch::before,
-        .app-title-glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            overflow: hidden;
-            pointer-events: none;
-            opacity: 0.85;
-        }
-        .app-title-glitch::before {
-            color: #ff3366;
-            transform: translate(0, 0);
-            clip-path: inset(0 0 0 0);
-            animation: glitchShift1 2.2s infinite steps(10);
-            mix-blend-mode: screen;
-            filter: drop-shadow(0 0 2px rgba(255,51,102,.6));
-        }
-        .app-title-glitch::after {
-            color: #33e0ff;
-            transform: translate(0, 0);
-            clip-path: inset(0 0 0 0);
-            animation: glitchShift2 2.8s infinite steps(12);
-            mix-blend-mode: screen;
-            filter: drop-shadow(0 0 2px rgba(51,224,255,.6));
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
         }
 
-        @keyframes glitchShift1 {
-            0% { transform: translate(0, 0); }
-            10% { transform: translate(-1px, -1px); }
-            20% { transform: translate(1px, 1px); }
-            30% { transform: translate(-2px, 1px); }
-            40% { transform: translate(2px, -1px); }
-            50% { transform: translate(0, 0); }
-            60% { transform: translate(1px, -2px); }
-            70% { transform: translate(-1px, 2px); }
-            80% { transform: translate(2px, 0); }
-            90% { transform: translate(-2px, 0); }
-            100% { transform: translate(0, 0); }
+        /* Сыпящиеся буквы эффект */
+        .app-title-glitch .letter {
+            display: inline-block;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            animation: letterFloat 3s ease-in-out infinite;
+            animation-delay: calc(var(--i, 0) * 0.1s);
         }
-        @keyframes glitchShift2 {
-            0% { transform: translate(0, 0); }
-            12% { transform: translate(1px, -1px); }
-            24% { transform: translate(-1px, 1px); }
-            36% { transform: translate(2px, -1px); }
-            48% { transform: translate(-2px, 1px); }
-            60% { transform: translate(0, 0); }
-            72% { transform: translate(-1px, -2px); }
-            84% { transform: translate(1px, 2px); }
-            96% { transform: translate(-2px, 0); }
-            100% { transform: translate(0, 0); }
+
+        .app-title-glitch:hover .letter {
+            animation: letterScatter 0.6s ease-out forwards;
+            animation-delay: calc(var(--i, 0) * 0.05s);
         }
+
+        .app-title-glitch .letter:nth-child(1) { color: #ff6b6b; }
+        .app-title-glitch .letter:nth-child(2) { color: #4ecdc4; }
+        .app-title-glitch .letter:nth-child(3) { color: #45b7d1; }
+        .app-title-glitch .letter:nth-child(4) { color: #96ceb4; }
+        .app-title-glitch .letter:nth-child(5) { color: #feca57; }
+        .app-title-glitch .letter:nth-child(6) { color: #ff9ff3; }
+        .app-title-glitch .letter:nth-child(7) { color: #54a0ff; }
+        .app-title-glitch .letter:nth-child(8) { color: #5f27cd; }
+        .app-title-glitch .letter:nth-child(9) { color: #00d2d3; }
+
+        @keyframes letterFloat {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg);
+                filter: drop-shadow(0 0 5px currentColor);
+            }
+            25% { 
+                transform: translateY(-3px) rotate(1deg);
+                filter: drop-shadow(0 2px 8px currentColor);
+            }
+            75% { 
+                transform: translateY(3px) rotate(-1deg);
+                filter: drop-shadow(0 -2px 8px currentColor);
+            }
+        }
+
+        @keyframes letterScatter {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(calc(var(--scatter-y, -20px))) 
+                          translateX(calc(var(--scatter-x, 10px))) 
+                          rotate(calc(var(--rotate, 180deg))) 
+                          scale(0.8);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Альтернативный эффект - буквы разлетаются в стороны */
+        .app-title-glitch.scatter-mode:hover .letter {
+            animation: letterExplode 0.8s ease-out forwards;
+            animation-delay: calc(var(--i, 0) * 0.03s);
+        }
+
+        @keyframes letterExplode {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            70% {
+                transform: translateY(calc(var(--explode-y, -30px))) 
+                          translateX(calc(var(--explode-x, 20px))) 
+                          rotate(calc(var(--explode-rotate, 360deg))) 
+                          scale(1.2);
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Эффект дрожания при наведении */
+        .app-title-glitch:hover {
+            animation: titleShake 0.3s ease-in-out;
+        }
+
+        @keyframes titleShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
 
         .app-title-icon {
             display: inline-flex;
@@ -1979,35 +2437,101 @@ input::-webkit-inner-spin-button {
         }
 
         .layout {
-
             display: grid;
-
-            grid-template-columns: 360px 1fr;
-
-            gap: 1rem;
-
+            grid-template-columns: 1fr; /* По умолчанию только контент */
+            gap: 0;
+            position: relative;
+            min-height: 100%;
+        }
+        
+        /* Триггерная зона для открытия сайдбара */
+        .sidebar-trigger {
+            position: fixed;
+            left: 0;
+            top: 68px;
+            bottom: 0;
+            width: 50px;
+            z-index: 1500;
+            background: transparent;
+            cursor: pointer;
         }
 
         .sidebar {
-
-            position: sticky;
-
+            position: fixed;
+            left: -360px; /* Спрятан по умолчанию */
             top: 68px;
-
             height: calc(100vh - 84px);
-
-            overflow: auto;
-
+            width: 360px;
             background: linear-gradient(180deg, rgba(58,45,32,0.95) 0%, rgba(36,28,21,0.95) 100%);
-
             border: 1px solid rgba(192, 147, 88, 0.35);
-
-            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.35);
-
-            border-radius: 10px;
-
+            border-left: none;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35), 8px 8px 24px rgba(0,0,0,0.5);
+            border-radius: 0 10px 10px 0;
             padding: 0.75rem;
-
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1400;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(192, 147, 88, 0.5) transparent;
+        }
+        
+        /* Состояние открытого сайдбара */
+        .sidebar.open {
+            left: 0;
+        }
+        
+        /* Темная подложка при открытом сайдбаре */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1300;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .sidebar-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Кастомизация скроллбара */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: rgba(192, 147, 88, 0.5);
+            border-radius: 3px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        /* Индикатор для триггерной зоны */
+        .sidebar-trigger::before {
+            content: '⚙';
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            font-size: 20px;
+            color: rgba(192, 147, 88, 0.7);
+            text-shadow: 0 0 8px rgba(192, 147, 88, 0.3);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+        
+        .sidebar-trigger:hover::before {
+            opacity: 1;
+            color: rgba(192, 147, 88, 1);
+            transform: scale(1.2);
         }
 
         .sidebar-header {
@@ -2048,7 +2572,28 @@ input::-webkit-inner-spin-button {
 
         .sidebar .filter-container { display: flex; flex-direction: column; gap: 1rem; margin: 0; }
 
-        .content { min-width: 0; }
+        .content { 
+            min-width: 0; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
+            background: var(--bg-surface);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-left: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Smooth transition for content when sidebar expands */
+        .layout:hover .content {
+            margin-left: 0;
+            transform: translateX(0);
+        }
+        
+        /* Ensure content takes full width when sidebar is collapsed */
+        .layout:not(:hover) .content {
+            width: 100%;
+        }
 
         .game-card { border: 1px solid rgba(192,147,88,0.25); background: linear-gradient(180deg, rgba(25,25,25,0.95) 0%, rgba(20,20,20,0.95) 100%); }
 
@@ -2068,7 +2613,16 @@ input::-webkit-inner-spin-button {
 
             .layout { grid-template-columns: 1fr; }
 
-            .sidebar { position: fixed; left: 0; top: 68px; width: 85%; max-width: 360px; z-index: 1100; height: calc(100vh - 84px); transform: translateX(-110%); transition: transform 0.3s ease; }
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 68px;
+                width: 85%;
+                max-width: 360px;
+                z-index: 1100;
+                height: calc(100vh - 84px);
+                transform: translateX(-100%) !important; /* Полностью скрыт на мобильных */
+            }
 
             body.sidebar-open .sidebar { transform: translateX(0); }
 
@@ -3096,7 +3650,159 @@ input::-webkit-inner-spin-button {
 
         }
 
-    </style>
+</style>
+
+<!-- Header restyle to match landing.html aesthetics -->
+<style>
+  /* Use display font for title */
+  .app-title { font-family: 'Space Grotesk', system-ui, -apple-system, Segoe UI, sans-serif; }
+
+  /* Glassy, elevated header */
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    border-radius: 14px;
+    padding: 0.75rem 1rem;
+    margin-top: 0.5rem;
+  }
+  /* subtle glowing accent line */
+  .app-header::after {
+    content: '';
+    position: absolute;
+    left: 10px; right: 10px; bottom: -2px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+    opacity: .35;
+    filter: blur(0.5px);
+    pointer-events: none;
+  }
+
+  /* Simple animated title */
+  .app-title-glitch {
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  /* Individual letter styling */
+  .app-title-glitch .letter {
+    display: inline-block;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    font-weight: 700;
+  }
+  
+  /* Colorful letters */
+  .app-title-glitch .letter:nth-child(1) { color: #ff6b6b; text-shadow: 0 0 8px rgba(255, 107, 107, 0.5); }
+  .app-title-glitch .letter:nth-child(2) { color: #4ecdc4; text-shadow: 0 0 8px rgba(78, 205, 196, 0.5); }
+  .app-title-glitch .letter:nth-child(3) { color: #45b7d1; text-shadow: 0 0 8px rgba(69, 183, 209, 0.5); }
+  .app-title-glitch .letter:nth-child(4) { color: #96ceb4; text-shadow: 0 0 8px rgba(150, 206, 180, 0.5); }
+  .app-title-glitch .letter:nth-child(5) { color: #feca57; text-shadow: 0 0 8px rgba(254, 202, 87, 0.5); }
+  .app-title-glitch .letter:nth-child(6) { color: #ff9ff3; text-shadow: 0 0 8px rgba(255, 159, 243, 0.5); }
+  .app-title-glitch .letter:nth-child(7) { color: #54a0ff; text-shadow: 0 0 8px rgba(84, 160, 255, 0.5); }
+  .app-title-glitch .letter:nth-child(8) { color: #5f27cd; text-shadow: 0 0 8px rgba(95, 39, 205, 0.5); }
+  .app-title-glitch .letter:nth-child(9) { color: #00d2d3; text-shadow: 0 0 8px rgba(0, 210, 211, 0.5); }
+  
+  /* Hover effects */
+  .app-title-glitch:hover .letter {
+    animation: letterBounce 0.6s ease-out;
+  }
+  
+  .app-title-glitch .letter:hover {
+    transform: translateY(-10px) rotate(10deg) scale(1.2);
+    filter: brightness(1.3) drop-shadow(0 5px 15px currentColor);
+  }
+  
+  /* Keyframe animations */
+  @keyframes letterBounce {
+    0% { transform: translateY(0) rotate(0deg) scale(1); }
+    25% { transform: translateY(-15px) rotate(5deg) scale(1.1); }
+    50% { transform: translateY(-25px) rotate(-5deg) scale(1.15); }
+    75% { transform: translateY(-10px) rotate(3deg) scale(1.05); }
+    100% { transform: translateY(0) rotate(0deg) scale(1); }
+  }
+
+  /* Refined controls area */
+  .language-switcher .btn,
+  #notifyBtn,
+  #densityBtn,
+  #magicButton,
+  .language-switcher .btn.active {
+    background: linear-gradient(135deg, var(--accent-primary), #6dd3a7) !important;
+    color: #0f1115 !important;
+    border: none !important;
+    box-shadow: 0 6px 18px rgba(76,175,80,0.35);
+  }
+  #notifyBtn.btn-success {
+    background: linear-gradient(135deg, var(--accent-primary), #6dd3a7) !important;
+    border: none !important;
+    color: #0f1115 !important;
+  }
+
+  /* "О нас" button styling */
+  .language-switcher a.btn-outline-light {
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    color: var(--text-primary) !important;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    font-weight: 500;
+    padding: 0.35rem 0.85rem !important;
+  }
+  .language-switcher a.btn-outline-light:hover {
+    background: linear-gradient(135deg, rgba(33,150,243,0.15), rgba(33,150,243,0.25)) !important;
+    border-color: rgba(33,150,243,0.4) !important;
+    color: var(--accent-secondary) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(33,150,243,0.2) !important;
+  }
+  .language-switcher a.btn-outline-light:active {
+    transform: translateY(0) scale(0.98) !important;
+  }
+
+  /* Region select styled to match */
+  .region-selector .form-select {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text-primary);
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+  }
+  .region-selector .form-select:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(76,175,80,0.25);
+  }
+
+  /* Counter chip */
+  .total-count {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  }
+
+  /* Responsive: stack nicely */
+  @media (max-width: 768px) {
+    .app-header { border-radius: 12px; }
+    .region-selector { width: 100%; }
+    .language-switcher {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+    .language-switcher a.btn-outline-light {
+      text-align: center;
+    }
+  }
+</style>
 
 </head>
 
@@ -3154,26 +3860,33 @@ input::-webkit-inner-spin-button {
                 });
             }
             
-            // Get game button handler
-            getGameBtn.addEventListener('click', function() {
-                window.open('https://store.steampowered.com/app/384310/Dead_In_Bermuda/', '_blank');
-                notification.classList.remove('show');
-                localStorage.setItem('notificationClosed', 'true');
-            });
-            
-            // Remind later handler
-            laterBtn.addEventListener('click', function() {
-                notification.classList.remove('show');
-                localStorage.setItem('notificationShown', currentTime.toString());
-            });
-            
-            // Close notification when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!notification.contains(event.target) && notification.classList.contains('show')) {
+            // Get game button handler (guard for optional element)
+            if (getGameBtn && notification) {
+                getGameBtn.addEventListener('click', function() {
+                    window.open('https://store.steampowered.com/app/384310/Dead_In_Bermuda/', '_blank');
                     notification.classList.remove('show');
                     localStorage.setItem('notificationClosed', 'true');
-                }
-            });
+                });
+            }
+            
+            // Remind later handler (guard for optional element)
+            if (laterBtn && notification) {
+                laterBtn.addEventListener('click', function() {
+                    notification.classList.remove('show');
+                    const nowTs = new Date().getTime();
+                    localStorage.setItem('notificationShown', nowTs.toString());
+                });
+            }
+            
+            // Close notification when clicking outside (only if notification exists)
+            if (notification) {
+                document.addEventListener('click', function(event) {
+                    if (!notification.contains(event.target) && notification.classList.contains('show')) {
+                        notification.classList.remove('show');
+                        localStorage.setItem('notificationClosed', 'true');
+                    }
+                });
+            }
         });
     </script>
 
@@ -3247,7 +3960,7 @@ input::-webkit-inner-spin-button {
                 </select>
             </div>
             <div class="app-title">
-                <span class="app-title-glitch" data-text="FreeSteam">FreeSteam</span>
+                <span class="app-title-glitch" id="appTitleText" data-text="FreeSteam">FreeSteam</span>
             </div>
             <div class="language-switcher" style="display: flex; align-items: center; gap: 10px;">
                 <a href="landing.html" class="btn btn-sm btn-outline-light" style="text-decoration: none;">
@@ -3259,13 +3972,6 @@ input::-webkit-inner-spin-button {
                 </div>
             </div>
 
-            <div class="total-count" style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
-                <span id="totalcount">Показано <strong>0</strong> из <strong>0</strong> (всего <strong>0</strong>) • Страница <strong>0</strong> из <strong>0</strong></span>
-                <button id="notifyBtn" type="button" class="btn btn-sm btn-outline-light" data-translate-key="notify_title">
-                    <i class="fas fa-bell"></i> <span class="notify-text" data-translate-key="notifications"></span>
-                </button>
-                <!-- Language/Currency selectors removed: English/US fixed -->
-            </div>
 
         </header>
 
@@ -3609,14 +4315,6 @@ input::-webkit-inner-spin-button {
 
             <div class="toolbar">
 
-                <button id="toggleFiltersBtn" class="btn btn-outline-secondary">
-
-                    <i class="fas fa-filter"></i>
-
-                    <span class="toolbar-toggle-text" data-translate-key="toggle_filters">Toggle filters</span>
-
-                </button>
-
                 <button id="resetFiltersBtn" class="btn btn-outline-warning">
 
                     <i class="fas fa-rotate"></i>
@@ -3626,6 +4324,11 @@ input::-webkit-inner-spin-button {
                 </button>
 
                 <div class="toolbar-spacer"></div>
+                
+                <div class="total-count" style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
+                    <span id="totalcount">Показано <strong>0</strong> из <strong>0</strong> (всего <strong>0</strong>) • Страница <strong>0</strong> из <strong>0</strong></span>
+                </div>
+                
                 <button id="magicButton" class="btn btn-outline-success">
 
                     <i class="fas fa-wand-magic-sparkles"></i>
@@ -3686,16 +4389,23 @@ input::-webkit-inner-spin-button {
 
 
 
-    <div class="slide-notification" id="slideNotification" style="display: none;">
-        <div class="notif-header">
-            <h3 class="notif-title"><i class="fas fa-gift"></i> <span id="notifTitle"></span></h3>
-            <button class="notif-close" id="closeNotification">×</button>
+    <!-- Выдвижная панель бесплатных игр -->
+    <div class="free-games-panel" id="freeGamesPanel">
+        <div class="panel-trigger" id="freeGamesTrigger">
+            <div class="panel-free-badge">FREE</div>
+            <i class="fas fa-chevron-left"></i>
         </div>
-        <div class="notif-meta" id="notifMeta"></div>
-        <div class="notif-desc" id="notifDesc"></div>
-        <a href="free_games.html" class="notif-link" id="notifAction">
-            <span id="notifActionText"></span> <i class="fas fa-arrow-right"></i>
-        </a>
+        <div class="panel-content">
+            <div class="panel-header">
+                <h3 class="panel-title"><i class="fas fa-gift"></i> Бесплатные игры</h3>
+                <button class="panel-close" id="closeFreeGamesPanel">×</button>
+            </div>
+            <div class="panel-meta">Доступны новые бесплатные игры</div>
+            <div class="panel-desc">Проверьте список, чтобы не упустить интересные предложения</div>
+            <a href="free_games.html" class="panel-link">
+                Показать список <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
     </div>
 
     <div class="modal fade magic-modal" id="magicModal" tabindex="-1" aria-hidden="true">
@@ -3769,12 +4479,9 @@ input::-webkit-inner-spin-button {
         </div>
     </div>
 
-    <script src="assets/js/nouislider.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
-    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <!-- Keep a single, SRI-verified jQuery and Bootstrap include; remove duplicates -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
@@ -5686,36 +6393,6 @@ input::-webkit-inner-spin-button {
 
 
 
-            $('#toggleFiltersBtn').on('click', function() {
-
-                const isMobile = window.matchMedia('(max-width: 992px)').matches;
-
-                if (isMobile) {
-
-                    $('body').toggleClass('sidebar-open');
-
-                    return;
-
-                }
-
-                $('body').toggleClass('sidebar-collapsed');
-
-                const textEl = $(this).find('.toolbar-toggle-text');
-
-                if ($('body').hasClass('sidebar-collapsed')) {
-
-                    textEl.text('Показать фильтры');
-
-                } else {
-
-                    textEl.text('Свернуть фильтры');
-
-                }
-
-            });
-
-
-
             $('#densityBtn').on('click', function() {
 
                 $('body').toggleClass('compact');
@@ -5966,7 +6643,6 @@ input::-webkit-inner-spin-button {
                 'sort_by': 'Сортировать по',
                 'desc': 'По убыванию',
                 'asc': 'По возрастанию',
-                'toggle_filters': 'Свернуть/показать фильтры',
                 'reset': 'Сбросить',
                 'randomly': 'Случайная',
                 'compact': 'Компактный',
@@ -6012,7 +6688,6 @@ input::-webkit-inner-spin-button {
                 'sort_by': 'Sort by',
                 'desc': 'Desc',
                 'asc': 'Asc',
-                'toggle_filters': 'Toggle filters',
                 'reset': 'Reset',
                 'randomly': 'Randomly',
                 'compact': 'Compact',
@@ -6097,6 +6772,131 @@ input::-webkit-inner-spin-button {
 
         try { applyTranslations(currentLang); } catch (_) {}
 
+        // Создание эффекта рассыпающихся букв для заголовка
+        function initScatteredTitle() {
+            const titleElement = document.getElementById('appTitleText');
+            if (!titleElement) return;
+            
+            const originalText = titleElement.textContent || 'FreeSteam';
+            titleElement.innerHTML = '';
+            
+            // Создаем span для каждой буквы
+            for (let i = 0; i < originalText.length; i++) {
+                const letter = originalText[i];
+                const letterSpan = document.createElement('span');
+                letterSpan.className = 'letter';
+                letterSpan.textContent = letter;
+                letterSpan.style.setProperty('--i', i);
+                
+                // Случайные значения для анимации рассыпания
+                const scatterX = Math.random() * 60 - 30; // от -30px до +30px
+                const scatterY = Math.random() * 40 - 20; // от -20px до +20px
+                const rotate = Math.random() * 720 - 360; // от -360deg до +360deg
+                
+                letterSpan.style.setProperty('--scatter-x', `${scatterX}px`);
+                letterSpan.style.setProperty('--scatter-y', `${scatterY}px`);
+                letterSpan.style.setProperty('--rotate', `${rotate}deg`);
+                
+                // Для альтернативного эффекта взрыва
+                const explodeX = Math.random() * 80 - 40;
+                const explodeY = Math.random() * 60 - 30;
+                const explodeRotate = Math.random() * 1080 - 540;
+                
+                letterSpan.style.setProperty('--explode-x', `${explodeX}px`);
+                letterSpan.style.setProperty('--explode-y', `${explodeY}px`);
+                letterSpan.style.setProperty('--explode-rotate', `${explodeRotate}deg`);
+                
+                titleElement.appendChild(letterSpan);
+            }
+            
+            // Счетчик кликов для секретной функции
+            let clickCount = 0;
+            let clickTimeout;
+            
+            // Добавляем обработчик клика для секретной функции
+            titleElement.addEventListener('click', function() {
+                clickCount++;
+                
+                // Сброс счетчика через 2 секунды
+                clearTimeout(clickTimeout);
+                clickTimeout = setTimeout(() => {
+                    clickCount = 0;
+                }, 2000);
+                
+                // При 5 кликах показываем случайную игру
+                if (clickCount >= 5) {
+                    clickCount = 0;
+                    this.classList.add('scatter-mode');
+                    
+                    // Показываем уведомление
+                    showCustomNotification('🎯 Секретная функция!', 'Открываю случайную игру...', 'success');
+                    
+                    // Через небольшую задержку открываем модал
+                    setTimeout(() => {
+                        this.classList.remove('scatter-mode');
+                        if (typeof showRandomGameModal === 'function') {
+                            showRandomGameModal();
+                        }
+                    }, 1000);
+                }
+                
+                // Подсказка при 3 кликах
+                if (clickCount === 3) {
+                    showCustomNotification('✨ Подсказка', 'Еще 2 клика для сюрприза...', 'info');
+                }
+            });
+            
+            // Добавляем обработчик двойного клика для переключения режимов
+            titleElement.addEventListener('dblclick', function() {
+                this.classList.toggle('scatter-mode');
+            });
+        }
+        
+        // Функция для показа кастомных уведомлений
+        function showCustomNotification(title, message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'linear-gradient(135deg, #4CAF50, #66BB6A)' : 
+                            type === 'error' ? 'linear-gradient(135deg, #f44336, #e57373)' : 
+                            'linear-gradient(135deg, #2196F3, #64B5F6)'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+                z-index: 10000;
+                max-width: 350px;
+                font-family: 'Space Grotesk', system-ui, sans-serif;
+                animation: slideInNotif 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <strong style="font-size: 1.1rem;">${title}</strong>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; margin-left: auto; opacity: 0.8; padding: 0;">
+                        ×
+                    </button>
+                </div>
+                <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">${message}</p>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Автоматически скрыть через 4 секунды
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.style.animation = 'slideOutNotif 0.3s ease forwards';
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 4000);
+        }
+        
+        // Инициализируем эффект после загрузки DOM
+        document.addEventListener('DOMContentLoaded', initScatteredTitle);
+
         // Function to show notification on page load
         function showPageLoadNotification() {
             const notification = document.createElement('div');
@@ -6120,8 +6920,133 @@ input::-webkit-inner-spin-button {
             }, 10000);
         }
 
-        // Show notification when page loads
+        // Free Games Panel logic
         document.addEventListener('DOMContentLoaded', function() {
+            const freeGamesPanel = document.getElementById('freeGamesPanel');
+            const freeGamesTrigger = document.getElementById('freeGamesTrigger');
+            const closeFreeGamesPanel = document.getElementById('closeFreeGamesPanel');
+            
+            if (freeGamesTrigger && freeGamesPanel) {
+                // Toggle panel when trigger is clicked
+                freeGamesTrigger.addEventListener('click', function() {
+                    freeGamesPanel.classList.toggle('show');
+                });
+            }
+            
+            if (closeFreeGamesPanel && freeGamesPanel) {
+                // Close panel when close button is clicked
+                closeFreeGamesPanel.addEventListener('click', function() {
+                    freeGamesPanel.classList.remove('show');
+                });
+            }
+            
+            // Auto-show panel if there are new free games (example logic)
+            // This would be called when new free games are detected
+            function showFreeGamesPanel() {
+                if (freeGamesPanel) {
+                    freeGamesPanel.classList.add('show');
+                    
+                    // Auto-hide after 10 seconds
+                    setTimeout(() => {
+                        freeGamesPanel.classList.remove('show');
+                    }, 10000);
+                }
+            }
+            
+            // Check for new free games and show panel
+            function checkForNewFreeGames() {
+                // This would check if there are new free games
+                // For now, we'll show it as an example
+                setTimeout(() => {
+                    showFreeGamesPanel();
+                }, 5000); // Show panel after 5 seconds as demo
+            }
+            
+            // Uncomment the line below to enable auto-showing the panel
+            // checkForNewFreeGames();
+            
+        // Sidebar logic
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarTrigger = document.createElement('div');
+            const sidebarOverlay = document.createElement('div');
+            
+            sidebarTrigger.className = 'sidebar-trigger';
+            sidebarOverlay.className = 'sidebar-overlay';
+            document.body.appendChild(sidebarTrigger);
+            document.body.appendChild(sidebarOverlay);
+            
+            let hoverTimeout;
+            let isMouseOverSidebar = false;
+            let isMouseOverTrigger = false;
+            
+            // Функция для открытия сайдбара
+            function openSidebar() {
+                if (sidebar) {
+                    sidebar.classList.add('open');
+                    sidebarOverlay.classList.add('show');
+                }
+            }
+            
+            // Функция для закрытия сайдбара
+            function closeSidebar() {
+                if (sidebar) {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('show');
+                }
+            }
+            
+            // Обработчики для триггерной зоны
+            sidebarTrigger.addEventListener('mouseenter', () => {
+                isMouseOverTrigger = true;
+                clearTimeout(hoverTimeout);
+                openSidebar();
+            });
+            
+            sidebarTrigger.addEventListener('mouseleave', () => {
+                isMouseOverTrigger = false;
+                hoverTimeout = setTimeout(() => {
+                    if (!isMouseOverSidebar && !isMouseOverTrigger) {
+                        closeSidebar();
+                    }
+                }, 200); // Небольшая задержка
+            });
+            
+            // Обработчики для сайдбара
+            if (sidebar) {
+                sidebar.addEventListener('mouseenter', () => {
+                    isMouseOverSidebar = true;
+                    clearTimeout(hoverTimeout);
+                });
+                
+                sidebar.addEventListener('mouseleave', () => {
+                    isMouseOverSidebar = false;
+                    hoverTimeout = setTimeout(() => {
+                        if (!isMouseOverSidebar && !isMouseOverTrigger) {
+                            closeSidebar();
+                        }
+                    }, 200); // Небольшая задержка
+                });
+            }
+            
+            // Закрытие по клику на overlay или вне сайдбара
+            sidebarOverlay.addEventListener('click', closeSidebar);
+            
+            // Закрытие по клику вне сайдбара
+            document.addEventListener('click', (event) => {
+                if (sidebar && !sidebar.contains(event.target) && 
+                    !sidebarTrigger.contains(event.target) && 
+                    sidebar.classList.contains('open')) {
+                    closeSidebar();
+                }
+            });
+            
+            // Закрытие по нажатию Escape
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && sidebar && sidebar.classList.contains('open')) {
+                    closeSidebar();
+                }
+            });
+            
             // Initialize notification elements
             const notification = document.getElementById('slideNotification');
             const closeBtn = document.getElementById('closeNotification');
