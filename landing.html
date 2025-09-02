@@ -492,9 +492,29 @@
     padding: var(--space-6);
   }
   
+  .section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, 
+      rgba(15, 15, 15, 0.7) 0%, 
+      rgba(15, 15, 15, 0.9) 100%);
+    backdrop-filter: blur(2px);
+    z-index: -1;
+  }
+  
   .section-content {
     max-width: 800px;
     width: 100%;
+    position: relative;
+    z-index: 1;
+    padding: var(--space-8);
+    border-radius: var(--radius-2xl);
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.05) 0%, 
+      rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
   }
   
   .section h1 {
@@ -563,15 +583,25 @@
   
   /* Footer */
   footer {
-    position: relative;
-    z-index: 5;
-    padding: var(--space-6);
+    position: fixed;
+    bottom: var(--space-4);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    padding: var(--space-3) var(--space-4);
     text-align: center;
     color: var(--text-muted);
     font-family: var(--font-family-mono);
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 0.05em;
     text-transform: uppercase;
+    background: rgba(15, 15, 15, 0.4);
+    backdrop-filter: blur(8px);
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    opacity: 0.8;
+    transition: opacity 0.3s var(--ease-out-cubic);
+    pointer-events: none;
   }
   
   /* Micro-interactions and hover states */
@@ -820,10 +850,6 @@
   
   <!-- Navigation -->
   <nav class="navigation" id="navigation">
-    <div class="nav-item" data-section="0">
-      <span class="nav-label">Intro</span>
-      <div class="nav-indicator"></div>
-    </div>
     <div class="nav-item" data-section="1">
       <span class="nav-label">Mission</span>
       <div class="nav-indicator"></div>
@@ -1204,7 +1230,14 @@
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const material = new THREE.PointsMaterial({ color: 0x00ff9d, size: isMobile ? 0.04 : 0.08, blending: THREE.AdditiveBlending, transparent: true });
+    // Уменьшенная яркость для лучшей читаемости текста
+    const material = new THREE.PointsMaterial({ 
+      color: 0x00ff9d, 
+      size: isMobile ? 0.03 : 0.05, 
+      blending: THREE.AdditiveBlending, 
+      transparent: true,
+      opacity: 0.4 // Снижена прозрачность
+    });
     tunnel = new THREE.Points(geometry, material);
     tunnel.visible = false;
     scene.add(tunnel);
@@ -1345,7 +1378,7 @@
   // reveal content + scroll-driven camera timeline (GSAP ScrollTrigger)
   function revealContent() {
     document.querySelectorAll('.section').forEach(s => { s.style.visibility = 'visible'; });
-    gsap.to('nav', { opacity: 1, duration: 0.8 });
+    gsap.to('.navigation', { opacity: 1, duration: 0.8 });
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -1354,7 +1387,18 @@
         end: 'bottom bottom',
         scrub: 1.6,
         pin: false,
-        invalidateOnRefresh: true
+        invalidateOnRefresh: true,
+        onUpdate: self => {
+          // Update navigation based on progress
+          const progress = self.progress;
+          const totalSections = 4;
+          const currentSection = Math.floor(progress * totalSections);
+          
+          // Update active navigation item (skip intro, start from section 1)
+          document.querySelectorAll('.nav-item').forEach((nav, i) => {
+            nav.classList.toggle('active', i === currentSection);
+          });
+        }
       }
     });
 
@@ -1551,27 +1595,36 @@
   // Navigation system
   function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
-    const sections = document.querySelectorAll('.section');
     
     navItems.forEach((item, index) => {
       item.addEventListener('click', () => {
-        // Scroll to section
-        const targetY = index * window.innerHeight;
+        // Calculate target scroll position based on timeline segments
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        let targetY;
+        
+        // Map navigation items to timeline positions
+        switch(index) {
+          case 0: // Mission
+            targetY = maxScroll * 0.15; // Early in timeline when section-1 appears
+            break;
+          case 1: // Tech  
+            targetY = maxScroll * 0.45; // When section-2 appears
+            break;
+          case 2: // Arsenal
+            targetY = maxScroll * 0.7; // When section-3 appears
+            break;
+          case 3: // Terminal
+            targetY = maxScroll * 1.0; // When section-4 appears
+            break;
+          default:
+            targetY = 0;
+        }
+        
         window.scrollTo({ top: targetY, behavior: 'smooth' });
         
         // Update active state
         navItems.forEach(nav => nav.classList.remove('active'));
         item.classList.add('active');
-      });
-    });
-    
-    // Update navigation on scroll
-    window.addEventListener('scroll', () => {
-      const scrollY = window.scrollY;
-      const sectionIndex = Math.round(scrollY / window.innerHeight);
-      
-      navItems.forEach((nav, i) => {
-        nav.classList.toggle('active', i === sectionIndex);
       });
     });
   }
