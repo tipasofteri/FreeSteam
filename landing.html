@@ -28,7 +28,12 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="steamfreeico.png">
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<!-- Fonts - makemepulse style -->
+<link href="https://fonts.googleapis.com/css2?family=Sohne:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://use.typekit.net/your-kit-id.css"> <!-- Optional: Adobe Fonts -->
+
+<!-- Additional libraries for makemepulse effects -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.0.42/dist/lenis.min.js"></script>
 
 <!-- GSAP + Tone -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -46,72 +51,819 @@
 </script>
 
 <style>
-  :root{ --bg:#030617; --primary:#00ff9d; --accent:#00b8ff; --muted:#9fb6c6; --fg:#e7f7fb; }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#051026);color:var(--fg);font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Arial;overflow-x:hidden}
-  canvas#gl{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:1;display:block}
-  #loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999;font-weight:800;color:var(--primary)}
-  .ui{position:relative;z-index:6;min-height:100vh;display:flex;align-items:center;justify-content:center;pointer-events:none}
-  .card{pointer-events:auto;text-align:center;padding:28px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 20px 60px rgba(2,6,12,0.6);backdrop-filter: blur(6px);}
-  h1.title{font-size:clamp(28px,6vw,56px);margin:0 0 12px;background:linear-gradient(90deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  p.subtitle{color:#a8c3cb;max-width:56ch;margin:0 auto 18px}
-  button#enter{border:2px solid var(--primary);background:transparent;color:var(--primary);padding:12px 24px;border-radius:999px;font-weight:700;cursor:pointer}
-  #charge-bar-container{width:80%;height:4px;background:rgba(255,255,255,0.06);border-radius:4px;margin:14px auto 0;overflow:hidden;transform:scaleX(0);transition:transform .3s ease}
-  #charge-bar-container.charging{transform:scaleX(1)}
-  #charge-bar{width:0%;height:100%;background:var(--primary);border-radius:4px;transition:width .12s linear}
-  #controls{position:fixed;right:18px;top:18px;z-index:20;display:flex;gap:8px;flex-direction:column}
-  .ctrl-btn{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.05);color:var(--fg);padding:8px 10px;border-radius:8px;font-weight:600;cursor:pointer}
-  .ctrl-btn.on{box-shadow:0 10px 30px rgba(0,255,157,0.08)}
-  /* sections / scroll */
-  #scroll-container{position:absolute;top:0;left:0;width:100%;height:1000vh;z-index:2}
-  .section{height:100vh;width:100%;position:fixed;top:0;left:0;display:flex;justify-content:center;align-items:center;text-align:center;pointer-events:none;opacity:0;visibility:hidden;z-index:3}
-  .section-content{max-width:700px;padding:2rem}
-  .section h1{font-size:3.2rem;margin-bottom:.5rem}
-  .section p{font-size:1.05rem;color:#bcd6df;line-height:1.7;}
+  /* makemepulse2016 inspired design system */
+  :root {
+    /* Core palette - sophisticated grays with accent */
+    --black: #000000;
+    --gray-900: #0f0f0f;
+    --gray-800: #1a1a1a;
+    --gray-700: #2a2a2a;
+    --gray-600: #404040;
+    --gray-500: #666666;
+    --gray-400: #808080;
+    --gray-300: #b3b3b3;
+    --gray-200: #cccccc;
+    --gray-100: #e6e6e6;
+    --white: #ffffff;
+    
+    /* Accent colors */
+    --accent-primary: #ff3366;
+    --accent-secondary: #00ff88;
+    --accent-tertiary: #3366ff;
+    --accent-warning: #ffaa00;
+    
+    /* Functional colors */
+    --bg: var(--gray-900);
+    --surface: var(--gray-800);
+    --surface-raised: var(--gray-700);
+    --text-primary: var(--white);
+    --text-secondary: var(--gray-300);
+    --text-muted: var(--gray-500);
+    --border: rgba(255, 255, 255, 0.1);
+    --border-hover: rgba(255, 255, 255, 0.2);
+    
+    /* Typography scale */
+    --font-family-primary: 'Sohne', 'SF Pro Display', system-ui, -apple-system, sans-serif;
+    --font-family-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    --font-family-display: 'Space Grotesk', 'Sohne', sans-serif;
+    
+    /* Spacing scale */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-20: 80px;
+    --space-24: 96px;
+    
+    /* Border radius scale */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+    --radius-full: 999px;
+    
+    /* Animation timing */
+    --ease-in-out-cubic: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+    --ease-in-cubic: cubic-bezier(0.32, 0, 0.67, 0);
+    --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-glow: 0 0 20px rgba(255, 51, 102, 0.3);
+  }
+
+  /* Reset and base styles */
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
+  body {
+    min-height: 100vh;
+    font-family: var(--font-family-primary);
+    font-weight: 400;
+    line-height: 1.5;
+    background: var(--bg);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    cursor: none; /* Custom cursor */
+  }
+  
+  /* Custom cursor - makemepulse signature */
+  .cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transition: transform 0.1s ease;
+    transform: translate(-50%, -50%);
+  }
+  
+  .cursor-follower {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(255, 51, 102, 0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.3s var(--ease-out-cubic);
+    transform: translate(-50%, -50%);
+  }
+  
+  /* Canvas */
+  canvas#gl {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    display: block;
+  }
+  
+  /* Loading screen with makemepulse aesthetics */
+  #loader {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    z-index: 9999;
+    color: var(--text-primary);
+  }
+  
+  .loader-content {
+    text-align: center;
+  }
+  
+  .loader-title {
+    font-family: var(--font-family-display);
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-6);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+  }
+  
+  .loader-bar-container {
+    width: 300px;
+    height: 2px;
+    background: var(--gray-800);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    position: relative;
+  }
+  
+  #loader-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: var(--radius-full);
+    transition: width 0.3s var(--ease-out-cubic);
+    position: relative;
+  }
+  
+  #loader-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8));
+    animation: loader-shine 1s ease-in-out infinite;
+  }
+  
+  @keyframes loader-shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  /* Main UI container */
+  .ui {
+    position: relative;
+    z-index: 6;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    padding: var(--space-6);
+  }
+  
+  /* Hero card with glassmorphism */
+  .card {
+    pointer-events: auto;
+    text-align: center;
+    padding: var(--space-12);
+    border-radius: var(--radius-2xl);
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.08) 0%, 
+      rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-xl);
+    max-width: 600px;
+    width: 100%;
+    transition: all 0.4s var(--ease-out-cubic);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(255, 51, 102, 0.1), 
+      transparent);
+    transition: left 0.8s var(--ease-out-cubic);
+  }
+  
+  .card:hover::before {
+    left: 100%;
+  }
+  
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-xl), var(--shadow-glow);
+  }
+  
+  /* Typography */
+  h1.title {
+    font-family: var(--font-family-display);
+    font-size: clamp(32px, 8vw, 72px);
+    font-weight: 700;
+    line-height: 0.9;
+    margin: 0 0 var(--space-4);
+    background: linear-gradient(135deg, 
+      var(--accent-primary) 0%, 
+      var(--accent-secondary) 50%,
+      var(--accent-tertiary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    letter-spacing: -0.02em;
+  }
+  
+  p.subtitle {
+    font-family: var(--font-family-primary);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    max-width: 480px;
+    margin: 0 auto var(--space-8);
+    line-height: 1.6;
+    opacity: 0.9;
+  }
+  
+  /* Enhanced button with micro-interactions */
+  button#enter {
+    font-family: var(--font-family-display);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: 1px solid var(--accent-primary);
+    background: transparent;
+    color: var(--accent-primary);
+    padding: var(--space-4) var(--space-8);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all 0.3s var(--ease-out-cubic);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  button#enter::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--accent-primary);
+    transition: left 0.3s var(--ease-out-cubic);
+    z-index: -1;
+  }
+  
+  button#enter:hover::before {
+    left: 0;
+  }
+  
+  button#enter:hover {
+    color: var(--black);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 51, 102, 0.4);
+  }
+  
+  button#enter:active {
+    transform: translateY(0) scale(0.98);
+  }
+  
+  /* Charge bar - refined */
+  #charge-bar-container {
+    width: 240px;
+    height: 2px;
+    background: var(--gray-800);
+    border-radius: var(--radius-full);
+    margin: var(--space-6) auto 0;
+    overflow: hidden;
+    transform: scaleX(0);
+    transition: transform 0.3s var(--ease-out-cubic);
+    position: relative;
+  }
+  
+  #charge-bar-container.charging {
+    transform: scaleX(1);
+  }
+  
+  #charge-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: var(--radius-full);
+    transition: width 0.12s linear;
+    position: relative;
+  }
+  
+  #charge-bar::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    right: -2px;
+    width: 4px;
+    height: 4px;
+    background: var(--white);
+    border-radius: 50%;
+    opacity: 0.8;
+  }
+  
+  .charge-label {
+    font-family: var(--font-family-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: var(--space-3);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  
+  /* Controls - minimal and refined */
+  #controls {
+    position: fixed;
+    top: var(--space-6);
+    right: var(--space-6);
+    z-index: 20;
+    display: flex;
+    gap: var(--space-2);
+    flex-direction: column;
+  }
+  
+  .ctrl-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family-mono);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s var(--ease-out-cubic);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  
+  .ctrl-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+  }
+  
+  .ctrl-btn.on {
+    background: rgba(255, 51, 102, 0.1);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+  }
+  
+  /* Scroll container */
+  #scroll-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 400vh; /* Reduced for better pacing */
+    z-index: 2;
+  }
+  
+  /* Section layouts */
+  .section {
+    height: 100vh;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 3;
+    padding: var(--space-6);
+  }
+  
+  .section-content {
+    max-width: 800px;
+    width: 100%;
+  }
+  
+  .section h1 {
+    font-family: var(--font-family-display);
+    font-size: clamp(28px, 6vw, 48px);
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: var(--space-6);
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+  
+  .section p {
+    font-family: var(--font-family-primary);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  /* CTA Button */
   .cta-button {
     display: inline-block;
-    margin-top: 2rem;
-    border: 2px solid var(--accent);
-    background: transparent;
-    color: var(--accent);
-    padding: 16px 32px;
-    border-radius: 999px;
-    font-weight: 700;
-    cursor: pointer;
+    margin-top: var(--space-8);
+    font-family: var(--font-family-display);
     font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: 1px solid var(--accent-secondary);
+    background: transparent;
+    color: var(--accent-secondary);
+    padding: var(--space-4) var(--space-8);
+    border-radius: var(--radius-full);
+    cursor: pointer;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all 0.3s var(--ease-out-cubic);
     pointer-events: auto;
+    position: relative;
+    overflow: hidden;
   }
+  
+  .cta-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--accent-secondary);
+    transition: left 0.3s var(--ease-out-cubic);
+    z-index: -1;
+  }
+  
+  .cta-button:hover::before {
+    left: 0;
+  }
+  
   .cta-button:hover {
-    background: var(--accent);
-    color: #031018;
-    box-shadow: 0 12px 40px rgba(0, 184, 255, 0.2);
-    transform: translateY(-3px);
+    color: var(--black);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 255, 136, 0.3);
   }
-  footer{position:relative;z-index:5;padding:20px;text-align:center;color:#8ea0ad}
-  @media(max-width:680px){ .card{padding:18px;width:92%} h1.title{font-size:28px} button#enter{padding:10px 18px} }
+  
+  /* Footer */
+  footer {
+    position: relative;
+    z-index: 5;
+    padding: var(--space-6);
+    text-align: center;
+    color: var(--text-muted);
+    font-family: var(--font-family-mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  
+  /* Micro-interactions and hover states */
+  .interactive {
+    transition: all 0.2s var(--ease-out-cubic);
+    cursor: pointer;
+  }
+  
+  .interactive:hover {
+    transform: translateY(-2px);
+  }
+  
+  /* Selection styles */
+  ::selection {
+    background: var(--accent-primary);
+    color: var(--white);
+  }
+  
+  ::-moz-selection {
+    background: var(--accent-primary);
+    color: var(--white);
+  }
+  
+  /* Grid overlay - makemepulse signature */
+  .grid-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0.03;
+    pointer-events: none;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: grid-drift 60s linear infinite;
+  }
+  
+  @keyframes grid-drift {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(40px, 40px); }
+  }
+  
+  /* Navigation - minimalist side navigation */
+  .navigation {
+    position: fixed;
+    left: var(--space-6);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-out-cubic);
+  }
+  
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    cursor: pointer;
+    transition: all 0.3s var(--ease-out-cubic);
+  }
+  
+  .nav-indicator {
+    width: 20px;
+    height: 2px;
+    background: var(--gray-600);
+    border-radius: var(--radius-full);
+    transition: all 0.3s var(--ease-out-cubic);
+    position: relative;
+  }
+  
+  .nav-indicator::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: var(--accent-primary);
+    border-radius: var(--radius-full);
+    transition: width 0.3s var(--ease-out-cubic);
+  }
+  
+  .nav-item.active .nav-indicator {
+    background: var(--accent-primary);
+    width: 40px;
+  }
+  
+  .nav-item.active .nav-indicator::before {
+    width: 100%;
+  }
+  
+  .nav-label {
+    font-family: var(--font-family-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s var(--ease-out-cubic);
+  }
+  
+  .nav-item:hover .nav-label,
+  .nav-item.active .nav-label {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--text-secondary);
+  }
+  
+  .nav-item.active .nav-label {
+    color: var(--accent-primary);
+  }
+  
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--gray-900);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--gray-700);
+    border-radius: var(--radius-full);
+    border: 2px solid var(--gray-900);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-600);
+  }
+  
+  /* Progress indicator */
+  .progress-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--gray-800);
+    z-index: 1001;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.1s linear;
+  }
+  
+  .progress-bar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    body {
+      cursor: default; /* Disable custom cursor on mobile */
+    }
+    
+    .cursor,
+    .cursor-follower {
+      display: none;
+    }
+    
+    .navigation {
+      display: none; /* Hide side nav on mobile */
+    }
+    
+    .card {
+      padding: var(--space-8);
+      margin: var(--space-4);
+      border-radius: var(--radius-xl);
+    }
+    
+    h1.title {
+      font-size: clamp(24px, 8vw, 48px);
+    }
+    
+    p.subtitle {
+      font-size: 16px;
+    }
+    
+    button#enter {
+      padding: var(--space-3) var(--space-6);
+      font-size: 12px;
+    }
+    
+    #controls {
+      top: var(--space-4);
+      right: var(--space-4);
+      gap: var(--space-1);
+    }
+    
+    .ctrl-btn {
+      padding: var(--space-2);
+      font-size: 10px;
+    }
+  }
+  
+  /* Animation utilities */
+  .fade-in {
+    animation: fadeIn 0.6s var(--ease-out-cubic) forwards;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .scale-in {
+    animation: scaleIn 0.4s var(--ease-elastic) forwards;
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+</style>
 </style>
 </head>
 <body>
+  <!-- Custom cursor elements -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-follower" id="cursor-follower"></div>
+  
+  <!-- Grid overlay -->
+  <div class="grid-overlay" id="grid-overlay"></div>
+  
+  <!-- Navigation -->
+  <nav class="navigation" id="navigation">
+    <div class="nav-item" data-section="0">
+      <span class="nav-label">Intro</span>
+      <div class="nav-indicator"></div>
+    </div>
+    <div class="nav-item" data-section="1">
+      <span class="nav-label">Mission</span>
+      <div class="nav-indicator"></div>
+    </div>
+    <div class="nav-item" data-section="2">
+      <span class="nav-label">Tech</span>
+      <div class="nav-indicator"></div>
+    </div>
+    <div class="nav-item" data-section="3">
+      <span class="nav-label">Arsenal</span>
+      <div class="nav-indicator"></div>
+    </div>
+    <div class="nav-item" data-section="4">
+      <span class="nav-label">Terminal</span>
+      <div class="nav-indicator"></div>
+    </div>
+  </nav>
+  
+  <!-- Loading screen -->
   <div id="loader">
-    <div style="text-align:center">
-      <div style="font-size:18px;margin-bottom:10px">ЗАГРУЗКА СИСТЕМЫ</div>
-      <div style="width:260px;height:6px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;margin:0 auto">
-        <div id="loader-bar" style="width:0%;height:100%;background:var(--primary)"></div>
+    <div class="loader-content">
+      <div class="loader-title">Initializing System</div>
+      <div class="loader-bar-container">
+        <div id="loader-bar"></div>
       </div>
     </div>
   </div>
 
   <canvas id="gl" aria-hidden="true"></canvas>
 
+  <!-- Main UI -->
   <div class="ui">
     <div class="card" id="hero-card" role="region" aria-label="hero">
-      <h1 class="title">FREE STEAM</h1>
-      <p class="subtitle">Тактический анализ экосистемы Steam — открой бесплатные игры и возьми преимущество.</p>
-      <button id="enter" aria-label="Удерживайте">УДЕРЖИВАЙТЕ → ОТПУСТИТЕ</button>
-      <div id="charge-bar-container"><div id="charge-bar"></div></div>
-      <p style="margin-top:10px;color:#9fb6c6;font-size:12px">Удерживайте кнопку для зарядки — отпустите для всплеска</p>
+      <h1 class="title">FreeSteam</h1>
+      <p class="subtitle">Интеллектуальная система мониторинга Steam. Обнаруживайте бесплатные игры, анализируйте тренды, получайте конкурентное преимущество.</p>
+      <button id="enter" class="interactive" aria-label="Удерживайте для активации">Hold → Release</button>
+      <div id="charge-bar-container">
+        <div id="charge-bar"></div>
+      </div>
+      <p class="charge-label">Hold to charge • Release to activate</p>
     </div>
   </div>
 
@@ -226,52 +978,215 @@
 
   if (POSTPROC) initPost();
 
-  // SINGULARITY (intro object) — simplified noise for performance
-  let singularity, singularityMat;
-  function createSingularity() {
-    const geo = new THREE.IcosahedronGeometry(1.6, Math.max(8, Math.min(DETAIL, 32)));
-    const vertex = `
+  // Advanced morphing system - makemepulse signature
+  let morphingObject, morphMaterial;
+  let currentGeometry = 0;
+  const geometries = [];
+  
+  function createMorphingObject() {
+    // Create multiple target geometries for morphing
+    geometries.push(new THREE.IcosahedronGeometry(2, DETAIL));
+    geometries.push(new THREE.SphereGeometry(2, DETAIL * 2, DETAIL));
+    geometries.push(new THREE.OctahedronGeometry(2, DETAIL));
+    geometries.push(new THREE.TorusGeometry(1.5, 0.5, DETAIL, DETAIL * 2));
+    geometries.push(new THREE.TetrahedronGeometry(2.5, DETAIL));
+    
+    // Advanced vertex shader with noise and morphing
+    const vertexShader = `
       uniform float uTime;
+      uniform float uMorphProgress;
+      uniform float uPulse;
+      uniform vec2 uMouse;
+      uniform float uNoiseStrength;
+      
+      varying vec3 vPosition;
+      varying vec3 vNormal;
+      varying vec2 vUv;
       varying float vNoise;
-      // small cost-effective pseudo-noise
-      float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
-      float noise(vec3 p){
-        vec2 i = floor(p.xy);
-        vec2 f = fract(p.xy);
-        float a = hash(i + vec2(0.0,0.0));
-        float b = hash(i + vec2(1.0,0.0));
-        float c = hash(i + vec2(0.0,1.0));
-        float d = hash(i + vec2(1.0,1.0));
-        vec2 u = f*f*(3.0-2.0*f);
-        return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;
+      
+      // High quality 3D noise
+      vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+      vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+      vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+      vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+      
+      float snoise(vec3 v) {
+        const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+        const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+        vec3 i = floor(v + dot(v, C.yyy));
+        vec3 x0 = v - i + dot(i, C.xxx);
+        vec3 g = step(x0.yzx, x0.xyz);
+        vec3 l = 1.0 - g;
+        vec3 i1 = min(g.xyz, l.zxy);
+        vec3 i2 = max(g.xyz, l.zxy);
+        vec3 x1 = x0 - i1 + C.xxx;
+        vec3 x2 = x0 - i2 + C.yyy;
+        vec3 x3 = x0 - D.yyy;
+        i = mod289(i);
+        vec4 p = permute(permute(permute(i.z + vec4(0.0, i1.z, i2.z, 1.0))
+                                      + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+                                      + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+        float n_ = 0.142857142857;
+        vec3 ns = n_ * D.wyz - D.xzx;
+        vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+        vec4 x_ = floor(j * ns.z);
+        vec4 y_ = floor(j - 7.0 * x_);
+        vec4 x = x_ *ns.x + ns.yyyy;
+        vec4 y = y_ *ns.x + ns.yyyy;
+        vec4 h = 1.0 - abs(x) - abs(y);
+        vec4 b0 = vec4(x.xy, y.xy);
+        vec4 b1 = vec4(x.zw, y.zw);
+        vec4 s0 = floor(b0)*2.0 + 1.0;
+        vec4 s1 = floor(b1)*2.0 + 1.0;
+        vec4 sh = -step(h, vec4(0.0));
+        vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+        vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+        vec3 p0 = vec3(a0.xy, h.x);
+        vec3 p1 = vec3(a0.zw, h.y);
+        vec3 p2 = vec3(a1.xy, h.z);
+        vec3 p3 = vec3(a1.zw, h.w);
+        vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+        p0 *= norm.x;
+        p1 *= norm.y;
+        p2 *= norm.z;
+        p3 *= norm.w;
+        vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+        m = m * m;
+        return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
       }
-      void main(){
-        float t = uTime * 0.45;
-        float n = noise(position * 2.0 + vec3(t));
-        vNoise = n;
-        vec3 pos = position + normal * (n * 0.28);
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos,1.0);
+      
+      void main() {
+        vUv = uv;
+        vNormal = normal;
+        
+        float time = uTime * 0.6;
+        
+        // Multi-layered noise for organic deformation
+        float noise1 = snoise(position * 1.2 + vec3(time));
+        float noise2 = snoise(position * 2.4 + vec3(time * 1.5)) * 0.5;
+        float noise3 = snoise(position * 4.8 + vec3(time * 2.0)) * 0.25;
+        
+        float combinedNoise = (noise1 + noise2 + noise3) * uNoiseStrength;
+        vNoise = combinedNoise;
+        
+        // Mouse interaction
+        vec3 mouseInfluence = vec3(uMouse * 0.3, 0.0);
+        float mouseDist = length(position.xy - mouseInfluence.xy);
+        float mouseEffect = smoothstep(3.0, 0.0, mouseDist) * 0.5;
+        
+        // Pulse effect
+        float pulseEffect = sin(time * 3.0 + length(position) * 2.0) * uPulse * 0.2;
+        
+        // Combine all effects
+        vec3 finalPosition = position;
+        finalPosition += normal * (combinedNoise + mouseEffect + pulseEffect);
+        
+        vPosition = finalPosition;
+        
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(finalPosition, 1.0);
       }
     `;
-    const fragment = `
+    
+    const fragmentShader = `
+      uniform float uTime;
+      uniform float uPulse;
+      uniform vec2 uMouse;
+      uniform float uMorphProgress;
+      
+      varying vec3 vPosition;
+      varying vec3 vNormal;
+      varying vec2 vUv;
       varying float vNoise;
-      void main(){
-        float r = smoothstep(-0.2,0.7,vNoise);
-        vec3 c1 = vec3(0.0,1.0,0.61);
-        vec3 c2 = vec3(0.0,0.72,1.0);
-        vec3 col = mix(c1,c2,r);
-        gl_FragColor = vec4(col*(0.6 + r*0.4), 1.0);
+      
+      // Color palette inspired by makemepulse
+      vec3 palette(float t) {
+        vec3 a = vec3(0.5, 0.5, 0.5);
+        vec3 b = vec3(0.5, 0.5, 0.5);
+        vec3 c = vec3(1.0, 1.0, 1.0);
+        vec3 d = vec3(0.263, 0.416, 0.557);
+        return a + b * cos(6.28318 * (c * t + d));
+      }
+      
+      void main() {
+        float time = uTime * 0.8;
+        
+        // Dynamic color based on noise and position
+        float colorT = vNoise * 0.5 + 0.5 + time * 0.2;
+        vec3 baseColor = palette(colorT);
+        
+        // Accent colors
+        vec3 accent1 = vec3(1.0, 0.2, 0.4); // makemepulse red
+        vec3 accent2 = vec3(0.0, 1.0, 0.53); // makemepulse green
+        vec3 accent3 = vec3(0.2, 0.4, 1.0); // makemepulse blue
+        
+        // Mix colors based on various factors
+        vec3 finalColor = mix(baseColor, accent1, uPulse * 0.3);
+        finalColor = mix(finalColor, accent2, smoothstep(-0.5, 0.5, vNoise) * 0.4);
+        finalColor = mix(finalColor, accent3, sin(time + length(vPosition) * 1.5) * 0.5 + 0.5) * 0.3;
+        
+        // Fresnel effect
+        float fresnel = 1.0 - abs(dot(normalize(vNormal), vec3(0.0, 0.0, 1.0)));
+        finalColor += accent2 * fresnel * (0.3 + uPulse * 0.7);
+        
+        // Edge enhancement
+        float edge = smoothstep(0.0, 0.3, fresnel);
+        finalColor = mix(finalColor, accent1, edge * 0.5);
+        
+        // Dynamic opacity
+        float alpha = 0.8 + fresnel * 0.2 + uPulse * 0.3;
+        alpha *= smoothstep(-1.0, 1.0, vNoise) * 0.5 + 0.5;
+        
+        gl_FragColor = vec4(finalColor, alpha);
       }
     `;
-    singularityMat = new THREE.ShaderMaterial({
-      uniforms: { uTime: { value: 0 }, uPulse: { value: 0 }, uPointer: { value: new THREE.Vector2(0,0) } },
-      vertexShader: vertex,
-      fragmentShader: fragment,
-      wireframe: true,
-      transparent: true
+    
+    morphMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uPulse: { value: 0 },
+        uMouse: { value: new THREE.Vector2(0, 0) },
+        uMorphProgress: { value: 0 },
+        uNoiseStrength: { value: 0.3 }
+      },
+      vertexShader,
+      fragmentShader,
+      transparent: true,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending
     });
-    singularity = new THREE.Mesh(geo, singularityMat);
-    scene.add(singularity);
+    
+    morphingObject = new THREE.Mesh(geometries[0], morphMaterial);
+    scene.add(morphingObject);
+    
+    // Auto-morphing animation
+    const morphTl = gsap.timeline({ repeat: -1 });
+    geometries.forEach((geo, i) => {
+      const nextIndex = (i + 1) % geometries.length;
+      morphTl.to(morphMaterial.uniforms.uMorphProgress, {
+        value: 1,
+        duration: 3,
+        ease: 'power2.inOut',
+        onUpdate: () => {
+          // Smooth geometry transition
+          if (currentGeometry !== i) {
+            morphingObject.geometry.dispose();
+            morphingObject.geometry = geometries[i];
+            currentGeometry = i;
+          }
+        },
+        onComplete: () => {
+          morphMaterial.uniforms.uMorphProgress.value = 0;
+          currentGeometry = nextIndex;
+        }
+      })
+      .to(morphMaterial.uniforms.uNoiseStrength, { 
+        value: 0.6, 
+        duration: 1.5, 
+        yoyo: true, 
+        repeat: 1, 
+        ease: 'power2.inOut' 
+      }, '<');
+    });
   }
 
   // Tunnel particles
@@ -320,7 +1235,7 @@
   scene.add(dir);
 
   // Init scene
-  createSingularity();
+  createMorphingObject();
   createTunnel();
   createProjects();
 
@@ -354,7 +1269,7 @@
     charging = true;
     chargeStart = performance.now();
     chargeContainer.classList.add('charging');
-    gsap.to(singularityMat.uniforms.uPulse, { value: 1.0, duration: 2.0, ease: 'power1.in' });
+    if (morphMaterial) gsap.to(morphMaterial.uniforms.uPulse, { value: 1.0, duration: 2.0, ease: 'power1.in' });
     gsap.to(heroCard, { scale: 0.98, duration: 0.12 });
     if (bloomPass) gsap.to(bloomPass, { strength: 2.5, duration: 2.0, ease: 'power1.in' });
     gsap.to(chargeBar, { width: '100%', duration: 2.0, ease: 'linear' });
@@ -366,7 +1281,7 @@
     const dt = performance.now() - chargeStart;
     const power = Math.min(1, dt / 2000);
     chargeContainer.classList.remove('charging');
-    gsap.to(singularityMat.uniforms.uPulse, { value: 0, duration: 0.9, ease: 'power2.out' });
+    if (morphMaterial) gsap.to(morphMaterial.uniforms.uPulse, { value: 0, duration: 0.9, ease: 'power2.out' });
     gsap.to(heroCard, { scale: 1.0, duration: 0.32, ease:'elastic.out(1,0.6)' });
     if (bloomPass) gsap.to(bloomPass, { strength: 1.2, duration: 0.9, ease:'power2.out' });
     gsap.to(chargeBar, { width: '0%', duration: 0.3 });
@@ -379,7 +1294,7 @@
       const dt = performance.now() - chargeStart;
       const power = Math.min(1, dt / 2000);
       chargeContainer.classList.remove('charging');
-      gsap.to(singularityMat.uniforms.uPulse, { value: 0, duration: 0.9, ease: 'power2.out' });
+      if (morphMaterial) gsap.to(morphMaterial.uniforms.uPulse, { value: 0, duration: 0.9, ease: 'power2.out' });
       gsap.to(heroCard, { scale: 1.0, duration: 0.32, ease:'elastic.out(1,0.6)' });
       if (bloomPass) gsap.to(bloomPass, { strength: 1.2, duration: 0.9, ease:'power2.out' });
       gsap.to(chargeBar, { width: '0%', duration: 0.3 });
@@ -402,9 +1317,11 @@
     const base = camera.position.clone();
     gsap.to(camera.position, { x: base.x + (Math.random() - 0.5) * 0.8 * strength, y: base.y + (Math.random() - 0.5) * 0.8 * strength, z: base.z + (Math.random() - 0.5) * 0.8 * strength, duration: 0.4, ease: 'elastic.out(1,0.4)', onComplete: ()=>{ gsap.to(camera.position, { x: base.x, y: base.y, z: base.z, duration: 0.6 }); } });
 
-    // Expand singularity
-    gsap.to(singularity.scale, { x: 28, y: 28, z: 28, duration: 1.6, ease: 'power2.in' });
-    gsap.to(singularityMat, { opacity: 0, duration: 1.6, ease: 'power2.in' });
+    // Expand morphing object
+    if (morphingObject) {
+      gsap.to(morphingObject.scale, { x: 28, y: 28, z: 28, duration: 1.6, ease: 'power2.in' });
+      gsap.to(morphMaterial, { opacity: 0, duration: 1.6, ease: 'power2.in' });
+    }
 
     // RGB pulse
     if (rgbPass) {
@@ -414,7 +1331,12 @@
     }
 
     setTimeout(() => {
-      if (singularity) { scene.remove(singularity); singularity.geometry.dispose(); singularity.material.dispose(); singularity = null; }
+      if (morphingObject) { 
+        scene.remove(morphingObject); 
+        morphingObject.geometry.dispose(); 
+        morphingObject.material.dispose(); 
+        morphingObject = null; 
+      }
       createTunnel(Math.round(PARTICLES_BASE * (0.7 + 1.6 * strength)));
       revealContent();
     }, 1100);
@@ -486,16 +1408,16 @@
   // animate
   function animate() {
     const t = clock.getElapsedTime();
-    if (singularityMat) singularityMat.uniforms.uTime.value = t;
+    
+    // Update morphing object time and mouse
+    if (morphMaterial) {
+      morphMaterial.uniforms.uTime.value = t;
+      morphMaterial.uniforms.uMouse.value.x += (pointer.x * 0.3 - morphMaterial.uniforms.uMouse.value.x) * 0.06;
+      morphMaterial.uniforms.uMouse.value.y += (pointer.y * 0.3 - morphMaterial.uniforms.uMouse.value.y) * 0.06;
+    }
+    
     if (tunnel && tunnel.visible) tunnel.rotation.z = t * 0.06;
     if (projectsGroup && projectsGroup.visible) projectsGroup.rotation.y += 0.004;
-
-    // pointer subtle follow
-    if (singularityMat) {
-      const u = singularityMat.uniforms.uPointer.value;
-      u.x += (pointer.x * 0.3 - u.x) * 0.06;
-      u.y += (pointer.y * 0.3 - u.y) * 0.06;
-    }
 
     if (POSTPROC && composer) {
       if (filmPass) filmPass.material.uniforms.uTime.value = t;
@@ -526,6 +1448,205 @@
 
   // try to unlock audio on first click
   window.addEventListener('pointerdown', () => { tryPlayMusic(); }, { once: true, passive: true });
+
+  // makemepulse signature custom cursor system
+  function initCustomCursor() {
+    const cursor = document.getElementById('cursor');
+    const follower = document.getElementById('cursor-follower');
+    
+    let mouse = { x: 0, y: 0 };
+    let cursorPos = { x: 0, y: 0 };
+    let followerPos = { x: 0, y: 0 };
+    
+    // Mouse tracking
+    document.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+    
+    // Smooth cursor animation
+    function animateCursor() {
+      // Cursor follows immediately
+      cursorPos.x += (mouse.x - cursorPos.x) * 1;
+      cursorPos.y += (mouse.y - cursorPos.y) * 1;
+      
+      // Follower with delay
+      followerPos.x += (mouse.x - followerPos.x) * 0.15;
+      followerPos.y += (mouse.y - followerPos.y) * 0.15;
+      
+      cursor.style.transform = `translate(${cursorPos.x}px, ${cursorPos.y}px) translate(-50%, -50%)`;
+      follower.style.transform = `translate(${followerPos.x}px, ${followerPos.y}px) translate(-50%, -50%)`;
+      
+      requestAnimationFrame(animateCursor);
+    }
+    
+    animateCursor();
+    
+    // Hover effects for interactive elements
+    const interactiveElements = document.querySelectorAll('button, a, .interactive, .ctrl-btn');
+    
+    interactiveElements.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform += ' scale(1.5)';
+        cursor.style.background = 'var(--accent-secondary)';
+        follower.style.transform += ' scale(1.8)';
+        follower.style.borderColor = 'var(--accent-secondary)';
+        follower.style.borderWidth = '2px';
+      });
+      
+      el.addEventListener('mouseleave', () => {
+        cursor.style.transform = cursor.style.transform.replace(' scale(1.5)', '');
+        cursor.style.background = 'var(--accent-primary)';
+        follower.style.transform = follower.style.transform.replace(' scale(1.8)', '');
+        follower.style.borderColor = 'rgba(255, 51, 102, 0.5)';
+        follower.style.borderWidth = '1px';
+      });
+    });
+    
+    // Hide on mouse leave
+    document.addEventListener('mouseleave', () => {
+      cursor.style.opacity = '0';
+      follower.style.opacity = '0';
+    });
+    
+    document.addEventListener('mouseenter', () => {
+      cursor.style.opacity = '1';
+      follower.style.opacity = '1';
+    });
+  }
+  
+  // Initialize Lenis smooth scroll (makemepulse standard)
+  function initSmoothScroll() {
+    if (typeof Lenis !== 'undefined') {
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing
+        direction: 'vertical',
+        gestureDirection: 'vertical',
+        smooth: true,
+        mouseMultiplier: 1,
+        smoothTouch: false,
+        touchMultiplier: 2,
+        infinite: false,
+      });
+      
+      function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+      
+      requestAnimationFrame(raf);
+      
+      // Connect with GSAP ScrollTrigger
+      lenis.on('scroll', ScrollTrigger.update);
+      
+      gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+      });
+      
+      gsap.ticker.lagSmoothing(0);
+    }
+  }
+  
+  // Navigation system
+  function initNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('.section');
+    
+    navItems.forEach((item, index) => {
+      item.addEventListener('click', () => {
+        // Scroll to section
+        const targetY = index * window.innerHeight;
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
+        
+        // Update active state
+        navItems.forEach(nav => nav.classList.remove('active'));
+        item.classList.add('active');
+      });
+    });
+    
+    // Update navigation on scroll
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      const sectionIndex = Math.round(scrollY / window.innerHeight);
+      
+      navItems.forEach((nav, i) => {
+        nav.classList.toggle('active', i === sectionIndex);
+      });
+    });
+  }
+  
+  // Progress indicator
+  function initProgressIndicator() {
+    const progressEl = document.createElement('div');
+    progressEl.className = 'progress-indicator';
+    progressEl.innerHTML = '<div class="progress-bar"></div>';
+    document.body.appendChild(progressEl);
+    
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrolled / maxScroll;
+      
+      progressEl.style.transform = `scaleX(${progress})`;
+    });
+  }
+  
+  // Enhanced hover effects
+  function initHoverEffects() {
+    const interactiveElements = document.querySelectorAll('.interactive, button, a, .ctrl-btn');
+    
+    interactiveElements.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        // Ripple effect
+        const rect = el.getBoundingClientRect();
+        const ripple = document.createElement('div');
+        ripple.style.cssText = `
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: var(--accent-primary);
+          border-radius: 50%;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%) scale(0);
+          pointer-events: none;
+          z-index: 1;
+        `;
+        
+        el.style.position = 'relative';
+        el.appendChild(ripple);
+        
+        gsap.to(ripple, {
+          scale: 20,
+          opacity: 0,
+          duration: 0.6,
+          ease: 'power2.out',
+          onComplete: () => ripple.remove()
+        });
+      });
+    });
+  }
+  
+  // Enhanced page initialization
+  function initPage() {
+    initCustomCursor();
+    initSmoothScroll();
+    initNavigation();
+    initProgressIndicator();
+    initHoverEffects();
+    
+    // Animate in UI elements with stagger
+    gsap.set(['.card', '#controls', '.navigation'], { opacity: 0, y: 20 });
+    
+    const tl = gsap.timeline();
+    tl.to('.card', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.5 })
+      .to('#controls', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.4')
+      .to('.navigation', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.3');
+  }
+  
+  // Initialize when page loads
+  window.addEventListener('DOMContentLoaded', initPage);
 
   </script>
 </body>
