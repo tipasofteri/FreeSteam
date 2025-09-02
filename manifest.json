@@ -1,0 +1,78 @@
+{
+  "name": "FreeSteam - Бесплатные игры Steam",
+  "short_name": "FreeSteam",
+  "description": "Агрегатор бесплатных игр и скидок в Steam с фильтрами и уведомлениями",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#4CAF50",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ru",
+  "categories": ["games", "entertainment", "utilities"],
+  "icons": [
+    {
+      "src": "steamfreeico.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "steamfreeico.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Главная страница с фильтрами игр"
+    },
+    {
+      "src": "assets/screenshot2.png", 
+      "sizes": "640x1136",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Мобильная версия с боковой панелью"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Проверка профиля Steam",
+      "short_name": "Checker",
+      "description": "Быстрая проверка Steam профиля",
+      "url": "/checker.html",
+      "icons": [
+        {
+          "src": "steamfreeico.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "О проекте",
+      "short_name": "About",
+      "description": "Информация о FreeSteam",
+      "url": "/landing.html",
+      "icons": [
+        {
+          "src": "steamfreeico.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "dir": "ltr",
+  "protocol_handlers": [
+    {
+      "protocol": "web+freesteam",
+      "url": "/checker.html?steamid=%s"
+    }
+  ]
+}
