@@ -45,7 +45,7 @@
       "name": "Проверка профиля Steam",
       "short_name": "Checker",
       "description": "Быстрая проверка Steam профиля",
-      "url": "/checker.html",
+      "url": "./checker.html",
       "icons": [
         {
           "src": "steamfreeico.png",
@@ -57,7 +57,7 @@
       "name": "О проекте",
       "short_name": "About",
       "description": "Информация о FreeSteam",
-      "url": "/landing.html",
+      "url": "./landing.html",
       "icons": [
         {
           "src": "steamfreeico.png",
