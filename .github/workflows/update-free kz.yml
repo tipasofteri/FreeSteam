@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # нужна полная история для rebase
+          fetch-depth: 0 
 
       - name: Sync with remote before generation (rebase)
         run: |
@@ -53,8 +53,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # ВНИМАНИЕ: добавляем только частичные файлы, чтобы избежать лимита GitHub (>100MB)
-          # Проверяем наличие файлов в корне
           if [ -f "free_goods_kz_detail_part1.json" ]; then
             git add free_goods_kz_detail_part*.json
           else
@@ -63,15 +61,12 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
-            # На случай, если за время генерации пришли новые коммиты: временно убираем локальные изменения
             git stash push -u -m "auto-stash-before-rebase" || true
             git fetch origin
             git pull --rebase origin main || true
-            # Вернём изменения и подготовим к коммиту
             git stash pop || true
             git add free_goods_kz_detail_part*.json || true
             git commit -m "chore: update free goods $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
-            # Пробуем пуш; если non-fast-forward из-за гонки — подтянем и повторим
             git push || {
               echo "Push rejected, retrying after rebase...";
               git fetch origin;
