@@ -265,11 +265,183 @@
             return 'steamfreeico.png';
         }
 
+        // Notification system for free games
+        const FREE_GAMES_NOTIF_KEY = 'fs_free_games_notify_enabled';
+        const FREE_GAMES_SEEN_KEY = 'fs_free_games_seen_ids';
+        
+        function isNotificationsEnabled() {
+            try { return localStorage.getItem(FREE_GAMES_NOTIF_KEY) === '1'; } catch(_) { return false; }
+        }
+        
+        function getSeenGameIds() {
+            try {
+                const raw = localStorage.getItem(FREE_GAMES_SEEN_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch(_) { return []; }
+        }
+        
+        function storeSeenGameIds(ids) {
+            try { localStorage.setItem(FREE_GAMES_SEEN_KEY, JSON.stringify(ids)); } catch(_) {}
+        }
+        
+        function extractGameId(steamUrl) {
+            const match = steamUrl.match(/app\/(\d+)/);
+            return match ? match[1] : steamUrl;
+        }
+        
+        function sendFreeGameNotification(newGames) {
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            if (!newGames || newGames.length === 0) return;
+            
+            const count = newGames.length;
+            const titles = newGames.slice(0, 2).map(g => g[0]).join(', ');
+            const body = count === 1 
+                ? `Новая бесплатная игра: ${newGames[0][0]}`
+                : `Новые бесплатные игры (${count}): ${titles}${count > 2 ? ' и другие' : ''}`;
+                
+            try {
+                const notification = new Notification('FreeSteam — Бесплатные игры!', {
+                    body,
+                    icon: 'steamfreeico.png',
+                    tag: 'freesteam-free-games',
+                    requireInteraction: true
+                });
+                
+                notification.onclick = function() {
+                    window.focus();
+                    notification.close();
+                };
+                
+                // Автозакрытие через 10 секунд
+                setTimeout(() => {
+                    try { notification.close(); } catch(_) {}
+                }, 10000);
+                
+            } catch(error) {
+                console.error('Error sending notification:', error);
+            }
+        }
+        
+        function checkForNewGames(games) {
+            if (!isNotificationsEnabled() || !games || games.length === 0) return;
+            
+            const currentIds = games.map(game => extractGameId(game[1]));
+            const seenIds = getSeenGameIds();
+            const newGameIds = currentIds.filter(id => !seenIds.includes(id));
+            
+            if (newGameIds.length > 0) {
+                const newGames = games.filter(game => newGameIds.includes(extractGameId(game[1])));
+                sendFreeGameNotification(newGames);
+            }
+            
+            // Обновляем список просмотренных игр
+            const allSeenIds = [...new Set([...seenIds, ...currentIds])];
+            storeSeenGameIds(allSeenIds);
+        }
+        
+        function enableNotifications() {
+            if (!('Notification' in window)) {
+                alert('Ваш браузер не поддерживает уведомления');
+                return Promise.resolve(false);
+            }
+            
+            if (Notification.permission === 'granted') {
+                localStorage.setItem(FREE_GAMES_NOTIF_KEY, '1');
+                return Promise.resolve(true);
+            }
+            
+            if (Notification.permission === 'denied') {
+                alert('Уведомления заблокированы в настройках браузера');
+                return Promise.resolve(false);
+            }
+            
+            return Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    localStorage.setItem(FREE_GAMES_NOTIF_KEY, '1');
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+        }
+        
+        // Добавить кнопку уведомлений в заголовок
+        function addNotificationButton() {
+            const header = document.querySelector('.page-header .container .d-flex');
+            if (header) {
+                const isEnabled = isNotificationsEnabled();
+                const buttonClass = isEnabled ? 'btn-success' : 'btn-outline-light';
+                const buttonText = isEnabled ? 'Уведомления включены' : 'Включить уведомления';
+                const iconClass = isEnabled ? 'fas fa-bell' : 'far fa-bell';
+                
+                const notifyButton = document.createElement('button');
+                notifyButton.className = `btn ${buttonClass} me-2`;
+                notifyButton.innerHTML = `<i class="${iconClass} me-2"></i>${buttonText}`;
+                notifyButton.id = 'notifyToggle';
+                
+                notifyButton.addEventListener('click', function() {
+                    if (isNotificationsEnabled()) {
+                        localStorage.removeItem(FREE_GAMES_NOTIF_KEY);
+                        this.className = 'btn btn-outline-light me-2';
+                        this.innerHTML = '<i class="far fa-bell me-2"></i>Включить уведомления';
+                    } else {
+                        enableNotifications().then(success => {
+                            if (success) {
+                                this.className = 'btn btn-success me-2';
+                                this.innerHTML = '<i class="fas fa-bell me-2"></i>Уведомления включены';
+                                
+                                // Показать тестовое уведомление
+                                setTimeout(() => {
+                                    new Notification('FreeSteam — Уведомления включены!', {
+                                        body: 'Теперь вы будете получать уведомления о новых бесплатных играх',
+                                        icon: 'steamfreeico.png'
+                                    });
+                                }, 500);
+                            }
+                        });
+                    }
+                });
+                
+                // Вставить кнопку перед кнопкой "На главную"
+                const mainButton = header.querySelector('a[href="index.html"]');
+                header.insertBefore(notifyButton, mainButton);
+            }
+        }
+        
+        // Автоматическая проверка обновлений каждые 5 минут
+        function startAutoRefresh() {
+            setInterval(() => {
+                if (isNotificationsEnabled()) {
+                    fetch('https://raw.githubusercontent.com/InJeCTrL/NeedFree/master/free_goods_detail.json')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.free_list && data.free_list.length > 0) {
+                                checkForNewGames(data.free_list);
+                            }
+                        })
+                        .catch(error => console.log('Auto-refresh error:', error));
+                }
+            }, 5 * 60 * 1000); // 5 минут
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const startTime = Date.now();
             const minLoadTime = 2000;
             
-            loadAndShowFreeGames().finally(() => {
+            // Добавить кнопку уведомлений
+            addNotificationButton();
+            
+            loadAndShowFreeGames().then(() => {
+                // Проверить на новые игры после загрузки
+                fetch('https://raw.githubusercontent.com/InJeCTrL/NeedFree/master/free_goods_detail.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.free_list && data.free_list.length > 0) {
+                            checkForNewGames(data.free_list);
+                        }
+                    })
+                    .catch(error => console.log('Initial notification check error:', error));
+            }).finally(() => {
                 const elapsed = Date.now() - startTime;
                 const remainingTime = Math.max(0, minLoadTime - elapsed);
                 
@@ -283,6 +455,9 @@
                     }
                 }, remainingTime);
             });
+            
+            // Запустить автоматические проверки
+            startAutoRefresh();
         });
     </script>
 </body>
