@@ -47,8 +47,220 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Display font to match landing aesthetics -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
 <style>
+
+/* Modern Design System - No Gradients */
+:root {
+    /* Color Palette */
+    --bg-primary: #0a0c10;
+    --bg-secondary: #141821;
+    --bg-tertiary: #1e2332;
+    --bg-card: #252b3d;
+    --bg-surface: #2a3142;
+    --bg-elevated: #323948;
+    
+    /* Accent Colors */
+    --accent-primary: #00d4aa;
+    --accent-secondary: #0099ff;
+    --accent-danger: #ff4757;
+    --accent-warning: #ffa502;
+    --accent-success: #26de81;
+    
+    /* Text Colors */
+    --text-primary: #ffffff;
+    --text-secondary: #b8c5d6;
+    --text-muted: #6b7785;
+    --text-inverse: #0a0c10;
+    
+    /* Border & Shadow */
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-hover: rgba(0, 212, 170, 0.3);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.35);
+    --shadow-glow: 0 0 24px rgba(0, 212, 170, 0.2);
+    
+    /* Animation */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Spacing & Sizing */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+}
+
+/* Reset old color system */
+:root {
+    --bg-dark: var(--bg-primary);
+    --bg-surface: var(--bg-card);
+    --bg-elevated: var(--bg-elevated);
+    --bg-card: var(--bg-card);
+    --accent: var(--accent-primary);
+    --accent-hover: var(--accent-primary);
+    --accent-primary: var(--accent-primary);
+    --accent-secondary: var(--accent-secondary);
+    --text-primary: var(--text-primary);
+    --text-secondary: var(--text-secondary);
+    --text-muted: var(--text-muted);
+    --border-radius: var(--radius-md);
+    --transition: var(--transition-normal);
+    --shadow: var(--shadow-md);
+    --shadow-hover: var(--shadow-lg);
+}
+
+/* Global element animations */
+.game-card {
+    animation: fadeInUp 0.6s var(--bounce) both;
+    animation-delay: calc(var(--index, 0) * 50ms);
+}
+
+.filter-group {
+    animation: slideInLeft 0.5s var(--bounce) both;
+    animation-delay: calc(var(--index, 0) * 100ms);
+}
+
+.sidebar-header {
+    animation: slideInDown 0.4s ease both;
+}
+
+.toolbar {
+    animation: slideInDown 0.5s ease both;
+    animation-delay: 0.2s;
+}
+
+.app-header {
+    animation: slideInDown 0.6s var(--bounce) both;
+}
+
+.btn {
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn:active {
+    transform: scale(0.96);
+    transition: transform 0.1s;
+}
+
+/* Global Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 /* Slide Notification Styles */
 .slide-notification {
@@ -472,60 +684,103 @@ input::-webkit-inner-spin-button {
             display: inline-block;
             line-height: 1;
             text-shadow: none;
-        }
-        .app-title-glitch::before,
-        .app-title-glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            overflow: hidden;
-            pointer-events: none;
-            opacity: 0.85;
-        }
-        .app-title-glitch::before {
-            color: #ff3366;
-            transform: translate(0, 0);
-            clip-path: inset(0 0 0 0);
-            animation: glitchShift1 2.2s infinite steps(10);
-            mix-blend-mode: screen;
-            filter: drop-shadow(0 0 2px rgba(255,51,102,.6));
-        }
-        .app-title-glitch::after {
-            color: #33e0ff;
-            transform: translate(0, 0);
-            clip-path: inset(0 0 0 0);
-            animation: glitchShift2 2.8s infinite steps(12);
-            mix-blend-mode: screen;
-            filter: drop-shadow(0 0 2px rgba(51,224,255,.6));
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
         }
 
-        @keyframes glitchShift1 {
-            0% { transform: translate(0, 0); }
-            10% { transform: translate(-1px, -1px); }
-            20% { transform: translate(1px, 1px); }
-            30% { transform: translate(-2px, 1px); }
-            40% { transform: translate(2px, -1px); }
-            50% { transform: translate(0, 0); }
-            60% { transform: translate(1px, -2px); }
-            70% { transform: translate(-1px, 2px); }
-            80% { transform: translate(2px, 0); }
-            90% { transform: translate(-2px, 0); }
-            100% { transform: translate(0, 0); }
+        /* Сыпящиеся буквы эффект */
+        .app-title-glitch .letter {
+            display: inline-block;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            animation: letterFloat 3s ease-in-out infinite;
+            animation-delay: calc(var(--i, 0) * 0.1s);
         }
-        @keyframes glitchShift2 {
-            0% { transform: translate(0, 0); }
-            12% { transform: translate(1px, -1px); }
-            24% { transform: translate(-1px, 1px); }
-            36% { transform: translate(2px, -1px); }
-            48% { transform: translate(-2px, 1px); }
-            60% { transform: translate(0, 0); }
-            72% { transform: translate(-1px, -2px); }
-            84% { transform: translate(1px, 2px); }
-            96% { transform: translate(-2px, 0); }
-            100% { transform: translate(0, 0); }
+
+        .app-title-glitch:hover .letter {
+            animation: letterScatter 0.6s ease-out forwards;
+            animation-delay: calc(var(--i, 0) * 0.05s);
         }
+
+        .app-title-glitch .letter:nth-child(1) { color: #ff6b6b; }
+        .app-title-glitch .letter:nth-child(2) { color: #4ecdc4; }
+        .app-title-glitch .letter:nth-child(3) { color: #45b7d1; }
+        .app-title-glitch .letter:nth-child(4) { color: #96ceb4; }
+        .app-title-glitch .letter:nth-child(5) { color: #feca57; }
+        .app-title-glitch .letter:nth-child(6) { color: #ff9ff3; }
+        .app-title-glitch .letter:nth-child(7) { color: #54a0ff; }
+        .app-title-glitch .letter:nth-child(8) { color: #5f27cd; }
+        .app-title-glitch .letter:nth-child(9) { color: #00d2d3; }
+
+        @keyframes letterFloat {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg);
+                filter: drop-shadow(0 0 5px currentColor);
+            }
+            25% { 
+                transform: translateY(-3px) rotate(1deg);
+                filter: drop-shadow(0 2px 8px currentColor);
+            }
+            75% { 
+                transform: translateY(3px) rotate(-1deg);
+                filter: drop-shadow(0 -2px 8px currentColor);
+            }
+        }
+
+        @keyframes letterScatter {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(calc(var(--scatter-y, -20px))) 
+                          translateX(calc(var(--scatter-x, 10px))) 
+                          rotate(calc(var(--rotate, 180deg))) 
+                          scale(0.8);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Альтернативный эффект - буквы разлетаются в стороны */
+        .app-title-glitch.scatter-mode:hover .letter {
+            animation: letterExplode 0.8s ease-out forwards;
+            animation-delay: calc(var(--i, 0) * 0.03s);
+        }
+
+        @keyframes letterExplode {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            70% {
+                transform: translateY(calc(var(--explode-y, -30px))) 
+                          translateX(calc(var(--explode-x, 20px))) 
+                          rotate(calc(var(--explode-rotate, 360deg))) 
+                          scale(1.2);
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Эффект дрожания при наведении */
+        .app-title-glitch:hover {
+            animation: titleShake 0.3s ease-in-out;
+        }
+
+        @keyframes titleShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
 
         .app-title-icon {
             display: inline-flex;
@@ -3096,7 +3351,165 @@ input::-webkit-inner-spin-button {
 
         }
 
-    </style>
+</style>
+
+<!-- Header restyle to match landing.html aesthetics -->
+<style>
+  /* Use display font for title */
+  .app-title { font-family: 'Space Grotesk', system-ui, -apple-system, Segoe UI, sans-serif; }
+
+  /* Glassy, elevated header */
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    border-radius: 14px;
+    padding: 0.75rem 1rem;
+    margin-top: 0.5rem;
+  }
+  /* subtle glowing accent line */
+  .app-header::after {
+    content: '';
+    position: absolute;
+    left: 10px; right: 10px; bottom: -2px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+    opacity: .35;
+    filter: blur(0.5px);
+    pointer-events: none;
+  }
+
+  /* Simple animated title */
+  .app-title-glitch {
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  /* Individual letter styling */
+  .app-title-glitch .letter {
+    display: inline-block;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    font-weight: 700;
+  }
+  
+  /* Colorful letters */
+  .app-title-glitch .letter:nth-child(1) { color: #ff6b6b; text-shadow: 0 0 8px rgba(255, 107, 107, 0.5); }
+  .app-title-glitch .letter:nth-child(2) { color: #4ecdc4; text-shadow: 0 0 8px rgba(78, 205, 196, 0.5); }
+  .app-title-glitch .letter:nth-child(3) { color: #45b7d1; text-shadow: 0 0 8px rgba(69, 183, 209, 0.5); }
+  .app-title-glitch .letter:nth-child(4) { color: #96ceb4; text-shadow: 0 0 8px rgba(150, 206, 180, 0.5); }
+  .app-title-glitch .letter:nth-child(5) { color: #feca57; text-shadow: 0 0 8px rgba(254, 202, 87, 0.5); }
+  .app-title-glitch .letter:nth-child(6) { color: #ff9ff3; text-shadow: 0 0 8px rgba(255, 159, 243, 0.5); }
+  .app-title-glitch .letter:nth-child(7) { color: #54a0ff; text-shadow: 0 0 8px rgba(84, 160, 255, 0.5); }
+  .app-title-glitch .letter:nth-child(8) { color: #5f27cd; text-shadow: 0 0 8px rgba(95, 39, 205, 0.5); }
+  .app-title-glitch .letter:nth-child(9) { color: #00d2d3; text-shadow: 0 0 8px rgba(0, 210, 211, 0.5); }
+  
+  /* Hover effects */
+  .app-title-glitch:hover .letter {
+    animation: letterBounce 0.6s ease-out;
+  }
+  
+  .app-title-glitch .letter:hover {
+    transform: translateY(-10px) rotate(10deg) scale(1.2);
+    filter: brightness(1.3) drop-shadow(0 5px 15px currentColor);
+  }
+  
+  /* Keyframe animations */
+  @keyframes letterBounce {
+    0% { transform: translateY(0) rotate(0deg) scale(1); }
+    25% { transform: translateY(-15px) rotate(5deg) scale(1.1); }
+    50% { transform: translateY(-25px) rotate(-5deg) scale(1.15); }
+    75% { transform: translateY(-10px) rotate(3deg) scale(1.05); }
+    100% { transform: translateY(0) rotate(0deg) scale(1); }
+  }
+
+  /* Refined controls area */
+  .language-switcher .btn,
+  #notifyBtn,
+  #densityBtn,
+  #magicButton,
+  #toggleFiltersBtn,
+  #resetFiltersBtn {
+    border-radius: 9999px !important;
+    backdrop-filter: blur(6px);
+    border-color: rgba(255,255,255,0.18) !important;
+  }
+  .language-switcher .btn.active {
+    background: linear-gradient(135deg, var(--accent-primary), #6dd3a7) !important;
+    color: #0f1115 !important;
+    border: none !important;
+    box-shadow: 0 6px 18px rgba(76,175,80,0.35);
+  }
+  #notifyBtn.btn-success {
+    background: linear-gradient(135deg, var(--accent-primary), #6dd3a7) !important;
+    border: none !important;
+    color: #0f1115 !important;
+  }
+
+  /* "О нас" button styling */
+  .language-switcher a.btn-outline-light {
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    color: var(--text-primary) !important;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    font-weight: 500;
+    padding: 0.35rem 0.85rem !important;
+  }
+  .language-switcher a.btn-outline-light:hover {
+    background: linear-gradient(135deg, rgba(33,150,243,0.15), rgba(33,150,243,0.25)) !important;
+    border-color: rgba(33,150,243,0.4) !important;
+    color: var(--accent-secondary) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(33,150,243,0.2) !important;
+  }
+  .language-switcher a.btn-outline-light:active {
+    transform: translateY(0) scale(0.98) !important;
+  }
+
+  /* Region select styled to match */
+  .region-selector .form-select {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text-primary);
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+  }
+  .region-selector .form-select:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(76,175,80,0.25);
+  }
+
+  /* Counter chip */
+  .total-count {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  }
+
+  /* Responsive: stack nicely */
+  @media (max-width: 768px) {
+    .app-header { border-radius: 12px; }
+    .region-selector { width: 100%; }
+    .language-switcher {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+    .language-switcher a.btn-outline-light {
+      text-align: center;
+    }
+  }
+</style>
 
 </head>
 
@@ -3154,26 +3567,33 @@ input::-webkit-inner-spin-button {
                 });
             }
             
-            // Get game button handler
-            getGameBtn.addEventListener('click', function() {
-                window.open('https://store.steampowered.com/app/384310/Dead_In_Bermuda/', '_blank');
-                notification.classList.remove('show');
-                localStorage.setItem('notificationClosed', 'true');
-            });
-            
-            // Remind later handler
-            laterBtn.addEventListener('click', function() {
-                notification.classList.remove('show');
-                localStorage.setItem('notificationShown', currentTime.toString());
-            });
-            
-            // Close notification when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!notification.contains(event.target) && notification.classList.contains('show')) {
+            // Get game button handler (guard for optional element)
+            if (getGameBtn && notification) {
+                getGameBtn.addEventListener('click', function() {
+                    window.open('https://store.steampowered.com/app/384310/Dead_In_Bermuda/', '_blank');
                     notification.classList.remove('show');
                     localStorage.setItem('notificationClosed', 'true');
-                }
-            });
+                });
+            }
+            
+            // Remind later handler (guard for optional element)
+            if (laterBtn && notification) {
+                laterBtn.addEventListener('click', function() {
+                    notification.classList.remove('show');
+                    const nowTs = new Date().getTime();
+                    localStorage.setItem('notificationShown', nowTs.toString());
+                });
+            }
+            
+            // Close notification when clicking outside (only if notification exists)
+            if (notification) {
+                document.addEventListener('click', function(event) {
+                    if (!notification.contains(event.target) && notification.classList.contains('show')) {
+                        notification.classList.remove('show');
+                        localStorage.setItem('notificationClosed', 'true');
+                    }
+                });
+            }
         });
     </script>
 
@@ -3247,7 +3667,7 @@ input::-webkit-inner-spin-button {
                 </select>
             </div>
             <div class="app-title">
-                <span class="app-title-glitch" data-text="FreeSteam">FreeSteam</span>
+                <span class="app-title-glitch" id="appTitleText" data-text="FreeSteam">FreeSteam</span>
             </div>
             <div class="language-switcher" style="display: flex; align-items: center; gap: 10px;">
                 <a href="landing.html" class="btn btn-sm btn-outline-light" style="text-decoration: none;">
@@ -3769,12 +4189,9 @@ input::-webkit-inner-spin-button {
         </div>
     </div>
 
-    <script src="assets/js/nouislider.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
-    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <!-- Keep a single, SRI-verified jQuery and Bootstrap include; remove duplicates -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
@@ -6096,6 +6513,52 @@ input::-webkit-inner-spin-button {
         } catch(_) {}
 
         try { applyTranslations(currentLang); } catch (_) {}
+
+        // Создание эффекта рассыпающихся букв для заголовка
+        function initScatteredTitle() {
+            const titleElement = document.getElementById('appTitleText');
+            if (!titleElement) return;
+            
+            const originalText = titleElement.textContent || 'FreeSteam';
+            titleElement.innerHTML = '';
+            
+            // Создаем span для каждой буквы
+            for (let i = 0; i < originalText.length; i++) {
+                const letter = originalText[i];
+                const letterSpan = document.createElement('span');
+                letterSpan.className = 'letter';
+                letterSpan.textContent = letter;
+                letterSpan.style.setProperty('--i', i);
+                
+                // Случайные значения для анимации рассыпания
+                const scatterX = Math.random() * 60 - 30; // от -30px до +30px
+                const scatterY = Math.random() * 40 - 20; // от -20px до +20px
+                const rotate = Math.random() * 720 - 360; // от -360deg до +360deg
+                
+                letterSpan.style.setProperty('--scatter-x', `${scatterX}px`);
+                letterSpan.style.setProperty('--scatter-y', `${scatterY}px`);
+                letterSpan.style.setProperty('--rotate', `${rotate}deg`);
+                
+                // Для альтернативного эффекта взрыва
+                const explodeX = Math.random() * 80 - 40;
+                const explodeY = Math.random() * 60 - 30;
+                const explodeRotate = Math.random() * 1080 - 540;
+                
+                letterSpan.style.setProperty('--explode-x', `${explodeX}px`);
+                letterSpan.style.setProperty('--explode-y', `${explodeY}px`);
+                letterSpan.style.setProperty('--explode-rotate', `${explodeRotate}deg`);
+                
+                titleElement.appendChild(letterSpan);
+            }
+            
+            // Добавляем обработчик двойного клика для переключения режимов
+            titleElement.addEventListener('dblclick', function() {
+                this.classList.toggle('scatter-mode');
+            });
+        }
+        
+        // Инициализируем эффект после загрузки DOM
+        document.addEventListener('DOMContentLoaded', initScatteredTitle);
 
         // Function to show notification on page load
         function showPageLoadNotification() {
