@@ -75,15 +75,3 @@ jobs:
             }
           fi
 
-      - name: Trigger Vercel deploy hook (if changes were pushed)
-        if: ${{ success() }}
-        run: |
-          LAST_MSG="$(git log -1 --pretty=%B || true)"
-          if echo "$LAST_MSG" | grep -q "chore: update free goods"; then
-            curl -X POST "$VERCEL_DEPLOY_HOOK_URL"
-            echo "Deploy hook triggered."
-          else
-            echo "No new commit; skipping deploy hook."
-          fi
-        env:
-          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
