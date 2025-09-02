@@ -26,10 +26,7 @@
 # 1) Установить зависимости
 pip install -r requirements.txt
 
-# 2) Запустить сервер API локально
-python server.py
-
-# 3) Одноразово собрать данные (англ/US)
+# 2) Одноразово собрать данные (англ/US)
 python NeedFree.py --cc us --lang english --once
 ```
 
