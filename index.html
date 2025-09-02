@@ -2237,10 +2237,16 @@ input::-webkit-inner-spin-button {
 
             display: grid;
 
-            grid-template-columns: 360px 1fr;
-
+            grid-template-columns: 60px 1fr; /* По умолчанию показываем узкую полоску */
             gap: 1rem;
-
+            transition: grid-template-columns 0.1s ease-out;
+        }
+        .layout:has(.sidebar:hover) {
+            grid-template-columns: 360px 1fr; /* При наведении на sidebar изменяем grid layout */
+        }
+        /* Fallback для браузеров без поддержки :has() */
+        .sidebar:hover {
+            width: 360px;
         }
 
         .sidebar {
@@ -2251,7 +2257,7 @@ input::-webkit-inner-spin-button {
 
             height: calc(100vh - 84px);
 
-            overflow: auto;
+            overflow: hidden;
 
             background: linear-gradient(180deg, rgba(58,45,32,0.95) 0%, rgba(36,28,21,0.95) 100%);
 
@@ -2262,7 +2268,41 @@ input::-webkit-inner-spin-button {
             border-radius: 10px;
 
             padding: 0.75rem;
-
+            transition: all 0.1s ease-out;
+            cursor: pointer;
+            /* Добавляем blur эффект в свернутом состоянии */
+            filter: blur(1px) opacity(0.85);
+            backdrop-filter: blur(2px);
+        }
+        
+        .sidebar:hover {
+            overflow: auto; /* Включаем скролл при расширении */
+            filter: none; /* Убираем blur при hover */
+            backdrop-filter: none;
+            opacity: 1;
+        }
+        
+        /* Показываем индикатор для сжатого состояния */
+        .sidebar::before {
+            content: '⚙';
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            transform: translateX(-50%);
+            font-size: 18px;
+            color: rgba(192,147,88,0.8);
+            pointer-events: none;
+            transition: opacity 0.1s ease;
+            filter: drop-shadow(0 0 4px rgba(192,147,88,0.6));
+        }
+        
+        .sidebar:hover::before {
+            opacity: 0;
+        }
+        
+        /* Убираем расширенную зону наведения для более точного контроля */
+        .sidebar {
+            position: relative;
         }
 
         .sidebar-header {
@@ -2323,7 +2363,16 @@ input::-webkit-inner-spin-button {
 
             .layout { grid-template-columns: 1fr; }
 
-            .sidebar { position: fixed; left: 0; top: 68px; width: 85%; max-width: 360px; z-index: 1100; height: calc(100vh - 84px); transform: translateX(-110%); transition: transform 0.3s ease; }
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 68px;
+                width: 85%;
+                max-width: 360px;
+                z-index: 1100;
+                height: calc(100vh - 84px);
+                transform: translateX(-100%) !important; /* Полностью скрыт на мобильных */
+            }
 
             body.sidebar-open .sidebar { transform: translateX(0); }
 
@@ -3437,12 +3486,6 @@ input::-webkit-inner-spin-button {
   #notifyBtn,
   #densityBtn,
   #magicButton,
-  #toggleFiltersBtn,
-  #resetFiltersBtn {
-    border-radius: 9999px !important;
-    backdrop-filter: blur(6px);
-    border-color: rgba(255,255,255,0.18) !important;
-  }
   .language-switcher .btn.active {
     background: linear-gradient(135deg, var(--accent-primary), #6dd3a7) !important;
     color: #0f1115 !important;
@@ -3679,13 +3722,6 @@ input::-webkit-inner-spin-button {
                 </div>
             </div>
 
-            <div class="total-count" style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
-                <span id="totalcount">Показано <strong>0</strong> из <strong>0</strong> (всего <strong>0</strong>) • Страница <strong>0</strong> из <strong>0</strong></span>
-                <button id="notifyBtn" type="button" class="btn btn-sm btn-outline-light" data-translate-key="notify_title">
-                    <i class="fas fa-bell"></i> <span class="notify-text" data-translate-key="notifications"></span>
-                </button>
-                <!-- Language/Currency selectors removed: English/US fixed -->
-            </div>
 
         </header>
 
@@ -4028,40 +4064,26 @@ input::-webkit-inner-spin-button {
           <main class="content">
 
             <div class="toolbar">
-
-                <button id="toggleFiltersBtn" class="btn btn-outline-secondary">
-
-                    <i class="fas fa-filter"></i>
-
-                    <span class="toolbar-toggle-text" data-translate-key="toggle_filters">Toggle filters</span>
-
-                </button>
-
                 <button id="resetFiltersBtn" class="btn btn-outline-warning">
-
                     <i class="fas fa-rotate"></i>
-
                     <span data-translate-key="reset">Reset</span>
-
                 </button>
-
+                
+                <div class="total-count" style="display:flex; align-items:center; gap:.5rem; margin:0 1rem;">
+                    <span id="totalcount"><i class="fas fa-list-ul me-1"></i> Показано <strong>0</strong> из <strong>0</strong> (всего <strong>0</strong>) • Страница <strong>0</strong> из <strong>0</strong></span>
+                </div>
+                
                 <div class="toolbar-spacer"></div>
+                
                 <button id="magicButton" class="btn btn-outline-success">
-
                     <i class="fas fa-wand-magic-sparkles"></i>
-
                     <span data-translate-key="randomly">Randomly</span>
-
                 </button>
 
                 <button id="densityBtn" class="btn btn-outline-success">
-
                     <i class="fas fa-compress"></i>
-
                     <span data-translate-key="compact">Compact</span>
-
                 </button>
-
             </div>
 
 
@@ -6103,36 +6125,6 @@ input::-webkit-inner-spin-button {
 
 
 
-            $('#toggleFiltersBtn').on('click', function() {
-
-                const isMobile = window.matchMedia('(max-width: 992px)').matches;
-
-                if (isMobile) {
-
-                    $('body').toggleClass('sidebar-open');
-
-                    return;
-
-                }
-
-                $('body').toggleClass('sidebar-collapsed');
-
-                const textEl = $(this).find('.toolbar-toggle-text');
-
-                if ($('body').hasClass('sidebar-collapsed')) {
-
-                    textEl.text('Показать фильтры');
-
-                } else {
-
-                    textEl.text('Свернуть фильтры');
-
-                }
-
-            });
-
-
-
             $('#densityBtn').on('click', function() {
 
                 $('body').toggleClass('compact');
@@ -6383,7 +6375,6 @@ input::-webkit-inner-spin-button {
                 'sort_by': 'Сортировать по',
                 'desc': 'По убыванию',
                 'asc': 'По возрастанию',
-                'toggle_filters': 'Свернуть/показать фильтры',
                 'reset': 'Сбросить',
                 'randomly': 'Случайная',
                 'compact': 'Компактный',
@@ -6429,7 +6420,6 @@ input::-webkit-inner-spin-button {
                 'sort_by': 'Sort by',
                 'desc': 'Desc',
                 'asc': 'Asc',
-                'toggle_filters': 'Toggle filters',
                 'reset': 'Reset',
                 'randomly': 'Randomly',
                 'compact': 'Compact',
