@@ -9,75 +9,203 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Modern Design System - No Gradients */
         :root {
-            --primary: #66c0f4;
-            --bg-dark: #1b2838;
-            --bg-darker: #171a21;
-            --text-primary: #e9e9e9;
-            --border-color: #2a3f5a;
+            /* Color Palette */
+            --bg-primary: #0a0c10;
+            --bg-secondary: #141821;
+            --bg-tertiary: #1e2332;
+            --bg-card: #252b3d;
+            --bg-surface: #2a3142;
+            --bg-elevated: #323948;
+            
+            /* Accent Colors */
+            --accent-primary: #00d4aa;
+            --accent-secondary: #0099ff;
+            --accent-danger: #ff4757;
+            --accent-warning: #ffa502;
+            --accent-success: #26de81;
+            
+            /* Text Colors */
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d6;
+            --text-muted: #6b7785;
+            --text-inverse: #0a0c10;
+            
+            /* Border & Shadow */
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-hover: rgba(0, 212, 170, 0.3);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.25);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.35);
+            --shadow-glow: 0 0 24px rgba(0, 212, 170, 0.2);
+            
+            /* Animation */
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            
+            /* Spacing & Sizing */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
         }
         
         body {
-            background-color: var(--bg-dark);
+            background: radial-gradient(1200px 800px at 20% 0%, #1a140d 0%, #0f0d0a 50%, #0b0a08 100%) fixed;
             color: var(--text-primary);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 10px;
+            background: #0f1115;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2f3a;
+            border: 1px solid #1e2230;
+            border-radius: 6px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a4050;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
         }
         
         .game-card {
-            background: rgba(42, 63, 90, 0.6);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            background: var(--bg-card);
+            border: 1px solid rgba(192,147,88,0.18);
+            border-radius: var(--radius-md);
             overflow: hidden;
+            transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
             height: 100%;
+            position: relative;
+            transform: translateY(0);
+            animation: fadeInUp 0.6s var(--bounce) both;
+            animation-delay: calc(var(--index, 0) * 50ms);
         }
         
         .game-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            border-color: var(--primary);
+            transform: translateY(-8px);
+            box-shadow: 0 16px 36px rgba(0,0,0,0.45), var(--shadow-glow);
+            border-color: rgba(0, 212, 170, 0.4);
+        }
+        
+        .game-card:active {
+            transform: translateY(-2px) scale(0.997);
+        }
+        
+        .game-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(120% 60% at 50% 0%, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0) 50%),
+                        linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 100%);
+            opacity: .6;
+            transition: opacity .25s ease;
+        }
+        .game-card:hover::after {
+            opacity: .85;
         }
         
         .game-image {
             width: 100%;
-            height: 180px;
+            height: 200px;
             object-fit: cover;
-            border-bottom: 1px solid var(--border-color);
+            transition: transform .35s ease;
+        }
+        
+        .game-card:hover .game-image {
+            transform: scale(1.06);
         }
         
         .game-title {
-            color: var(--primary);
-            font-size: 1rem;
+            color: var(--text-primary);
+            font-size: 1.1rem;
             font-weight: 600;
-            margin: 1rem 1rem 0.5rem;
-            white-space: nowrap;
+            margin: 1.2rem 1.2rem 0.8rem;
+            line-height: 1.3;
+            transition: var(--transition-normal);
             overflow: hidden;
             text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        .game-card:hover .game-title {
+            color: var(--accent-secondary);
         }
         
         .game-price {
-            color: #a1cd44;
+            color: var(--accent-success);
             font-weight: 700;
-            padding: 0 1rem 1rem;
+            font-size: 1.1rem;
+            padding: 0 1.2rem;
+            margin-bottom: 0.8rem;
+            text-shadow: 0 0 8px rgba(38, 222, 129, 0.3);
         }
         
         .btn-steam {
-            background: linear-gradient(135deg, #1b2838 0%, #2a3f5a 100%);
-            border: 1px solid var(--primary);
-            color: var(--primary);
+            background: linear-gradient(135deg, var(--accent-primary), #6dd3a7);
+            color: var(--text-inverse);
             font-weight: 600;
-            border-radius: 0 0 6px 6px;
-            padding: 0.5rem;
-            transition: all 0.2s;
+            border: none;
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            padding: 0.75rem;
+            transition: all var(--transition-normal);
             width: 100%;
             text-align: center;
             text-decoration: none;
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: auto;
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(0);
+        }
+        
+        .btn-steam::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
         
         .btn-steam:hover {
-            background: var(--primary);
-            color: #1b2838;
+            background: linear-gradient(135deg, #00e6bf, #5dd69c);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 212, 170, 0.35);
+            text-decoration: none;
+            color: var(--text-inverse);
+        }
+        
+        .btn-steam:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-steam:active {
+            transform: scale(0.96);
+            transition: transform 0.1s;
         }
         
         .loading-overlay {
@@ -86,11 +214,13 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(23, 26, 33, 0.95);
+            background: rgba(10, 12, 16, 0.95);
+            backdrop-filter: blur(8px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 9999;
+            transition: opacity var(--transition-slow);
         }
         
         .spinner {
@@ -103,67 +233,280 @@
             max-width: 90vw;
             max-height: 90vh;
             background: url('loading1.gif') center/contain no-repeat;
-            background-color: #1b2838;
+            background-color: var(--bg-card);
             z-index: 10000;
             border-radius: 50%;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+            border: 2px solid rgba(0, 212, 170, 0.2);
         }
         
-
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         .page-header {
-            background: linear-gradient(135deg, #1b2838 0%, #2a3f5a 100%);
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1100;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+            border-radius: 14px;
+            padding: 1.5rem 0;
+            margin: 0.5rem 1rem 2rem;
+            animation: fadeInDown 0.6s var(--bounce) both;
+        }
+        
+        .page-header::after {
+            content: '';
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            bottom: -2px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            opacity: .35;
+            filter: blur(0.5px);
+            pointer-events: none;
+        }
+        
+        .page-header h1 {
+            color: var(--text-primary);
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .page-header h1 i {
+            color: var(--accent-primary);
+            filter: drop-shadow(0 0 8px rgba(0, 212, 170, 0.4));
         }
 
         #gamesContainer {
-            min-height: 60vh; /* контейнер занимает хотя бы 60% высоты экрана */
+            min-height: 60vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            padding: 1rem 0;
         }
-
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+        }
+        
         .animated-emoji {
             font-size: 5rem;
             display: inline-block;
             position: relative;
             animation: float 15s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(0, 212, 170, 0.4));
         }
-
+        
         @keyframes float {
             0% { 
                 transform: translate(0, 0) rotate(0deg);
-                filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3));
+                filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 20px rgba(0, 212, 170, 0.4));
             }
             25% { 
                 transform: translate(50px, -30px) rotate(5deg);
-                filter: drop-shadow(5px 10px 8px rgba(0, 0, 0, 0.2));
+                filter: drop-shadow(5px 10px 8px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 25px rgba(0, 212, 170, 0.5));
             }
             50% { 
                 transform: translate(30px, 20px) rotate(-3deg);
-                filter: drop-shadow(-5px 5px 6px rgba(0, 0, 0, 0.25));
+                filter: drop-shadow(-5px 5px 6px rgba(0, 0, 0, 0.25)) drop-shadow(0 0 30px rgba(0, 212, 170, 0.6));
             }
             75% { 
                 transform: translate(-40px, -10px) rotate(4deg);
-                filter: drop-shadow(5px -5px 7px rgba(0, 0, 0, 0.2));
+                filter: drop-shadow(5px -5px 7px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 25px rgba(0, 212, 170, 0.5));
             }
             100% { 
                 transform: translate(0, 0) rotate(0deg);
-                filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3));
+                filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 20px rgba(0, 212, 170, 0.4));
             }
         }
         
         .animated-emoji:hover {
             animation-play-state: paused;
-            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5)) !important;
+            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 15px rgba(0, 212, 170, 0.6)) !important;
+            transform: scale(1.1);
+        }
+        
+        .empty-state, .error-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+            animation: fadeInUp 0.8s ease both;
+        }
+        
+        .empty-state h2, .error-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .empty-state p, .error-state p {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-secondary), #0088ff);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            transition: all var(--transition-normal);
+            box-shadow: 0 4px 16px rgba(0, 153, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0088ff, #0066cc);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 153, 255, 0.4);
+        }
+        
+        .btn-outline-light, .btn-success {
+            background: linear-gradient(135deg, var(--accent-primary), #6dd3a7);
+            color: var(--text-inverse);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            transition: all var(--transition-normal);
+            box-shadow: 0 4px 16px rgba(0, 212, 170, 0.3);
+        }
+        
+        .btn-outline-light:hover, .btn-success:hover {
+            background: linear-gradient(135deg, #00e6bf, #5dd69c);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 212, 170, 0.4);
+            color: var(--text-inverse);
+        }
+        
+        /* Стили для уведомлений */
+        .notification-button {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notification-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .notification-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-header {
+                margin: 0.25rem 0.5rem 1.5rem;
+                padding: 1rem 0;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .game-card {
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            
+            .page-header .d-flex {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+                text-align: center;
+            }
         }
 
+        
+        /* Дополнительные стили для лучшего UX */
+        .container {
+            max-width: 1400px;
+        }
+        
+        .free-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: linear-gradient(135deg, var(--accent-success), #4caf50);
+            color: white;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(38, 222, 129, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(38, 222, 129, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 4px 16px rgba(38, 222, 129, 0.5);
+            }
+        }
+        
+        /* Улучшенная типографика */
+        h1, h2, h3 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        /* Улучшенные фокус состояния для доступности */
+        .btn:focus-visible, .game-card:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
     </style>
+    
+    <!-- Подключение Google Fonts для улучшенной типографики -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="loading-overlay">
@@ -184,7 +527,8 @@
     </header>
 
     <div class="container">
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="gamesContainer">
+        <div id="gamesContainer">
+            <!-- Games will be loaded here -->
         </div>
     </div>
 
@@ -199,35 +543,35 @@
                         const gamesContainer = document.getElementById('gamesContainer');
                         
                         if (data.free_list && data.free_list.length > 0) {
-                            gamesContainer.innerHTML = data.free_list.map(game => `
-                                <div class="col">
-                                    <div class="game-card h-100 d-flex flex-column">
-                                        <img src="${getGameImageUrl(game[1])}" 
-                                             class="game-image" 
-                                             onerror="this.onerror=null; this.src='steamfreeico.png'" 
-                                             alt="${game[0]}"
-                                             loading="lazy">
-                                        <h3 class="game-title" title="${game[0]}">${game[0]}</h3>
-                                        <div class="mt-auto">
-                                            <div class="game-price">Бесплатно</div>
-                                            <a href="${game[1]}" target="_blank" class="btn-steam">
-                                                <i class="fab fa-steam me-2"></i>В Steam
-                                            </a>
-                                        </div>
+                            gamesContainer.className = 'games-grid';
+                            gamesContainer.innerHTML = data.free_list.map((game, index) => `
+                                <div class="game-card" style="--index: ${index}">
+                                    <div class="free-badge">🎁 FREE</div>
+                                    <img src="${getGameImageUrl(game[1])}" 
+                                         class="game-image" 
+                                         onerror="this.onerror=null; this.src='steamfreeico.png'" 
+                                         alt="${game[0]}"
+                                         loading="lazy">
+                                    <h3 class="game-title" title="${game[0]}">${game[0]}</h3>
+                                    <div class="game-price">
+                                        <i class="fas fa-gift me-2"></i>Бесплатно навсегда!
                                     </div>
+                                    <a href="${game[1]}" target="_blank" class="btn-steam">
+                                        <i class="fab fa-steam"></i>
+                                        <span>Получить в Steam</span>
+                                    </a>
                                 </div>
                             `).join('');
                         } else {
+                            gamesContainer.className = 'empty-state';
                             gamesContainer.innerHTML = `
-                            <div class="text-center">
-                            <div class="animated-emoji">🤕</div>
-                            <h2 style="margin-bottom: 1rem;">Нет доступных игр</h2>
-                            <p style="margin-bottom: 1.5rem;">Попробуйте обновить страницу позже</p>
-                            <button onclick="window.location.reload()" class="btn btn-primary btn-lg">
-                            <i class="fas fa-sync-alt me-2"></i>Обновить страницу
-                         </button>
-                     </div>
-                 `;
+                                <div class="animated-emoji">🎮</div>
+                                <h2>Нет доступных бесплатных игр</h2>
+                                <p>В данный момент нет актуальных бесплатных предложений.<br>Попробуйте обновить страницу позже.</p>
+                                <button onclick="window.location.reload()" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sync-alt me-2"></i>Обновить страницу
+                                </button>
+                            `;
                         }
                         resolve();
                     })
@@ -235,20 +579,20 @@
                         console.error('Ошибка при загрузке списка игр:', error);
                         const gamesContainer = document.getElementById('gamesContainer');
                         if (gamesContainer) {
+                            gamesContainer.className = 'error-state';
+                            gamesContainer.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: rgba(10, 12, 16, 0.95); backdrop-filter: blur(8px); z-index: 1000;';
                             gamesContainer.innerHTML = `
-                                <div class="col-12" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.9);">
-                                    <div class="text-center p-4" style="max-width: 500px;">
-                                        <div class="mb-4" style="font-size: 5rem;">😟</div>
-                                        <h3 class="text-white mb-3">Произошла ошибка</h3>
-                                        <div class="alert alert-danger mb-4">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            Не удалось загрузить список игр
-                                        </div>
-                                        <p class="text-muted mb-4">Попробуйте перезагрузить страницу или зайти позже</p>
-                                        <button onclick="window.location.reload()" class="btn btn-primary btn-lg w-100">
-                                            <i class="fas fa-sync-alt me-2"></i>Повторить попытку
-                                        </button>
+                                <div class="text-center p-4" style="max-width: 500px; background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid rgba(255,255,255,0.1);">
+                                    <div class="animated-emoji mb-4">⚠️</div>
+                                    <h3 class="mb-3">Произошла ошибка</h3>
+                                    <div class="alert" style="background: rgba(255, 71, 87, 0.1); border: 1px solid rgba(255, 71, 87, 0.3); color: var(--accent-danger); border-radius: var(--radius-sm);">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        Не удалось загрузить список игр
                                     </div>
+                                    <p class="mb-4" style="color: var(--text-muted);">Возможно, проблема с соединением или сервер временно недоступен</p>
+                                    <button onclick="window.location.reload()" class="btn btn-primary btn-lg" style="width: 100%;">
+                                        <i class="fas fa-sync-alt me-2"></i>Повторить попытку
+                                    </button>
                                 </div>
                             `;
                         }
@@ -375,7 +719,7 @@
                 const iconClass = isEnabled ? 'fas fa-bell' : 'far fa-bell';
                 
                 const notifyButton = document.createElement('button');
-                notifyButton.className = `btn ${buttonClass} me-2`;
+                notifyButton.className = `btn ${buttonClass} me-2 notification-button`;
                 notifyButton.innerHTML = `<i class="${iconClass} me-2"></i>${buttonText}`;
                 notifyButton.id = 'notifyToggle';
                 
@@ -387,8 +731,8 @@
                     } else {
                         enableNotifications().then(success => {
                             if (success) {
-                                this.className = 'btn btn-success me-2';
-                                this.innerHTML = '<i class="fas fa-bell me-2"></i>Уведомления включены';
+                            this.className = 'btn btn-success me-2 notification-button';
+                            this.innerHTML = '<i class="fas fa-bell me-2"></i>Уведомления включены';
                                 
                                 // Показать тестовое уведомление
                                 setTimeout(() => {
