@@ -1,23 +1,27 @@
-const CACHE_VERSION = 'v1.2.0';
+const CACHE_VERSION = 'v1.3.0';
 const CACHE_NAME = `freesteam-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `freesteam-data-${CACHE_VERSION}`;
 
-// Статические файлы для кэширования
+// Статические файлы для кэширования (относительные пути)
 const STATIC_CACHE_URLS = [
-  '/',
-  '/index.html',
-  '/checker.html',
-  '/landing.html',
-  '/steamfreeico.png',
-  '/loading.gif',
-  '/loading1.gif',
-  '/manifest.json',
+  './',
+  './index.html',
+  './checker.html', 
+  './landing.html',
+  './steamfreeico.png',
+  './loading.gif',
+  './loading1.gif',
+  './manifest.json',
   // CDN ресурсы
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js',
+  'https://cdn.jsdelivr.net/npm/lenis@1.0.42/dist/lenis.min.js'
 ];
 
 // API эндпоинты для кэширования данных
@@ -159,8 +163,8 @@ self.addEventListener('fetch', (event) => {
             })
             .catch(() => {
               // Офлайн fallback для HTML страниц
-              if (event.request.headers.get('accept').includes('text/html')) {
-                return caches.match('/index.html');
+              if (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html')) {
+                return caches.match('./index.html') || caches.match('./');
               }
               
               // Для остальных ресурсов возвращаем ошибку
@@ -200,15 +204,15 @@ self.addEventListener('push', (event) => {
   let notificationData = {
     title: 'FreeSteam',
     body: 'Новые бесплатные игры доступны!',
-    icon: '/steamfreeico.png',
-    badge: '/steamfreeico.png',
+    icon: './steamfreeico.png',
+    badge: './steamfreeico.png',
     tag: 'new-games',
     requireInteraction: true,
     actions: [
       {
         action: 'open',
         title: 'Открыть',
-        icon: '/steamfreeico.png'
+        icon: './steamfreeico.png'
       },
       {
         action: 'close',
@@ -216,7 +220,7 @@ self.addEventListener('push', (event) => {
       }
     ],
     data: {
-      url: '/'
+      url: './'
     }
   };
   
@@ -282,19 +286,19 @@ async function checkForNewGames() {
 async function showNewGamesNotification() {
   const notificationOptions = {
     body: 'Найдены новые бесплатные игры в Steam!',
-    icon: '/steamfreeico.png',
-    badge: '/steamfreeico.png',
+    icon: './steamfreeico.png',
+    badge: './steamfreeico.png',
     tag: 'new-games-auto',
     requireInteraction: false,
     actions: [
       {
         action: 'view',
         title: 'Посмотреть',
-        icon: '/steamfreeico.png'
+        icon: './steamfreeico.png'
       }
     ],
     data: {
-      url: '/'
+      url: './'
     }
   };
   
