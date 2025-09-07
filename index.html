@@ -2624,9 +2624,18 @@ input::-webkit-inner-spin-button {
                 transform: translateX(-100%) !important; /* Полностью скрыт на мобильных */
             }
 
-            body.sidebar-open .sidebar { transform: translateX(0); }
-
-            body.sidebar-open::after { content: ""; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; }
+            .sidebar.open { 
+                transform: translateX(0) !important; 
+                box-shadow: 5px 0 25px rgba(0,0,0,0.5);
+            }
+            
+            /* Индикатор активного состояния кнопки меню */
+            .mobile-menu-btn.active {
+                background: var(--accent-primary);
+                color: var(--bg-dark);
+                border-color: var(--accent-primary);
+                box-shadow: 0 4px 12px rgba(76,175,80,0.3);
+            }
 
         }
 
@@ -3790,14 +3799,53 @@ input::-webkit-inner-spin-button {
   }
 
   /* Responsive: stack nicely */
+  /* Mobile menu button styles */
+  .mobile-menu-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--accent-primary);
+    border-radius: 8px;
+    padding: 0.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    margin-right: 1rem;
+  }
+  
+  .mobile-menu-btn:hover {
+    background: var(--accent-primary);
+    color: var(--bg-dark);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(76,175,80,0.3);
+  }
+  
+  .mobile-menu-btn:active {
+    transform: scale(0.95);
+  }
+  
   @media (max-width: 768px) {
-    .app-header { border-radius: 12px; }
-    .region-selector { width: 100%; }
+    .app-header { 
+      border-radius: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .region-selector { 
+      width: 100%;
+      order: 3;
+      margin-right: 0;
+      margin-top: 0.75rem;
+    }
+    
     .language-switcher {
       flex-direction: column;
       align-items: stretch;
       gap: 8px;
     }
+    
     .language-switcher a.btn-outline-light {
       text-align: center;
     }
@@ -3952,6 +4000,11 @@ input::-webkit-inner-spin-button {
         </div>
 
         <header class="app-header">
+            <!-- Mobile menu button -->
+            <button class="mobile-menu-btn d-lg-none" id="mobileMenuBtn" aria-label="Открыть фильтры">
+                <i class="fas fa-bars"></i>
+            </button>
+            
             <div class="region-selector" style="margin-right: 15px;">
                 <select id="ccSelect" class="form-select form-select-sm" style="width: auto; display: inline-block;">
                     <option value="us">Global (US)</option>
@@ -6964,6 +7017,33 @@ input::-webkit-inner-spin-button {
             
             // Uncomment the line below to enable auto-showing the panel
             // checkForNewFreeGames();
+            
+        // Mobile menu button logic
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    const sidebar = document.querySelector('.sidebar');
+                    const sidebarOverlay = document.querySelector('.sidebar-overlay');
+                    
+                    if (sidebar && sidebarOverlay) {
+                        const isOpen = sidebar.classList.contains('open');
+                        
+                        if (isOpen) {
+                            sidebar.classList.remove('open');
+                            sidebarOverlay.classList.remove('show');
+                        } else {
+                            sidebar.classList.add('open');
+                            sidebarOverlay.classList.add('show');
+                        }
+                        
+                        // Update button icon
+                        const icon = mobileMenuBtn.querySelector('i');
+                        if (icon) {
+                            icon.className = isOpen ? 'fas fa-bars' : 'fas fa-times';
+                        }
+                    }
+                });
+            }
             
         // Sidebar logic
             const sidebar = document.querySelector('.sidebar');
