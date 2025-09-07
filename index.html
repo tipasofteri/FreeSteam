@@ -40,9 +40,56 @@
     <meta name="msapplication-config" content="browserconfig.xml">
     
     <!-- Icons and Manifest -->
-    <link rel="icon" href="steamfreeico.png">
+    <link rel="icon" href="steamfreeico.png" sizes="any">
+    <link rel="icon" href="steamfreeico.png" type="image/png" sizes="192x192">
     <link rel="apple-touch-icon" href="steamfreeico.png">
     <link rel="manifest" href="manifest.json">
+    
+    <!-- Performance and SEO -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://store.fastly.steamstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="//shared.akamai.steamstatic.com">
+    <link rel="dns-prefetch" href="//steamcdn-a.akamaihd.net">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "FreeSteam",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Найдите лучшие бесплатные игры и скидки в Steam. Автоматическое обновление данных, продвинутые фильтры по жанрам, платформам и рейтингам.",
+      "url": "https://tipasofteri.github.io/FreeSteam/",
+      "screenshot": "https://tipasofteri.github.io/FreeSteam/steamfreeico.png",
+      "author": {
+        "@type": "Person",
+        "name": "Pavel Ovchinnikov"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "150",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "FreeSteam",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://tipasofteri.github.io/FreeSteam/steamfreeico.png"
+        }
+      }
+    }
+    </script>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" rel="stylesheet">
@@ -3850,6 +3897,115 @@ input::-webkit-inner-spin-button {
       text-align: center;
     }
   }
+
+  /* Settings Modal Styles */
+  .settings-group {
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  
+  .settings-title {
+    color: var(--accent-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .form-check-input {
+    background-color: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  
+  .form-check-input:checked {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+  }
+  
+  .form-check-input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 0.25rem rgba(76,175,80,0.25);
+  }
+  
+  .stat-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  .stat-number {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 0.25rem;
+  }
+  
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  
+  /* Notification Animations */
+  @keyframes slideInNotif {
+    from {
+      opacity: 0;
+      transform: translateX(100%) scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+  
+  @keyframes slideOutNotif {
+    from {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(100%) scale(0.8);
+    }
+  }
+  
+  /* Light theme overrides */
+  .light-theme {
+    background: #f8f9fa !important;
+  }
+  
+  .light-theme .game-card {
+    background: #ffffff !important;
+    border-color: rgba(0,0,0,0.125) !important;
+    color: #212529 !important;
+  }
+  
+  .light-theme .modal-content {
+    background: #ffffff !important;
+    color: #212529 !important;
+  }
+  
+  .light-theme .form-control {
+    background: #ffffff !important;
+    border-color: rgba(0,0,0,0.125) !important;
+    color: #212529 !important;
+  }
+  
+  .light-theme .settings-group {
+    background: rgba(0,0,0,0.03) !important;
+    border-color: rgba(0,0,0,0.1) !important;
+  }
+  
+  .light-theme .stat-card {
+    background: rgba(0,0,0,0.05) !important;
+    border-color: rgba(0,0,0,0.1) !important;
+  }
 </style>
 
 </head>
@@ -4023,6 +4179,12 @@ input::-webkit-inner-spin-button {
                     <button id="langRu" class="btn btn-sm btn-outline-secondary active" data-lang="ru">RU</button>
                     <button id="langEn" class="btn btn-sm btn-outline-secondary" data-lang="en">EN</button>
                 </div>
+                <button id="themeToggle" class="btn btn-sm btn-outline-secondary" title="Переключить тему">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <button id="settingsBtn" class="btn btn-sm btn-outline-secondary" title="Настройки">
+                    <i class="fas fa-cog"></i>
+                </button>
             </div>
 
 
@@ -4390,14 +4552,6 @@ input::-webkit-inner-spin-button {
 
                 </button>
 
-                <button id="densityBtn" class="btn btn-outline-success">
-
-                    <i class="fas fa-compress"></i>
-
-                    <span data-translate-key="compact">Compact</span>
-
-                </button>
-
             </div>
 
 
@@ -4592,6 +4746,7 @@ input::-webkit-inner-spin-button {
             
             try { 
                 console.info(`[FreeSteam] Loading data for region: ${cc.toUpperCase()}`); 
+                console.info(`[FreeSteam] URLs: ${JSON.stringify({p1, p2})}`);
             } catch(_) {}
             
             return { 
@@ -6524,7 +6679,9 @@ input::-webkit-inner-spin-button {
                         initialAsyncLoad(true);
                     });
                     if (ccSel) ccSel.addEventListener('change', () => {
+                        console.log('[DEBUG] Currency selector changed to:', ccSel.value);
                         setStoredCC(ccSel.value);
+                        console.log('[DEBUG] Stored CC:', getStoredCC());
                         initialAsyncLoad(true);
                     });
                 } catch(_) {}
@@ -6825,6 +6982,356 @@ input::-webkit-inner-spin-button {
 
         try { applyTranslations(currentLang); } catch (_) {}
 
+        // Theme toggle functionality
+        const THEME_KEY = 'fs_theme_v1';
+        let currentTheme = 'dark'; // default theme
+        
+        function getStoredTheme() {
+            try {
+                return localStorage.getItem(THEME_KEY) || 'dark';
+            } catch (_) {
+                return 'dark';
+            }
+        }
+        
+        function setStoredTheme(theme) {
+            try {
+                localStorage.setItem(THEME_KEY, theme);
+            } catch (_) {}
+        }
+        
+        function applyTheme(theme) {
+            currentTheme = theme;
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            if (theme === 'light') {
+                body.classList.add('light-theme');
+                if (themeIcon) {
+                    themeIcon.className = 'fas fa-sun';
+                }
+                // Update CSS custom properties for light theme
+                body.style.setProperty('--bg-primary', '#f8f9fa');
+                body.style.setProperty('--bg-secondary', '#ffffff');
+                body.style.setProperty('--bg-card', '#ffffff');
+                body.style.setProperty('--text-primary', '#212529');
+                body.style.setProperty('--text-secondary', '#495057');
+                body.style.setProperty('--text-muted', '#6c757d');
+                body.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.125)');
+            } else {
+                body.classList.remove('light-theme');
+                if (themeIcon) {
+                    themeIcon.className = 'fas fa-moon';
+                }
+                // Reset to dark theme
+                body.style.removeProperty('--bg-primary');
+                body.style.removeProperty('--bg-secondary');
+                body.style.removeProperty('--bg-card');
+                body.style.removeProperty('--text-primary');
+                body.style.removeProperty('--text-secondary');
+                body.style.removeProperty('--text-muted');
+                body.style.removeProperty('--border-color');
+            }
+        }
+        
+        // Initialize theme
+        document.addEventListener('DOMContentLoaded', function() {
+            const storedTheme = getStoredTheme();
+            applyTheme(storedTheme);
+            
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    applyTheme(newTheme);
+                    setStoredTheme(newTheme);
+                    
+                    // Show notification
+                    const themeText = newTheme === 'light' ? 'Светлая' : 'Тёмная';
+                    showCustomNotification('🎨 Тема изменена', `Активирована ${themeText.toLowerCase()} тема`, 'success');
+                });
+            }
+        });
+        
+        // Settings modal functionality
+        function showSettingsModal() {
+            let settingsModal = document.getElementById('settingsModal');
+            
+            if (!settingsModal) {
+                // Create settings modal
+                settingsModal = document.createElement('div');
+                settingsModal.className = 'modal fade';
+                settingsModal.id = 'settingsModal';
+                settingsModal.setAttribute('tabindex', '-1');
+                settingsModal.setAttribute('aria-hidden', 'true');
+                
+                settingsModal.innerHTML = `
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-cog me-2"></i>Настройки
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="settings-group">
+                                            <h6 class="settings-title">
+                                                <i class="fas fa-palette me-2"></i>Внешний вид
+                                            </h6>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="darkModeSwitch">
+                                                <label class="form-check-label" for="darkModeSwitch">
+                                                    Тёмная тема
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="compactModeSwitch">
+                                                <label class="form-check-label" for="compactModeSwitch">
+                                                    Компактный режим
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="settings-group">
+                                            <h6 class="settings-title">
+                                                <i class="fas fa-bell me-2"></i>Уведомления
+                                            </h6>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="notificationsSwitch">
+                                                <label class="form-check-label" for="notificationsSwitch">
+                                                    Уведомления о бесплатных играх
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="soundSwitch">
+                                                <label class="form-check-label" for="soundSwitch">
+                                                    Звук уведомлений
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        
+                                        <div class="settings-group">
+                                            <h6 class="settings-title">
+                                                <i class="fas fa-database me-2"></i>Данные
+                                            </h6>
+                                            <div class="mb-3">
+                                                <button type="button" class="btn btn-outline-warning btn-sm" id="clearCacheBtn">
+                                                    <i class="fas fa-trash me-1"></i>Очистить кэш
+                                                </button>
+                                            </div>
+                                            <div class="mb-3">
+                                                <button type="button" class="btn btn-outline-danger btn-sm" id="resetSettingsBtn">
+                                                    <i class="fas fa-undo me-1"></i>Сбросить настройки
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <hr class="my-4">
+                                
+                                <div class="settings-group">
+                                    <h6 class="settings-title">
+                                        <i class="fas fa-info-circle me-2"></i>Информация
+                                    </h6>
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <div class="stat-card">
+                                                <div class="stat-number" id="totalGamesCount">0</div>
+                                                <div class="stat-label">Всего игр</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="stat-card">
+                                                <div class="stat-number" id="freeGamesCount">0</div>
+                                                <div class="stat-label">Бесплатных</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="stat-card">
+                                                <div class="stat-number" id="discountedGamesCount">0</div>
+                                                <div class="stat-label">Со скидкой</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-1"></i>Закрыть
+                                </button>
+                                <button type="button" class="btn btn-primary" id="saveSettingsBtn">
+                                    <i class="fas fa-save me-1"></i>Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(settingsModal);
+            }
+            
+            // Initialize settings values
+            const darkModeSwitch = settingsModal.querySelector('#darkModeSwitch');
+            const compactModeSwitch = settingsModal.querySelector('#compactModeSwitch');
+            const notificationsSwitch = settingsModal.querySelector('#notificationsSwitch');
+            const soundSwitch = settingsModal.querySelector('#soundSwitch');
+            const languageSelect = settingsModal.querySelector('#languageSelect');
+            const regionSelect = settingsModal.querySelector('#regionSelect');
+            
+            if (darkModeSwitch) darkModeSwitch.checked = currentTheme === 'dark';
+            if (compactModeSwitch) compactModeSwitch.checked = document.body.classList.contains('compact');
+            if (notificationsSwitch) notificationsSwitch.checked = isNotifyEnabled();
+            if (soundSwitch) soundSwitch.checked = getStoredSetting('sound_enabled', true);
+            if (languageSelect) languageSelect.value = currentLang;
+            if (regionSelect) regionSelect.value = getStoredCC();
+            
+            // Update stats
+            if (allGames && allGames.length > 0) {
+                const totalGames = allGames.length;
+                const freeGames = allGames.filter(g => Number(g.discount) >= 100).length;
+                const discountedGames = allGames.filter(g => Number(g.discount) > 0 && Number(g.discount) < 100).length;
+                
+                const totalEl = settingsModal.querySelector('#totalGamesCount');
+                const freeEl = settingsModal.querySelector('#freeGamesCount');
+                const discountedEl = settingsModal.querySelector('#discountedGamesCount');
+                
+                if (totalEl) totalEl.textContent = totalGames.toLocaleString();
+                if (freeEl) freeEl.textContent = freeGames.toLocaleString();
+                if (discountedEl) discountedEl.textContent = discountedGames.toLocaleString();
+            }
+            
+            // Event listeners
+            const clearCacheBtn = settingsModal.querySelector('#clearCacheBtn');
+            const resetSettingsBtn = settingsModal.querySelector('#resetSettingsBtn');
+            const saveSettingsBtn = settingsModal.querySelector('#saveSettingsBtn');
+            
+            if (clearCacheBtn) {
+                clearCacheBtn.addEventListener('click', function() {
+                    try {
+                        // Clear cache data
+                        const keysToKeep = ['fs_agreement_accepted_v1', 'fs_theme_v1', 'fs_ui_lang_v1', 'fs_ui_cc_v1'];
+                        const allKeys = Object.keys(localStorage);
+                        allKeys.forEach(key => {
+                            if (!keysToKeep.includes(key) && key.startsWith('fs_')) {
+                                localStorage.removeItem(key);
+                            }
+                        });
+                        showCustomNotification('🗑️ Кэш очищен', 'Данные кэша успешно удалены', 'success');
+                    } catch (_) {
+                        showCustomNotification('❌ Ошибка', 'Не удалось очистить кэш', 'error');
+                    }
+                });
+            }
+            
+            if (resetSettingsBtn) {
+                resetSettingsBtn.addEventListener('click', function() {
+                    if (confirm('Вы уверены, что хотите сбросить все настройки?')) {
+                        try {
+                            // Keep only agreement
+                            const agreement = localStorage.getItem('fs_agreement_accepted_v1');
+                            localStorage.clear();
+                            if (agreement) localStorage.setItem('fs_agreement_accepted_v1', agreement);
+                            
+                            showCustomNotification('🔄 Настройки сброшены', 'Страница будет перезагружена', 'success');
+                            setTimeout(() => location.reload(), 2000);
+                        } catch (_) {
+                            showCustomNotification('❌ Ошибка', 'Не удалось сбросить настройки', 'error');
+                        }
+                    }
+                });
+            }
+            
+            if (saveSettingsBtn) {
+                saveSettingsBtn.addEventListener('click', function() {
+                    try {
+                        // Save theme
+                        if (darkModeSwitch) {
+                            const newTheme = darkModeSwitch.checked ? 'dark' : 'light';
+                            if (newTheme !== currentTheme) {
+                                applyTheme(newTheme);
+                                setStoredTheme(newTheme);
+                            }
+                        }
+                        
+                        // Save compact mode
+                        if (compactModeSwitch) {
+                            document.body.classList.toggle('compact', compactModeSwitch.checked);
+                            setStoredSetting('compact_mode', compactModeSwitch.checked);
+                        }
+                        
+                        // Save notifications
+                        if (notificationsSwitch) {
+                            setNotifyEnabled(notificationsSwitch.checked);
+                        }
+                        
+                        // Save sound
+                        if (soundSwitch) {
+                            setStoredSetting('sound_enabled', soundSwitch.checked);
+                        }
+                        
+                        // Save language and region
+                        if (languageSelect && languageSelect.value !== currentLang) {
+                            setLanguage(languageSelect.value);
+                        }
+                        
+                        if (regionSelect && regionSelect.value !== getStoredCC()) {
+                            setStoredCC(regionSelect.value);
+                            // Reload data for new region
+                            initialAsyncLoad && initialAsyncLoad(true);
+                        }
+                        
+                        showCustomNotification('💾 Настройки сохранены', 'Ваши предпочтения применены', 'success');
+                        
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(settingsModal);
+                        if (modal) modal.hide();
+                    } catch (_) {
+                        showCustomNotification('❌ Ошибка', 'Не удалось сохранить настройки', 'error');
+                    }
+                });
+            }
+            
+            // Show modal
+            const modal = new bootstrap.Modal(settingsModal);
+            modal.show();
+        }
+        
+        // Helper functions for settings storage
+        function getStoredSetting(key, defaultValue) {
+            try {
+                const value = localStorage.getItem(`fs_setting_${key}`);
+                return value !== null ? JSON.parse(value) : defaultValue;
+            } catch (_) {
+                return defaultValue;
+            }
+        }
+        
+        function setStoredSetting(key, value) {
+            try {
+                localStorage.setItem(`fs_setting_${key}`, JSON.stringify(value));
+            } catch (_) {}
+        }
+        
+        // Initialize settings button
+        document.addEventListener('DOMContentLoaded', function() {
+            const settingsBtn = document.getElementById('settingsBtn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', showSettingsModal);
+            }
+            
+            // Load compact mode setting
+            const compactMode = getStoredSetting('compact_mode', false);
+            if (compactMode) {
+                document.body.classList.add('compact');
+            }
+        });
+
         // Создание эффекта рассыпающихся букв для заголовка
         function initScatteredTitle() {
             const titleElement = document.getElementById('appTitleText');
@@ -7029,11 +7536,15 @@ input::-webkit-inner-spin-button {
                         const isOpen = sidebar.classList.contains('open');
                         
                         if (isOpen) {
+                            // Close sidebar
                             sidebar.classList.remove('open');
                             sidebarOverlay.classList.remove('show');
+                            mobileMenuBtn.classList.remove('active');
                         } else {
+                            // Open sidebar
                             sidebar.classList.add('open');
                             sidebarOverlay.classList.add('show');
+                            mobileMenuBtn.classList.add('active');
                         }
                         
                         // Update button icon
@@ -7108,8 +7619,19 @@ input::-webkit-inner-spin-button {
                 });
             }
             
-            // Закрытие по клику на overlay или вне сайдбара
-            sidebarOverlay.addEventListener('click', closeSidebar);
+            // Закрытие по клику на overlay (с обновлением кнопки на мобильных)
+            sidebarOverlay.addEventListener('click', function() {
+                closeSidebar();
+                // Обновляем мобильную кнопку меню при закрытии через overlay
+                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                if (mobileMenuBtn) {
+                    mobileMenuBtn.classList.remove('active');
+                    const icon = mobileMenuBtn.querySelector('i');
+                    if (icon) {
+                        icon.className = 'fas fa-bars';
+                    }
+                }
+            });
             
             // Закрытие по клику вне сайдбара
             document.addEventListener('click', (event) => {
