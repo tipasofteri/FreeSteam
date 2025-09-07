@@ -2379,54 +2379,316 @@ input::-webkit-inner-spin-button {
 
 
 
-        @media (max-width: 768px) {
-
-            .app-header {
-
-                flex-direction: column;
-
-                align-items: flex-start;
-
-                gap: 1rem;
-
-            }
-
-            .toolbar { top: 96px; }
-
-            
-
-            .game-header {
-
-                flex-direction: column;
-
-                align-items: flex-start;
-
-            }
-
-            
-
-            .game-discount {
-
-                margin-top: 0.5rem;
-
-            }
-
-            
-
-            .filter-container {
-
-                grid-template-columns: 1fr;
-
-            }
-
-            
-
+        /* ===== МОБИЛЬНАЯ ОПТИМИЗАЦИЯ ===== */
+        
+        /* Оптимизация для планшетов (768px - 992px) */
+        @media (max-width: 992px) {
             .game-list {
-
-                grid-template-columns: 1fr;
-
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1rem;
             }
-
+            
+            .filter-container {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+            }
+            
+            .app-header {
+                padding: 0.5rem;
+                margin-top: 0.25rem;
+                border-radius: 10px;
+            }
+        }
+        
+        /* Основная мобильная оптимизация (до 768px) */
+        @media (max-width: 768px) {
+            /* Контейнер и базовая компоновка */
+            .container {
+                padding: 0 0.75rem;
+            }
+            
+            /* Заголовок приложения */
+            .app-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+                padding: 0.75rem;
+                margin-top: 0.25rem;
+                border-radius: 8px;
+            }
+            
+            .app-title {
+                order: 2;
+                text-align: center;
+                font-size: 1.4rem;
+            }
+            
+            .region-selector {
+                order: 1;
+                margin-right: 0;
+                margin-bottom: 0;
+            }
+            
+            .language-switcher {
+                order: 3;
+                margin-left: 0;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .language-switcher > div {
+                display: flex;
+                gap: 0.25rem;
+                order: 1;
+            }
+            
+            .language-switcher > a {
+                order: 2;
+                flex: 1;
+                text-align: center;
+                min-width: auto;
+            }
+            
+            .language-switcher > button {
+                order: 3;
+                padding: 0.4rem;
+                min-width: 36px;
+                height: 36px;
+            }
+            
+            /* Тулбар */
+            .toolbar {
+                top: 140px; /* Увеличено для нового header */
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                padding: 0.5rem 0;
+            }
+            
+            .toolbar .btn {
+                padding: 0.4rem 0.7rem;
+                font-size: 0.85rem;
+            }
+            
+            .total-count {
+                order: -1;
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 0.5rem;
+                font-size: 0.8rem;
+                padding: 0.4rem 0.6rem;
+            }
+            
+            /* Сетка игр */
+            .game-list {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            /* Карточки игр */
+            .game-card {
+                border-radius: 8px;
+                margin: 0;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 1rem 0.75rem;
+                min-height: auto;
+            }
+            
+            .game-image-container {
+                width: 140px;
+                height: 52px;
+                margin-bottom: 0.75rem;
+            }
+            
+            .game-discount-container {
+                padding-left: 0;
+                width: 100%;
+            }
+            
+            .game-discount {
+                font-size: 1.1rem;
+                margin-top: 0;
+            }
+            
+            .game-body {
+                padding: 1rem;
+            }
+            
+            .game-name {
+                font-size: 1.1rem;
+                text-align: center;
+                margin-bottom: 0.75rem;
+                line-height: 1.3;
+            }
+            
+            .game-meta {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            /* Фильтры - адаптируем под мобильные */
+            .filter-container {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            
+            .filter-group {
+                padding: 1rem;
+            }
+            
+            .filter-group-title {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .slider-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .slider-input {
+                width: 100%;
+                max-width: none;
+            }
+            
+            .platform-filters,
+            .additional-filters {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .platform-checkbox,
+            .additional-filter {
+                justify-content: flex-start;
+                padding: 0.5rem 0.25rem;
+            }
+            
+            /* Пагинация */
+            .pagination-container {
+                padding-top: 1rem;
+                bottom: 4px;
+            }
+            
+            .pagination {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 0.25rem;
+            }
+            
+            .page-link {
+                width: 36px;
+                height: 36px;
+                font-size: 0.85rem;
+            }
+            
+            /* Подвал */
+            .app-footer {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Дополнительная оптимизация для очень маленьких экранов */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 0.5rem;
+            }
+            
+            .app-header {
+                padding: 0.5rem;
+            }
+            
+            .app-title {
+                font-size: 1.2rem;
+            }
+            
+            .game-card {
+                border-radius: 6px;
+            }
+            
+            .game-header {
+                padding: 0.75rem 0.5rem;
+            }
+            
+            .game-body {
+                padding: 0.75rem;
+            }
+            
+            .game-name {
+                font-size: 1rem;
+            }
+            
+            .game-discount {
+                font-size: 1rem;
+            }
+            
+            .filter-group {
+                padding: 0.75rem;
+                border-radius: 6px;
+            }
+            
+            .total-count {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.5rem;
+            }
+            
+            .toolbar .btn {
+                padding: 0.35rem 0.6rem;
+                font-size: 0.8rem;
+            }
+            
+            .page-link {
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Оптимизация для альбомной ориентации на мобильных */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .game-list {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 0.75rem;
+            }
+            
+            .game-header {
+                flex-direction: row;
+                text-align: left;
+                padding: 0.75rem;
+            }
+            
+            .game-image-container {
+                width: 120px;
+                height: 45px;
+                margin-bottom: 0;
+                margin-right: 0.75rem;
+            }
+            
+            .game-discount-container {
+                padding-left: 0.75rem;
+            }
+            
+            .game-name {
+                text-align: left;
+            }
+            
+            .game-meta {
+                flex-direction: row;
+                justify-content: space-between;
+            }
         }
 
 
@@ -2660,28 +2922,134 @@ input::-webkit-inner-spin-button {
 
             .layout { grid-template-columns: 1fr; }
 
+            /* Скрываем триггерную зону на мобильных */
+            .sidebar-trigger {
+                display: none;
+            }
+
             .sidebar {
                 position: fixed;
-                left: 0;
-                top: 68px;
-                width: 85%;
-                max-width: 360px;
-                z-index: 1100;
-                height: calc(100vh - 84px);
-                transform: translateX(-100%) !important; /* Полностью скрыт на мобильных */
+                left: -100%;
+                top: 0;
+                width: 90%;
+                max-width: 380px;
+                height: 100vh;
+                z-index: 2000;
+                background: linear-gradient(180deg, rgba(26,20,13,0.98) 0%, rgba(19,15,11,0.98) 100%);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: none;
+                border-radius: 0 16px 16px 0;
+                box-shadow: 8px 0 32px rgba(0,0,0,0.6);
+                transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+                padding: 1rem;
+                padding-top: 2rem;
             }
 
             .sidebar.open { 
-                transform: translateX(0) !important; 
-                box-shadow: 5px 0 25px rgba(0,0,0,0.5);
+                left: 0;
+                box-shadow: 8px 0 40px rgba(0,0,0,0.8);
             }
             
-            /* Индикатор активного состояния кнопки меню */
+            /* Мобильная кнопка меню */
+            .mobile-menu-btn {
+                display: flex !important;
+                position: relative;
+                z-index: 2001;
+            }
+            
             .mobile-menu-btn.active {
-                background: var(--accent-primary);
-                color: var(--bg-dark);
-                border-color: var(--accent-primary);
-                box-shadow: 0 4px 12px rgba(76,175,80,0.3);
+                background: var(--accent-primary) !important;
+                color: var(--bg-dark) !important;
+                border-color: var(--accent-primary) !important;
+                box-shadow: 0 4px 12px rgba(76,175,80,0.3) !important;
+            }
+            
+            /* Overlay для закрытия */
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 1999;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+            
+            .sidebar-overlay.show {
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            /* Заголовок сайдбара */
+            .sidebar-header {
+                font-size: 1.2rem;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid rgba(192,147,88,0.3);
+                text-align: center;
+            }
+            
+            /* Улучшаем группы фильтров */
+            .sidebar .filter-group {
+                margin-bottom: 1.5rem;
+                background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
+                border: 1px solid rgba(255,255,255,0.15);
+                border-radius: 12px;
+                padding: 1.25rem;
+            }
+            
+            /* Увеличиваем элементы управления для touch */
+            .sidebar .form-control,
+            .sidebar .form-select,
+            .sidebar .btn {
+                padding: 0.75rem;
+                font-size: 1rem;
+                border-radius: 8px;
+            }
+            
+            .sidebar .platform-checkbox,
+            .sidebar .additional-filter {
+                padding: 1rem 0.5rem;
+                margin-bottom: 0.5rem;
+                background: rgba(255,255,255,0.05);
+                border-radius: 8px;
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .sidebar .platform-checkbox:active,
+            .sidebar .additional-filter:active {
+                background: rgba(255,255,255,0.15);
+                transform: scale(0.98);
+            }
+            
+            /* Улучшаем слайдеры */
+            .sidebar .slider-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .sidebar .slider-input {
+                width: 100%;
+                padding: 1rem;
+            }
+            
+            .sidebar .noUi-target {
+                height: 12px;
+                margin: 1rem 0;
+            }
+            
+            .sidebar .noUi-handle {
+                width: 32px !important;
+                height: 32px !important;
+                right: -16px !important;
+                top: -10px !important;
             }
 
         }
@@ -7525,129 +7893,125 @@ input::-webkit-inner-spin-button {
             // Uncomment the line below to enable auto-showing the panel
             // checkForNewFreeGames();
             
-        // Mobile menu button logic
+        // Mobile menu button and sidebar logic
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            if (mobileMenuBtn) {
-                mobileMenuBtn.addEventListener('click', function() {
-                    const sidebar = document.querySelector('.sidebar');
-                    const sidebarOverlay = document.querySelector('.sidebar-overlay');
-                    
-                    if (sidebar && sidebarOverlay) {
-                        const isOpen = sidebar.classList.contains('open');
-                        
-                        if (isOpen) {
-                            // Close sidebar
-                            sidebar.classList.remove('open');
-                            sidebarOverlay.classList.remove('show');
-                            mobileMenuBtn.classList.remove('active');
-                        } else {
-                            // Open sidebar
-                            sidebar.classList.add('open');
-                            sidebarOverlay.classList.add('show');
-                            mobileMenuBtn.classList.add('active');
-                        }
-                        
-                        // Update button icon
-                        const icon = mobileMenuBtn.querySelector('i');
-                        if (icon) {
-                            icon.className = isOpen ? 'fas fa-bars' : 'fas fa-times';
-                        }
-                    }
-                });
-            }
-            
-        // Sidebar logic
             const sidebar = document.querySelector('.sidebar');
-            const sidebarTrigger = document.createElement('div');
-            const sidebarOverlay = document.createElement('div');
             
-            sidebarTrigger.className = 'sidebar-trigger';
-            sidebarOverlay.className = 'sidebar-overlay';
-            document.body.appendChild(sidebarTrigger);
-            document.body.appendChild(sidebarOverlay);
-            
-            let hoverTimeout;
-            let isMouseOverSidebar = false;
-            let isMouseOverTrigger = false;
-            
-            // Функция для открытия сайдбара
-            function openSidebar() {
-                if (sidebar) {
-                    sidebar.classList.add('open');
-                    sidebarOverlay.classList.add('show');
-                }
+            // Create overlay element for mobile
+            let sidebarOverlay = document.querySelector('.sidebar-overlay');
+            if (!sidebarOverlay) {
+                sidebarOverlay = document.createElement('div');
+                sidebarOverlay.className = 'sidebar-overlay';
+                document.body.appendChild(sidebarOverlay);
             }
             
-            // Функция для закрытия сайдбара
-            function closeSidebar() {
-                if (sidebar) {
-                    sidebar.classList.remove('open');
-                    sidebarOverlay.classList.remove('show');
-                }
-            }
-            
-            // Обработчики для триггерной зоны
-            sidebarTrigger.addEventListener('mouseenter', () => {
-                isMouseOverTrigger = true;
-                clearTimeout(hoverTimeout);
-                openSidebar();
-            });
-            
-            sidebarTrigger.addEventListener('mouseleave', () => {
-                isMouseOverTrigger = false;
-                hoverTimeout = setTimeout(() => {
-                    if (!isMouseOverSidebar && !isMouseOverTrigger) {
-                        closeSidebar();
+            if (mobileMenuBtn && sidebar) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    const isOpen = sidebar.classList.contains('open');
+                    
+                    if (isOpen) {
+                        // Close sidebar
+                        sidebar.classList.remove('open');
+                        sidebarOverlay.classList.remove('show');
+                        mobileMenuBtn.classList.remove('active');
+                    } else {
+                        // Open sidebar
+                        sidebar.classList.add('open');
+                        sidebarOverlay.classList.add('show');
+                        mobileMenuBtn.classList.add('active');
                     }
-                }, 200); // Небольшая задержка
-            });
-            
-            // Обработчики для сайдбара
-            if (sidebar) {
-                sidebar.addEventListener('mouseenter', () => {
-                    isMouseOverSidebar = true;
-                    clearTimeout(hoverTimeout);
+                    
+                    // Update button icon
+                    const icon = mobileMenuBtn.querySelector('i');
+                    if (icon) {
+                        icon.className = isOpen ? 'fas fa-bars' : 'fas fa-times';
+                    }
                 });
                 
-                sidebar.addEventListener('mouseleave', () => {
-                    isMouseOverSidebar = false;
-                    hoverTimeout = setTimeout(() => {
-                        if (!isMouseOverSidebar && !isMouseOverTrigger) {
-                            closeSidebar();
-                        }
-                    }, 200); // Небольшая задержка
-                });
-            }
-            
-            // Закрытие по клику на overlay (с обновлением кнопки на мобильных)
-            sidebarOverlay.addEventListener('click', function() {
-                closeSidebar();
-                // Обновляем мобильную кнопку меню при закрытии через overlay
-                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-                if (mobileMenuBtn) {
+                // Close sidebar when clicking overlay
+                sidebarOverlay.addEventListener('click', function() {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('show');
                     mobileMenuBtn.classList.remove('active');
+                    
                     const icon = mobileMenuBtn.querySelector('i');
                     if (icon) {
                         icon.className = 'fas fa-bars';
                     }
-                }
-            });
+                });
+                
+                // Close sidebar on Escape key
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape' && sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                        sidebarOverlay.classList.remove('show');
+                        mobileMenuBtn.classList.remove('active');
+                        
+                        const icon = mobileMenuBtn.querySelector('i');
+                        if (icon) {
+                            icon.className = 'fas fa-bars';
+                        }
+                    }
+                });
+            }
             
-            // Закрытие по клику вне сайдбара
-            document.addEventListener('click', (event) => {
-                if (sidebar && !sidebar.contains(event.target) && 
-                    !sidebarTrigger.contains(event.target) && 
-                    sidebar.classList.contains('open')) {
-                    closeSidebar();
+        // Desktop sidebar hover logic (only for desktop)
+            if (window.innerWidth > 992) {
+                const sidebarTrigger = document.createElement('div');
+                sidebarTrigger.className = 'sidebar-trigger';
+                document.body.appendChild(sidebarTrigger);
+                
+                let hoverTimeout;
+                let isMouseOverSidebar = false;
+                let isMouseOverTrigger = false;
+                
+                // Функция для открытия сайдбара
+                function openSidebar() {
+                    if (sidebar) {
+                        sidebar.classList.add('open');
+                    }
                 }
-            });
-            
-            // Закрытие по нажатию Escape
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && sidebar && sidebar.classList.contains('open')) {
-                    closeSidebar();
+                
+                // Функция для закрытия сайдбара
+                function closeSidebar() {
+                    if (sidebar) {
+                        sidebar.classList.remove('open');
+                    }
                 }
-            });
+                
+                // Обработчики для триггерной зоны
+                sidebarTrigger.addEventListener('mouseenter', () => {
+                    isMouseOverTrigger = true;
+                    clearTimeout(hoverTimeout);
+                    openSidebar();
+                });
+                
+                sidebarTrigger.addEventListener('mouseleave', () => {
+                    isMouseOverTrigger = false;
+                    hoverTimeout = setTimeout(() => {
+                        if (!isMouseOverSidebar && !isMouseOverTrigger) {
+                            closeSidebar();
+                        }
+                    }, 200);
+                });
+                
+                // Обработчики для сайдбара
+                if (sidebar) {
+                    sidebar.addEventListener('mouseenter', () => {
+                        isMouseOverSidebar = true;
+                        clearTimeout(hoverTimeout);
+                    });
+                    
+                    sidebar.addEventListener('mouseleave', () => {
+                        isMouseOverSidebar = false;
+                        hoverTimeout = setTimeout(() => {
+                            if (!isMouseOverSidebar && !isMouseOverTrigger) {
+                                closeSidebar();
+                            }
+                        }, 200);
+                    });
+                }
+            }
             
             // Initialize notification elements
             const notification = document.getElementById('slideNotification');
