@@ -1,6 +1,7 @@
-const CACHE_VERSION = 'v1.3.0';
+const CACHE_VERSION = 'v2.1.0';
 const CACHE_NAME = `freesteam-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `freesteam-data-${CACHE_VERSION}`;
+const CACHE_DURATION = 1000 * 60 * 30; // 30 минут
 
 // Статические файлы для кэширования (относительные пути)
 const STATIC_CACHE_URLS = [
@@ -271,12 +272,53 @@ self.addEventListener('notificationclick', (event) => {
 // Вспомогательные функции
 async function checkForNewGames() {
   try {
-    const response = await fetch('/api/health');
-    if (response.ok) {
-      // Здесь можно добавить логику проверки новых игр
-      return Math.random() > 0.8; // Заглушка
+    console.log('[SW] Checking for new games...');
+    
+    // Получаем настройки уведомлений
+    const settings = await getNotificationSettings();
+    if (!settings.enabled) {
+      console.log('[SW] Notifications disabled by user');
+      return false;
     }
+    
+    // Загружаем актуальный список игр
+    const response = await fetch('https://raw.githubusercontent.com/InJeCTrL/NeedFree/master/free_goods_detail.json');
+    if (!response.ok) {
+      console.log('[SW] Failed to fetch games list');
+      return false;
+    }
+    
+    const data = await response.json();
+    if (!data.free_list || data.free_list.length === 0) {
+      return false;
+    }
+    
+    // Получаем последний известный список
+    const lastKnownGames = await getLastKnownGames();
+    const currentGameIds = data.free_list.map(game => extractGameId(game[1]));
+    const lastKnownIds = lastKnownGames.map(game => extractGameId(game[1]));
+    
+    // Находим новые игры
+    const newGameIds = currentGameIds.filter(id => !lastKnownIds.includes(id));
+    
+    if (newGameIds.length > 0) {
+      const newGames = data.free_list.filter(game => {
+        const gameId = extractGameId(game[1]);
+        return newGameIds.includes(gameId);
+      });
+      
+      console.log('[SW] Found new games:', newGames.length);
+      
+      // Сохраняем обновленный список
+      await saveLastKnownGames(data.free_list);
+      await saveNewGamesForNotification(newGames);
+      
+      return true;
+    }
+    
+    console.log('[SW] No new games found');
     return false;
+    
   } catch (error) {
     console.error('[SW] Error checking for new games:', error);
     return false;
@@ -284,25 +326,241 @@ async function checkForNewGames() {
 }
 
 async function showNewGamesNotification() {
-  const notificationOptions = {
-    body: 'Найдены новые бесплатные игры в Steam!',
-    icon: './steamfreeico.png',
-    badge: './steamfreeico.png',
-    tag: 'new-games-auto',
-    requireInteraction: false,
-    actions: [
-      {
-        action: 'view',
-        title: 'Посмотреть',
-        icon: './steamfreeico.png'
-      }
-    ],
-    data: {
-      url: './'
+  try {
+    const newGames = await getNewGamesForNotification();
+    if (!newGames || newGames.length === 0) {
+      return;
     }
-  };
+    
+    const count = newGames.length;
+    const firstGameTitle = newGames[0][0];
+    
+    const title = count === 1 ? 
+      '🎮 Новая бесплатная игра!' : 
+      `🎮 ${count} новых бесплатных игр!`;
+      
+    const body = count === 1 ?
+      `${firstGameTitle} теперь доступна бесплатно!` :
+      `${firstGameTitle} и еще ${count - 1} игр теперь бесплатны!`;
+    
+    const notificationOptions = {
+      body: body,
+      icon: './steamfreeico.png',
+      badge: './steamfreeico.png',
+      tag: 'new-games-' + Date.now(),
+      requireInteraction: true,
+      vibrate: [200, 100, 200], // Для мобильных устройств
+      actions: [
+        {
+          action: 'view',
+          title: '👀 Посмотреть',
+          icon: './steamfreeico.png'
+        },
+        {
+          action: 'later',
+          title: '⏰ Позже'
+        }
+      ],
+      data: {
+        url: './',
+        games: newGames,
+        timestamp: Date.now()
+      }
+    };
+    
+    return self.registration.showNotification(title, notificationOptions);
+    
+  } catch (error) {
+    console.error('[SW] Error showing notification:', error);
+  }
+}
+
+// Дополнительные вспомогательные функции
+function extractGameId(steamUrl) {
+  const match = steamUrl.match(/app\/(\d+)/);
+  return match ? match[1] : steamUrl;
+}
+
+async function getNotificationSettings() {
+  try {
+    const cache = await caches.open(DATA_CACHE_NAME);
+    const response = await cache.match('/notification-settings');
+    if (response) {
+      const data = await response.json();
+      return data;
+    }
+  } catch (error) {
+    console.error('[SW] Error getting notification settings:', error);
+  }
   
-  return self.registration.showNotification('FreeSteam - Новые игры!', notificationOptions);
+  // Настройки по умолчанию
+  return {
+    enabled: true,
+    types: ['all'],
+    maxPerDay: 10,
+    quietHours: { start: 22, end: 8 },
+    vibrate: true,
+    sound: true
+  };
+}
+
+async function getLastKnownGames() {
+  try {
+    const cache = await caches.open(DATA_CACHE_NAME);
+    const response = await cache.match('/last-known-games');
+    if (response) {
+      const data = await response.json();
+      return data.games || [];
+    }
+  } catch (error) {
+    console.error('[SW] Error getting last known games:', error);
+  }
+  return [];
+}
+
+async function saveLastKnownGames(games) {
+  try {
+    const cache = await caches.open(DATA_CACHE_NAME);
+    const data = {
+      games: games,
+      timestamp: Date.now()
+    };
+    const response = new Response(JSON.stringify(data), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    await cache.put('/last-known-games', response);
+  } catch (error) {
+    console.error('[SW] Error saving last known games:', error);
+  }
+}
+
+async function saveNewGamesForNotification(games) {
+  try {
+    const cache = await caches.open(DATA_CACHE_NAME);
+    const data = {
+      games: games,
+      timestamp: Date.now()
+    };
+    const response = new Response(JSON.stringify(data), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    await cache.put('/new-games-notification', response);
+  } catch (error) {
+    console.error('[SW] Error saving new games for notification:', error);
+  }
+}
+
+async function getNewGamesForNotification() {
+  try {
+    const cache = await caches.open(DATA_CACHE_NAME);
+    const response = await cache.match('/new-games-notification');
+    if (response) {
+      const data = await response.json();
+      return data.games || [];
+    }
+  } catch (error) {
+    console.error('[SW] Error getting new games for notification:', error);
+  }
+  return [];
+}
+
+// Обработка сообщений от клиента
+self.addEventListener('message', (event) => {
+    console.log('[SW] Message received:', event.data);
+    
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+    
+    if (event.data && event.data.type === 'CHECK_NEW_GAMES') {
+        event.waitUntil(checkForNewGames().then(hasNewGames => {
+            if (hasNewGames) {
+                return showNewGamesNotification();
+            }
+        }));
+    }
+    
+    if (event.data && event.data.type === 'UPDATE_NOTIFICATION_SETTINGS') {
+        event.waitUntil(updateNotificationSettings(event.data.settings));
+    }
+    
+    // Новый обработчик для уведомлений о бесплатных играх
+    if (event.data && event.data.type === 'SHOW_FREE_GAMES_NOTIFICATION') {
+        event.waitUntil(showFreeGamesNotification(event.data.data));
+    }
+});
+
+// Функция для отображения уведомлений о бесплатных играх
+async function showFreeGamesNotification(notificationData) {
+  try {
+    console.log('[SW] Showing free games notification:', notificationData);
+    
+    const settings = await getNotificationSettings();
+    if (!settings.enabled) {
+      console.log('[SW] Notifications disabled by user');
+      return;
+    }
+    
+    // Проверяем тихие часы
+    if (settings.quietHours && settings.quietHours.enabled) {
+      const now = new Date();
+      const hour = now.getHours();
+      const start = settings.quietHours.start || 22;
+      const end = settings.quietHours.end || 8;
+      
+      let isQuietTime = false;
+      if (start <= end) {
+        isQuietTime = hour >= start && hour < end;
+      } else {
+        isQuietTime = hour >= start || hour < end;
+      }
+      
+      if (isQuietTime) {
+        console.log('[SW] Quiet time - skipping notification');
+        return;
+      }
+    }
+    
+    // Подготавливаем данные уведомления
+    const notificationOptions = {
+      body: notificationData.body || 'Новые бесплатные игры доступны!',
+      icon: notificationData.icon || './steamfreeico.png',
+      badge: notificationData.badge || './steamfreeico.png',
+      tag: notificationData.tag || 'free-games-' + Date.now(),
+      requireInteraction: notificationData.requireInteraction || true,
+      data: notificationData.data || { url: './free_games.html' }
+    };
+    
+    // Добавляем вибрацию если разрешено
+    if (settings.vibrate && notificationData.vibrate) {
+      notificationOptions.vibrate = notificationData.vibrate;
+    }
+    
+    // Добавляем действия если есть
+    if (notificationData.actions) {
+      notificationOptions.actions = notificationData.actions;
+    }
+    
+    const title = notificationData.title || 'FreeSteam - Бесплатные игры!';
+    
+    return self.registration.showNotification(title, notificationOptions);
+    
+  } catch (error) {
+    console.error('[SW] Error showing free games notification:', error);
+  }
+}
+
+async function updateNotificationSettings(settings) {
+  try {
+    const cache = await caches.open(DATA_CACHE_NAME);
+    const response = new Response(JSON.stringify(settings), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    await cache.put('/notification-settings', response);
+    console.log('[SW] Notification settings updated');
+  } catch (error) {
+    console.error('[SW] Error updating notification settings:', error);
+  }
 }
 
 // Обработка ошибок
