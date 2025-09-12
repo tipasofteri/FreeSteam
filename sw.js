@@ -7,7 +7,6 @@ const CACHE_DURATION = 1000 * 60 * 30; // 30 минут
 const STATIC_CACHE_URLS = [
   './',
   './index.html',
-  './checker.html', 
   './landing.html',
   './steamfreeico.png',
   './loading.gif',
