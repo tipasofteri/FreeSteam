@@ -7,3 +7,9 @@ node_modules/
 __pycache__/
 *.pyc
 .venv/
+free_goods_detail_part1.json
+free_goods_detail_part2.json
+free_goods_kz_detail_part1.json
+free_goods_kz_detail_part2.json
+free_goods_ru_detail_part1.json
+free_goods_ru_detail_part2.json
