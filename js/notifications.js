@@ -35,8 +35,8 @@ class FreeSteamNotifications {
             console.log('[Notifications] Initializing...');
             
             // Регистрируем Service Worker
-            this.registration = await navigator.serviceWorker.register('/sw.js', {
-                scope: '/'
+            this.registration = await navigator.serviceWorker.register('./sw.js', {
+                scope: './'
             });
             
             console.log('[Notifications] Service Worker registered');
@@ -69,7 +69,9 @@ class FreeSteamNotifications {
                 return JSON.parse(stored);
             }
         } catch (error) {
-            console.error('[Notifications] Error loading settings:', error);
+            console.warn('[Notifications] LocalStorage blocked or unavailable:', error.message);
+            // Показываем предупреждение пользователю
+            this.showFallbackNotification('⚠️ Хранилище браузера недоступно. Настройки уведомлений не сохраняются.', 'warning');
         }
         
         // Настройки по умолчанию
