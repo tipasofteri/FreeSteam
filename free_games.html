@@ -804,5 +804,108 @@
             startAutoRefresh();
         });
     </script>
+    
+    <!-- Подключение системы уведомлений -->
+    <script src="js/notifications.js"></script>
+    
+    <script>
+        // Интеграция с системой уведомлений FreeSteam
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем, доступна ли система уведомлений
+            if (window.FreeSteamNotifications) {
+                console.log('[FreeSteam] Notification system connected');
+                
+                // Переопределяем функции для использования централизованной системы
+                window.originalEnableNotifications = enableNotifications;
+                window.originalSendFreeGameNotification = sendFreeGameNotification;
+                
+                // Новая функция включения уведомлений
+                enableNotifications = function() {
+                    return window.FreeSteamNotifications.requestPermission().then(success => {
+                        if (success) {
+                            localStorage.setItem(FREE_GAMES_NOTIF_KEY, '1');
+                            return true;
+                        }
+                        return false;
+                    });
+                };
+                
+                // Новая функция отправки уведомлений о бесплатных играх
+                sendFreeGameNotification = function(newGames) {
+                    if (!isNotificationsEnabled() || !newGames || newGames.length === 0) return;
+                    
+                    const count = newGames.length;
+                    const firstGameTitle = newGames[0][0];
+                    
+                    const title = count === 1 ? 
+                        '🎮 Новая бесплатная игра!' : 
+                        `🎮 ${count} новых бесплатных игр!`;
+                        
+                    const body = count === 1 ?
+                        `${firstGameTitle} теперь доступна бесплатно!` :
+                        `${firstGameTitle} и еще ${count - 1} игр теперь бесплатны!`;
+                    
+                    // Используем Service Worker для отправки уведомления
+                    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                        navigator.serviceWorker.controller.postMessage({
+                            type: 'SHOW_FREE_GAMES_NOTIFICATION',
+                            data: {
+                                title: title,
+                                body: body,
+                                icon: './steamfreeico.png',
+                                badge: './steamfreeico.png',
+                                tag: 'free-games-' + Date.now(),
+                                requireInteraction: true,
+                                vibrate: [200, 100, 200],
+                                actions: [
+                                    {
+                                        action: 'view',
+                                        title: '👀 Посмотреть',
+                                        icon: './steamfreeico.png'
+                                    },
+                                    {
+                                        action: 'later',
+                                        title: '⏰ Позже'
+                                    }
+                                ],
+                                data: {
+                                    url: './free_games.html',
+                                    games: newGames,
+                                    timestamp: Date.now()
+                                }
+                            }
+                        });
+                    } else {
+                        // Fallback к обычному уведомлению
+                        if ('Notification' in window && Notification.permission === 'granted') {
+                            try {
+                                new Notification(title, {
+                                    body: body,
+                                    icon: './steamfreeico.png',
+                                    tag: 'free-games-' + Date.now(),
+                                    requireInteraction: true,
+                                    data: {
+                                        url: './free_games.html',
+                                        games: newGames
+                                    }
+                                });
+                            } catch (error) {
+                                console.error('[FreeSteam] Error showing notification:', error);
+                            }
+                        }
+                    }
+                };
+                
+                // Синхронизируем настройки с централизованной системой
+                const currentSettings = window.FreeSteamNotifications.getSettings();
+                if (isNotificationsEnabled() && !currentSettings.enabled) {
+                    window.FreeSteamNotifications.updateSettings({ 
+                        enabled: true,
+                        types: { newFreeGames: true }
+                    });
+                }
+            }
+        });
+    </script>
 </body>
 </html>
