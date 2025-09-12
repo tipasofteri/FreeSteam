@@ -2934,7 +2934,7 @@ input::-webkit-inner-spin-button {
                 width: 90%;
                 max-width: 380px;
                 height: 100vh;
-                z-index: 2000;
+                z-index: 2100;
                 background: linear-gradient(180deg, rgba(26,20,13,0.98) 0%, rgba(19,15,11,0.98) 100%);
                 backdrop-filter: blur(10px);
                 -webkit-backdrop-filter: blur(10px);
@@ -2943,7 +2943,8 @@ input::-webkit-inner-spin-button {
                 box-shadow: 8px 0 32px rgba(0,0,0,0.6);
                 transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
                 padding: 1rem;
-                padding-top: 2rem;
+                padding-top: 1rem;
+                overflow-y: auto;
             }
 
             .sidebar.open { 
@@ -2955,7 +2956,7 @@ input::-webkit-inner-spin-button {
             .mobile-menu-btn {
                 display: flex !important;
                 position: relative;
-                z-index: 2001;
+                z-index: 1200;
             }
             
             .mobile-menu-btn.active {
@@ -2973,7 +2974,7 @@ input::-webkit-inner-spin-button {
                 width: 100%;
                 height: 100%;
                 background: rgba(0, 0, 0, 0.6);
-                z-index: 1999;
+                z-index: 2050;
                 opacity: 0;
                 visibility: hidden;
                 transition: all 0.3s ease;
@@ -7463,23 +7464,6 @@ input::-webkit-inner-spin-button {
                                             </div>
                                         </div>
                                         
-                                        <div class="settings-group">
-                                            <h6 class="settings-title">
-                                                <i class="fas fa-bell me-2"></i>Уведомления
-                                            </h6>
-                                            <div class="form-check form-switch mb-3">
-                                                <input class="form-check-input" type="checkbox" id="notificationsSwitch">
-                                                <label class="form-check-label" for="notificationsSwitch">
-                                                    Уведомления о бесплатных играх
-                                                </label>
-                                            </div>
-                                            <div class="form-check form-switch mb-3">
-                                                <input class="form-check-input" type="checkbox" id="soundSwitch">
-                                                <label class="form-check-label" for="soundSwitch">
-                                                    Звук уведомлений
-                                                </label>
-                                            </div>
-                                        </div>
                                     </div>
                                     <div class="col-md-6">
                                         
@@ -7547,15 +7531,12 @@ input::-webkit-inner-spin-button {
             // Initialize settings values
             const darkModeSwitch = settingsModal.querySelector('#darkModeSwitch');
             const compactModeSwitch = settingsModal.querySelector('#compactModeSwitch');
-            const notificationsSwitch = settingsModal.querySelector('#notificationsSwitch');
-            const soundSwitch = settingsModal.querySelector('#soundSwitch');
             const languageSelect = settingsModal.querySelector('#languageSelect');
             const regionSelect = settingsModal.querySelector('#regionSelect');
             
             if (darkModeSwitch) darkModeSwitch.checked = currentTheme === 'dark';
             if (compactModeSwitch) compactModeSwitch.checked = document.body.classList.contains('compact');
-            if (notificationsSwitch) notificationsSwitch.checked = isNotifyEnabled();
-            if (soundSwitch) soundSwitch.checked = getStoredSetting('sound_enabled', true);
+            
             if (languageSelect) languageSelect.value = currentLang;
             if (regionSelect) regionSelect.value = getStoredCC();
             
@@ -7578,6 +7559,24 @@ input::-webkit-inner-spin-button {
             const clearCacheBtn = settingsModal.querySelector('#clearCacheBtn');
             const resetSettingsBtn = settingsModal.querySelector('#resetSettingsBtn');
             const saveSettingsBtn = settingsModal.querySelector('#saveSettingsBtn');
+            
+            
+            // Обработчик переключателя темной темы
+            if (darkModeSwitch) {
+                darkModeSwitch.addEventListener('change', function() {
+                    const newTheme = this.checked ? 'dark' : 'light';
+                    applyTheme(newTheme);
+                    setStoredTheme(newTheme);
+                });
+            }
+            
+            // Обработчик компактного режима
+            if (compactModeSwitch) {
+                compactModeSwitch.addEventListener('change', function() {
+                    document.body.classList.toggle('compact', this.checked);
+                    setStoredSetting('compact_mode', this.checked);
+                });
+            }
             
             if (clearCacheBtn) {
                 clearCacheBtn.addEventListener('click', function() {
@@ -7614,7 +7613,6 @@ input::-webkit-inner-spin-button {
                     }
                 });
             }
-            
             if (saveSettingsBtn) {
                 saveSettingsBtn.addEventListener('click', function() {
                     try {
@@ -7631,16 +7629,6 @@ input::-webkit-inner-spin-button {
                         if (compactModeSwitch) {
                             document.body.classList.toggle('compact', compactModeSwitch.checked);
                             setStoredSetting('compact_mode', compactModeSwitch.checked);
-                        }
-                        
-                        // Save notifications
-                        if (notificationsSwitch) {
-                            setNotifyEnabled(notificationsSwitch.checked);
-                        }
-                        
-                        // Save sound
-                        if (soundSwitch) {
-                            setStoredSetting('sound_enabled', soundSwitch.checked);
                         }
                         
                         // Save language and region
@@ -8233,6 +8221,83 @@ input::-webkit-inner-spin-button {
                 console.log('[PWA] Background sync registration failed:', err);
             });
         }
+    </script>
+    
+    <!-- FreeSteam Enhanced Modules -->
+    <script src="js/notifications.js"></script>
+    <script src="js/mobile-enhancements.js"></script>
+    
+    <script>
+        // Интеграция с новыми модулями
+        document.addEventListener('DOMContentLoaded', function() {
+            // Интеграция с системой уведомлений
+            if (window.FreeSteamNotifications) {
+                // Обновляем кнопки уведомлений в шапке
+                const notificationButtons = document.querySelectorAll('.notification-button');
+                notificationButtons.forEach(button => {
+                    button.setAttribute('data-notification-toggle', 'true');
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        if (window.FreeSteamNotifications.settings.enabled) {
+                            window.FreeSteamNotifications.disable();
+                        } else {
+                            window.FreeSteamNotifications.requestPermission();
+                        }
+                    });
+                });
+                
+                // Периодическая проверка новых игр
+                setInterval(() => {
+                    if (window.FreeSteamNotifications.settings.enabled) {
+                        window.FreeSteamNotifications.checkForNewGames();
+                    }
+                }, 5 * 60 * 1000); // каждые 5 минут
+            }
+            
+            // Интеграция с мобильными улучшениями
+            if (window.FreeSteamMobile) {
+                // Переопределяем функцию обновления для pull-to-refresh
+                window.loadGames = function() {
+                    return new Promise((resolve, reject) => {
+                        // Перезагружаем данные игр
+                        loadAndUpdateGames().then(() => {
+                            resolve();
+                        }).catch(reject);
+                    });
+                };
+            }
+        });
+        
+        // Обновленные обработчики событий
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && window.FreeSteamNotifications) {
+                // Проверяем новые игры при возвращении на страницу
+                setTimeout(() => {
+                    window.FreeSteamNotifications.checkForNewGames();
+                }, 1000);
+            }
+        });
+        
+        // Обработка online/offline состояния
+        window.addEventListener('online', function() {
+            if (window.FreeSteamMobile) {
+                window.FreeSteamMobile.showToast('🌐 Подключение восстановлено');
+            }
+            
+            // Проверяем новые игры при восстановлении связи
+            setTimeout(() => {
+                if (window.FreeSteamNotifications) {
+                    window.FreeSteamNotifications.checkForNewGames();
+                }
+            }, 2000);
+        });
+        
+        window.addEventListener('offline', function() {
+            if (window.FreeSteamMobile) {
+                window.FreeSteamMobile.showToast('⚠️ Нет подключения к интернету', 3000);
+            }
+        });
     </script>
 
 </body>
