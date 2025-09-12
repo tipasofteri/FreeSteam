@@ -2175,6 +2175,15 @@ input::-webkit-inner-spin-button {
             border: none;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
+        
+        /* Увеличиваем z-index для всех модальных окон */
+        .modal {
+            z-index: 2200 !important;
+        }
+        
+        .modal-backdrop {
+            z-index: 2150 !important;
+        }
 
         #agreementModal .modal-dialog { max-width: 760px; }
         #agreementModal .modal-content {
@@ -7465,7 +7474,6 @@ input::-webkit-inner-spin-button {
                                         </div>
                                         
                                     </div>
-                                    <div class="col-md-6">
                                         
                                         <div class="settings-group">
                                             <h6 class="settings-title">
@@ -7613,6 +7621,7 @@ input::-webkit-inner-spin-button {
                     }
                 });
             }
+
             if (saveSettingsBtn) {
                 saveSettingsBtn.addEventListener('click', function() {
                     try {
@@ -7630,6 +7639,7 @@ input::-webkit-inner-spin-button {
                             document.body.classList.toggle('compact', compactModeSwitch.checked);
                             setStoredSetting('compact_mode', compactModeSwitch.checked);
                         }
+                        
                         
                         // Save language and region
                         if (languageSelect && languageSelect.value !== currentLang) {
