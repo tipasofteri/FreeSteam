@@ -39,6 +39,11 @@
     <meta name="msapplication-TileColor" content="#4CAF50">
     <meta name="msapplication-config" content="browserconfig.xml">
     
+    <!-- Prevent Caching -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <!-- Icons and Manifest -->
     <link rel="icon" href="steamfreeico.png" sizes="any">
     <link rel="icon" href="steamfreeico.png" type="image/png" sizes="192x192">
@@ -5294,9 +5299,9 @@ input::-webkit-inner-spin-button {
                                 <i class="fab fa-github"></i>
                                 <span data-translate-key="open_github">GitHub</span>
                             </a>
-                            <a href="checker.html" class="footer-link website" target="_blank" rel="noopener noreferrer">
+                            <a href="vampire_game.html" class="footer-link website" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-telegram"></i>
-                                <span>Чекер</span>
+                                <span>Telegram</span>
                             </a>
                             <a href="free_games.html" class="footer-link website">
                                 <i class="fas fa-gift"></i>
@@ -5441,6 +5446,7 @@ input::-webkit-inner-spin-button {
 
         const LS_KEY_LANG = 'fs_ui_lang_v1';
         const LS_KEY_CC = 'fs_ui_cc_v1';
+        const DATA_VERSION = '1.0.1'; // Update this with each deployment
         const DEFAULT_LANG = 'ru';
         const DEFAULT_CC = 'us';
 
@@ -5456,21 +5462,19 @@ input::-webkit-inner-spin-button {
         }
 
         function buildDataUrls(bustStamp) {
-            const addBust = (u) => `${u}?t=${bustStamp}`;
-            const cc = getSelectedCC();
-            const prefix = cc === 'us' ? '' : `_${cc}`;
-            
-            const p1 = [`./free_goods${prefix}_detail_part1.json`];
-            const p2 = [`./free_goods${prefix}_detail_part2.json`];
+            const prefix = `_${getStoredLang()}`;
+            const cc = getStoredCC();
+            const p1 = [`./free_goods${prefix}_detail_part1.json?v=${DATA_VERSION}`];
+            const p2 = [`./free_goods${prefix}_detail_part2.json?v=${DATA_VERSION}`];
             
             try { 
-                console.info(`[FreeSteam] Loading data for region: ${cc.toUpperCase()}`); 
+                console.info(`[FreeSteam] Loading data for region: ${cc.toUpperCase()}, version: ${DATA_VERSION}`); 
                 console.info(`[FreeSteam] URLs: ${JSON.stringify({p1, p2})}`);
             } catch(_) {}
             
             return { 
-                part1: p1.map(addBust), 
-                part2: p2.map(addBust),
+                part1: p1, 
+                part2: p2,
                 region: cc
             };
         }
@@ -5478,9 +5482,30 @@ input::-webkit-inner-spin-button {
         function fetchFirstAvailableJson(candidates) {
             const tryNext = (idx) => {
                 if (idx >= candidates.length) return $.Deferred().reject('no candidates').promise();
-                return $.getJSON(candidates[idx]).then(
+                
+                // Add cache-busting parameter if not already present
+                let url = candidates[idx];
+                if (url.indexOf('?') === -1) {
+                    url += `?v=${DATA_VERSION}&_t=${Date.now()}`;
+                } else {
+                    url += `&_t=${Date.now()}`;
+                }
+                
+                return $.ajax({
+                    url: url,
+                    dataType: 'json',
+                    cache: false, // Prevent caching
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                }).then(
                     (data) => $.Deferred().resolve(data).promise(),
-                    () => tryNext(idx + 1)
+                    (xhr, status, error) => {
+                        console.warn(`[FreeSteam] Failed to load ${url}:`, status, error);
+                        return tryNext(idx + 1);
+                    }
                 );
             };
             return tryNext(0);
