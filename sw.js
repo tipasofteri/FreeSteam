@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v2.1.1';
+const CACHE_VERSION = 'v2.1.2'; // Увеличиваем версию при изменениях
 const CACHE_NAME = `freesteam-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `freesteam-data-${CACHE_VERSION}`;
 
@@ -61,26 +61,18 @@ self.addEventListener('install', (event) => {
 
 // Активация Service Worker
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating Service Worker...');
-  
   event.waitUntil(
-    caches.keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames
-            .filter((cacheName) => {
-              return cacheName !== CACHE_NAME && cacheName !== DATA_CACHE_NAME;
-            })
-            .map((cacheName) => {
-              console.log('[SW] Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            })
-        );
-      })
-      .then(() => {
-        console.log('[SW] Activation complete');
-        return self.clients.claim();
-      })
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames
+          .filter((name) => name !== CACHE_NAME && name !== DATA_CACHE_NAME)
+          .map((name) => caches.delete(name))
+      );
+    }).then(() => {
+      console.log('[SW] Activation complete');
+      // Принудительно обновляем все вкладки
+      return self.clients.claim();
+    })
   );
 });
 
