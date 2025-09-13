@@ -15,7 +15,7 @@ import random
 import argparse
 
 
-API_URL_TEMPLATE = "https://store.steampowered.com/search/results/?query&start={pos}&count=100&hidef2p=1&infinite=1&ndl=1&cc={cc}&l={lang}"
+API_URL_TEMPLATE = "https://store.steampowered.com/search/results/?query&start={pos}&count=100&infinite=1&ndl=1&cc={cc}&l={lang}"
 THREAD_CNT = 4
 
 free_list = queue.Queue()
@@ -102,29 +102,62 @@ def get_free_goods(start, append_list = False, session: requests.Session = None,
             goods_count = response_json["total_count"]
             goods_html = response_json["results_html"]
             page_parser = bs4.BeautifulSoup(goods_html, "html.parser")
-            full_discounts_div = page_parser.find_all(name = "div", attrs = {"class":"search_discount_block"})
-            sub_free_list = [
-                {
-                    'id': None,
-                    'popularity': start + idx,
-                    'discount': div.parent.parent.parent.parent.find(name="div", attrs={"class": "search_discount_block"}).get("data-discount"),
-                    'price': div.parent.parent.parent.parent.find(name="div", attrs={"class": "discount_original_price"}),
-                    'price_final': div.parent.parent.parent.parent.find(name="div", attrs={"class": "discount_final_price"}).get_text(),
-                    'title': div.parent.parent.parent.parent.find(name="span", attrs={"class": "title"}).get_text(),
-                    'link': div.parent.parent.parent.parent.get("href"),
-                    'image': div.parent.parent.parent.parent.find_all("div")[0].find("img").get("src"),
-                    'tags': div.parent.parent.parent.parent.get("data-ds-tagids"),
-                    'is_bundle': div.parent.parent.parent.parent.get("data-ds-bundleid"),
-                    'bundle_data': div.parent.parent.parent.parent.get("data-ds-bundle-data"),
-                    'is_soundtrack': div.parent.parent.parent.parent.find(name="span", attrs={"class": "music"}),
-                    'for_win': div.parent.parent.parent.parent.find(name="span", attrs={"class": "win"}),
-                    'for_mac': div.parent.parent.parent.parent.find(name="span", attrs={"class": "mac"}),
-                    'for_linux': div.parent.parent.parent.parent.find(name="span", attrs={"class": "linux"}),
-                    'vr_support': div.parent.parent.parent.parent.find(name="span", attrs={"class": "vr_supported"}),
-                    'release': div.parent.parent.parent.parent.find(name="div", attrs={"class": "search_released"}),
-                    'reviews': div.parent.parent.parent.parent.find(name="span", attrs={"class": "search_review_summary"})
-                } for idx, div in enumerate(full_discounts_div)
-            ]
+            
+            # Ищем все результаты поиска (не только со скидкой)
+            all_results = page_parser.find_all("a", class_="search_result_row")
+            
+            sub_free_list = []
+            for idx, result in enumerate(all_results):
+                try:
+                    # Получаем скидку (может быть None для товаров без скидки)
+                    discount_elem = result.find("div", class_="search_discount_block")
+                    discount = discount_elem.get("data-discount") if discount_elem else "0"
+                    
+                    # Цены
+                    price_elem = result.find("div", class_="discount_original_price")
+                    price_final_elem = result.find("div", class_="discount_final_price")
+                    
+                    # Если нет элемента окончательной цены, попробуем найти обычную цену
+                    if not price_final_elem:
+                        price_final_elem = result.find("div", class_="search_price")
+                    
+                    price_final = price_final_elem.get_text().strip() if price_final_elem else "Free"
+                    
+                    # Название игры
+                    title_elem = result.find("span", class_="title")
+                    if not title_elem:
+                        continue  # Пропускаем, если нет названия
+                    
+                    # Изображение
+                    img_elem = result.find("img")
+                    image_src = img_elem.get("src") if img_elem else ""
+                    
+                    game_data = {
+                        'id': None,
+                        'popularity': start + idx,
+                        'discount': discount,
+                        'price': price_elem,
+                        'price_final': price_final,
+                        'title': title_elem.get_text().strip(),
+                        'link': result.get("href"),
+                        'image': image_src,
+                        'tags': result.get("data-ds-tagids"),
+                        'is_bundle': result.get("data-ds-bundleid"),
+                        'bundle_data': result.get("data-ds-bundle-data"),
+                        'is_soundtrack': result.find("span", class_="music"),
+                        'for_win': result.find("span", class_="win"),
+                        'for_mac': result.find("span", class_="mac"),
+                        'for_linux': result.find("span", class_="linux"),
+                        'vr_support': result.find("span", class_="vr_supported"),
+                        'release': result.find("div", class_="search_released"),
+                        'reviews': result.find("span", class_="search_review_summary")
+                    }
+                    
+                    sub_free_list.append(game_data)
+                    
+                except Exception as e:
+                    print(f"Ошибка обработки элемента {idx}: {e}")
+                    continue
 
             counter = 0
             if append_list:
@@ -170,9 +203,14 @@ def get_free_goods(start, append_list = False, session: requests.Session = None,
 def run_crawl(session: requests.Session, cc: str, lang: str):
     tryget_first_page = get_free_goods(0, False, session, cc, lang)
     total_count = tryget_first_page
+    
+    # Вычисляем количество страниц (каждая страница содержит до 100 элементов)
+    # Ограничиваем максимальным разумным количеством страниц для избежания бесконечного цикла
+    max_pages = min(total_count // 100 + 1, 5000)  # Максимум 500,000 товаров (5000 страниц по 100)
+    print(f"[FreeSteam] Общее количество товаров: {total_count}, будет загружено страниц: {max_pages}")
 
     threads = ThreadPoolExecutor(max_workers=THREAD_CNT)
-    futures = [threads.submit(get_free_goods, index, True, session, cc, lang) for index in range(0, total_count, 100)]
+    futures = [threads.submit(get_free_goods, index, True, session, cc, lang) for index in range(0, max_pages * 100, 100)]
     wait(futures, return_when=ALL_COMPLETED)
 
     final_free_list = []
