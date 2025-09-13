@@ -5462,10 +5462,20 @@ input::-webkit-inner-spin-button {
         }
 
         function buildDataUrls(bustStamp) {
-            const prefix = `_${getStoredLang()}`;
+            const lang = getStoredLang();
             const cc = getStoredCC();
-            const p1 = [`./free_goods${prefix}_detail_part1.json?v=${DATA_VERSION}`];
-            const p2 = [`./free_goods${prefix}_detail_part2.json?v=${DATA_VERSION}`];
+            
+            // Build region-specific file paths
+            let regionSuffix = '';
+            if (cc === 'ru') {
+                regionSuffix = '_ru';
+            } else if (cc === 'kz') {
+                regionSuffix = '_kz';
+            }
+            // For 'us' region, use default files without suffix
+            
+            const p1 = [`./free_goods${regionSuffix}_detail_part1.json?v=${DATA_VERSION}`];
+            const p2 = [`./free_goods${regionSuffix}_detail_part2.json?v=${DATA_VERSION}`];
             
             try { 
                 console.info(`[FreeSteam] Loading data for region: ${cc.toUpperCase()}, version: ${DATA_VERSION}`); 
