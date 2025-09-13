@@ -300,12 +300,167 @@
         @keyframes particle-float {
             0% {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0) scale(1) rotate(0deg);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translateY(-50px) scale(1.2) rotate(180deg);
             }
             100% {
                 opacity: 0;
-                transform: translateY(-100px) scale(0);
+                transform: translateY(-100px) scale(0) rotate(360deg);
             }
+        }
+        
+        /* Enhanced Glow Effects */
+        .glow-pulse {
+            animation: glow-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow-pulse {
+            0%, 100% {
+                box-shadow: 0 0 5px var(--accent-green), 0 0 10px var(--accent-green);
+            }
+            50% {
+                box-shadow: 0 0 20px var(--accent-green), 0 0 30px var(--accent-green), 0 0 40px var(--accent-green);
+            }
+        }
+        
+        /* Animated Border */
+        .animated-border {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .animated-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--accent-green), var(--accent-blue), var(--accent-yellow), var(--accent-red));
+            border-radius: inherit;
+            z-index: -1;
+            animation: border-rotate 3s linear infinite;
+        }
+        
+        @keyframes border-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Morphing Background */
+        .morphing-bg {
+            background: linear-gradient(45deg, var(--primary-bg), var(--secondary-bg), var(--platform-color));
+            background-size: 400% 400%;
+            animation: morphing-gradient 8s ease infinite;
+        }
+        
+        @keyframes morphing-gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Floating Elements */
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            25% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+            50% {
+                transform: translateY(-10px) rotate(0deg);
+            }
+            75% {
+                transform: translateY(-15px) rotate(-5deg);
+            }
+        }
+        
+        /* Enhanced Collectible Animations */
+        .collectible {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            animation: float-enhanced 4s ease-in-out infinite;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+        
+        @keyframes float-enhanced {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg) scale(1);
+                filter: hue-rotate(0deg) drop-shadow(0 0 10px currentColor);
+            }
+            25% {
+                transform: translateY(-15px) rotate(90deg) scale(1.1);
+                filter: hue-rotate(90deg) drop-shadow(0 0 15px currentColor);
+            }
+            50% {
+                transform: translateY(-8px) rotate(180deg) scale(0.9);
+                filter: hue-rotate(180deg) drop-shadow(0 0 20px currentColor);
+            }
+            75% {
+                transform: translateY(-12px) rotate(270deg) scale(1.05);
+                filter: hue-rotate(270deg) drop-shadow(0 0 15px currentColor);
+            }
+        }
+        
+        /* Platform Hover Enhancement */
+        .game-platform {
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .game-platform::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(0, 255, 65, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.6s ease;
+            z-index: -1;
+        }
+        
+        .game-platform:hover::after {
+            width: 120%;
+            height: 120%;
+        }
+        
+        /* Ripple Effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .ripple:active::before {
+            width: 300px;
+            height: 300px;
         }
 
         /* Mobile Responsive */
@@ -432,6 +587,58 @@
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
         }
+        
+        /* Screen Shake Effect */
+        @keyframes screen-shake {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-2px, -1px); }
+            20% { transform: translate(2px, 1px); }
+            30% { transform: translate(-1px, 2px); }
+            40% { transform: translate(1px, -2px); }
+            50% { transform: translate(-2px, 1px); }
+            60% { transform: translate(2px, -1px); }
+            70% { transform: translate(-1px, -2px); }
+            80% { transform: translate(1px, 2px); }
+            90% { transform: translate(-2px, -1px); }
+        }
+        
+        /* Sound Controls */
+        .sound-controls {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1002;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .sound-toggle {
+            background: rgba(26, 26, 46, 0.9);
+            border: 2px solid var(--accent-green);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: var(--text-glow);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .sound-toggle:hover {
+            background: rgba(0, 255, 65, 0.2);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+        
+        .sound-toggle.muted {
+            background: rgba(238, 90, 111, 0.2);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
     </style>
 </head>
 <body>
@@ -452,20 +659,8 @@
             <div class="game-title">🎮 FREESTEAM PLATFORMER</div>
             <div class="score-board">
                 <div class="score-item">
-                    <span>🏆</span>
+                    <span class="score-label">SCORE:</span>
                     <span id="score">0</span>
-                </div>
-                <div class="score-item">
-                    <span>🪙</span>
-                    <span id="coins">0</span>
-                </div>
-                <div class="score-item">
-                    <span>💎</span>
-                    <span id="gems">0</span>
-                </div>
-                <div class="score-item">
-                    <span>⚡</span>
-                    <span id="crystals">0</span>
                 </div>
             </div>
         </header>
@@ -475,20 +670,20 @@
             <div class="platform-level">
                 <h2 class="level-title">🌟 LEVEL 1: TELEGRAM DIMENSION</h2>
                 <div class="platforms-grid">
-                    <div class="platform game-platform" data-platform="telegram-channel">
+                    <div class="platform game-platform animated-border glow-pulse ripple" data-platform="telegram-channel">
                         <h3>📢 CHANNEL PLATFORM</h3>
                         <p>Jump on this platform to access the official FreeSteam announcements! Collect power-ups and stay updated with the latest free games!</p>
-                        <button class="power-up-button" onclick="activatePlatform('telegram-channel')">ACTIVATE</button>
+                        <button class="power-up-button ripple" onclick="activatePlatform('telegram-channel')">ACTIVATE</button>
                         
                         <!-- Collectibles -->
                         <div class="collectible coin" data-type="coin" style="top: -15px; right: 20px;"></div>
                         <div class="collectible gem" data-type="gem" style="top: -15px; left: 50%;"></div>
                     </div>
                     
-                    <div class="platform game-platform" data-platform="telegram-group">
+                    <div class="platform game-platform glow-pulse ripple" data-platform="telegram-group">
                         <h3>💬 GROUP PLATFORM</h3>
                         <p>Land here to join the community discussions! Share strategies, find gaming buddies, and level up together!</p>
-                        <button class="power-up-button" onclick="activatePlatform('telegram-group')">ACTIVATE</button>
+                        <button class="power-up-button ripple" onclick="activatePlatform('telegram-group')">ACTIVATE</button>
                         
                         <!-- Collectibles -->
                         <div class="collectible crystal" data-type="crystal" style="top: -15px; right: 30px;"></div>
@@ -501,20 +696,20 @@
             <div class="platform-level">
                 <h2 class="level-title">⚡ LEVEL 2: DEVELOPER ZONE</h2>
                 <div class="platforms-grid">
-                    <div class="platform game-platform" data-platform="github">
+                    <div class="platform game-platform animated-border glow-pulse ripple" data-platform="github">
                         <h3>🔧 CODE PLATFORM</h3>
                         <p>Master this platform to unlock the source code vault! Contribute to open source and earn developer achievements!</p>
-                        <button class="power-up-button" onclick="activatePlatform('github')">HACK IN</button>
+                        <button class="power-up-button ripple" onclick="activatePlatform('github')">HACK IN</button>
                         
                         <!-- Collectibles -->
                         <div class="collectible gem" data-type="gem" style="top: -15px; right: 40px;"></div>
                         <div class="collectible crystal" data-type="crystal" style="top: -15px; left: 40px;"></div>
                     </div>
                     
-                    <div class="platform game-platform" data-platform="portfolio">
+                    <div class="platform game-platform glow-pulse ripple" data-platform="portfolio">
                         <h3>🎨 CREATIVE PLATFORM</h3>
                         <p>Explore the developer's portfolio dimension! Discover other worlds and unlock hidden creative powers!</p>
-                        <button class="power-up-button" onclick="activatePlatform('portfolio')">EXPLORE</button>
+                        <button class="power-up-button ripple" onclick="activatePlatform('portfolio')">EXPLORE</button>
                         
                         <!-- Collectibles -->
                         <div class="collectible coin" data-type="coin" style="top: -15px; right: 25px;"></div>
@@ -527,10 +722,10 @@
             <div class="platform-level">
                 <h2 class="level-title">🚀 FINAL LEVEL: STEAM UNIVERSE</h2>
                 <div class="platforms-grid">
-                    <div class="platform game-platform" data-platform="steam" style="grid-column: 1 / -1;">
+                    <div class="platform game-platform animated-border glow-pulse morphing-bg ripple" data-platform="steam" style="grid-column: 1 / -1;">
                         <h3>🎮 ULTIMATE STEAM PLATFORM</h3>
                         <p>The final boss platform! Connect to Steam universe, unlock all achievements, and become the ultimate gaming champion of FreeSteam!</p>
-                        <button class="power-up-button" onclick="activatePlatform('steam')">ENTER STEAM</button>
+                        <button class="power-up-button ripple" onclick="activatePlatform('steam')">ENTER STEAM</button>
                         
                         <!-- Special collectibles -->
                         <div class="collectible coin" data-type="coin" style="top: -15px; left: 20%;"></div>
@@ -543,6 +738,13 @@
         </div>
     </div>
 
+    <!-- Sound Controls -->
+    <div class="sound-controls">
+        <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Звук включен/выключен">
+            🔊
+        </button>
+    </div>
+
     <!-- Achievement Popup -->
     <div class="achievement" id="achievementPopup">
         <h4 id="achievementTitle">Achievement Unlocked!</h4>
@@ -550,6 +752,104 @@
     </div>
 
     <script>
+        // Sound Effects System
+        class SoundManager {
+            constructor() {
+                this.audioContext = null;
+                this.sounds = {};
+                this.volume = 0.3;
+                this.enabled = true;
+                this.init();
+            }
+            
+            async init() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    await this.loadSounds();
+                } catch (error) {
+                    console.warn('[Sound] Audio context not available:', error);
+                    this.enabled = false;
+                }
+            }
+            
+            async loadSounds() {
+                // Создаем звуки программно (без внешних файлов)
+                this.sounds = {
+                    collect: this.createBeepSound(800, 0.1),
+                    achievement: this.createChordSound([523, 659, 784], 0.5),
+                    platform: this.createBeepSound(400, 0.2),
+                    hover: this.createBeepSound(600, 0.05),
+                    success: this.createChordSound([523, 659, 784, 1047], 0.8)
+                };
+            }
+            
+            createBeepSound(frequency, duration) {
+                return () => {
+                    if (!this.enabled || !this.audioContext) return;
+                    
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                    oscillator.type = 'square';
+                    
+                    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(this.volume, this.audioContext.currentTime + 0.01);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+                    
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                };
+            }
+            
+            createChordSound(frequencies, duration) {
+                return () => {
+                    if (!this.enabled || !this.audioContext) return;
+                    
+                    frequencies.forEach((freq, index) => {
+                        setTimeout(() => {
+                            const oscillator = this.audioContext.createOscillator();
+                            const gainNode = this.audioContext.createGain();
+                            
+                            oscillator.connect(gainNode);
+                            gainNode.connect(this.audioContext.destination);
+                            
+                            oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+                            oscillator.type = 'sine';
+                            
+                            gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                            gainNode.gain.linearRampToValueAtTime(this.volume * 0.3, this.audioContext.currentTime + 0.01);
+                            gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+                            
+                            oscillator.start(this.audioContext.currentTime);
+                            oscillator.stop(this.audioContext.currentTime + duration);
+                        }, index * 50);
+                    });
+                };
+            }
+            
+            play(soundName) {
+                if (this.sounds[soundName] && this.enabled) {
+                    try {
+                        this.sounds[soundName]();
+                    } catch (error) {
+                        console.warn('[Sound] Error playing sound:', error);
+                    }
+                }
+            }
+            
+            toggleSound() {
+                this.enabled = !this.enabled;
+                return this.enabled;
+            }
+        }
+        
+        // Initialize Sound Manager
+        const soundManager = new SoundManager();
+        
         // Game State
         let gameState = {
             score: 0,
@@ -557,7 +857,9 @@
             gems: 0,
             crystals: 0,
             platformsActivated: [],
-            achievements: []
+            achievements: [],
+            combo: 0,
+            lastCollectTime: 0
         };
 
         // Platform URLs
@@ -647,18 +949,38 @@
             const type = item.dataset.type;
             const rect = item.getBoundingClientRect();
             
+            // Play collect sound
+            soundManager.play('collect');
+            
             // Add collected class for animation
             item.classList.add('collected');
             
+            // Update combo system
+            const now = Date.now();
+            if (now - gameState.lastCollectTime < 2000) {
+                gameState.combo++;
+            } else {
+                gameState.combo = 1;
+            }
+            gameState.lastCollectTime = now;
+            
             // Update game state
             gameState[type + 's']++;
-            gameState.score += getItemValue(type);
+            const baseValue = getItemValue(type);
+            const comboMultiplier = Math.min(gameState.combo, 5);
+            const totalValue = baseValue * comboMultiplier;
+            gameState.score += totalValue;
             
             // Update UI
             updateScoreBoard();
             
-            // Create floating score
-            createFloatingScore(rect.left + rect.width/2, rect.top, getItemValue(type));
+            // Create floating score with combo
+            createFloatingScore(rect.left + rect.width/2, rect.top, totalValue, gameState.combo > 1 ? `x${comboMultiplier}` : '');
+            
+            // Screen shake effect for high combos
+            if (gameState.combo > 3) {
+                createScreenShake();
+            }
             
             // Check for achievements
             checkAchievements(type);
@@ -678,6 +1000,9 @@
         }
 
         function activatePlatform(platformId) {
+            // Play platform activation sound
+            soundManager.play('platform');
+            
             // Add to activated platforms
             if (!gameState.platformsActivated.includes(platformId)) {
                 gameState.platformsActivated.push(platformId);
@@ -696,6 +1021,11 @@
                 
                 // Create celebration particles
                 createCelebrationParticles(platform);
+                
+                // Play success sound for first activation
+                if (gameState.platformsActivated.length === 1) {
+                    setTimeout(() => soundManager.play('success'), 300);
+                }
                 
                 // Save progress
                 saveGameProgress();
@@ -754,6 +1084,9 @@
             
             popup.classList.add('show');
             
+            // Play achievement sound
+            soundManager.play('achievement');
+            
             // Award bonus points
             gameState.score += 50;
             updateScoreBoard();
@@ -763,6 +1096,22 @@
             }, 3000);
             
             saveGameProgress();
+        }
+        
+        // Sound toggle function
+        function toggleSound() {
+            const enabled = soundManager.toggleSound();
+            const soundToggle = document.getElementById('soundToggle');
+            
+            if (enabled) {
+                soundToggle.textContent = '🔊';
+                soundToggle.classList.remove('muted');
+                soundToggle.title = 'Звук включен (нажмите для выключения)';
+            } else {
+                soundToggle.textContent = '🔇';
+                soundToggle.classList.add('muted');
+                soundToggle.title = 'Звук выключен (нажмите для включения)';
+            }
         }
 
         function createParticles(element) {
@@ -821,17 +1170,17 @@
             }
         }
 
-        function createFloatingScore(x, y, score) {
+        function createFloatingScore(x, y, score, comboText = '') {
             const scoreElement = document.createElement('div');
-            scoreElement.textContent = '+' + score;
+            scoreElement.innerHTML = `+${score} ${comboText}`;
             scoreElement.style.position = 'fixed';
             scoreElement.style.left = x + 'px';
             scoreElement.style.top = y + 'px';
-            scoreElement.style.color = '#00ff41';
+            scoreElement.style.color = comboText ? '#feca57' : '#00ff41';
             scoreElement.style.fontFamily = 'Press Start 2P';
-            scoreElement.style.fontSize = '1rem';
+            scoreElement.style.fontSize = comboText ? '1.2rem' : '1rem';
             scoreElement.style.fontWeight = 'bold';
-            scoreElement.style.textShadow = '0 0 10px #00ff41';
+            scoreElement.style.textShadow = comboText ? '0 0 15px #feca57' : '0 0 10px #00ff41';
             scoreElement.style.zIndex = '1001';
             scoreElement.style.pointerEvents = 'none';
             scoreElement.style.transition = 'all 1s ease';
@@ -847,12 +1196,18 @@
                 scoreElement.remove();
             }, 1100);
         }
+        
+        function createScreenShake() {
+            const gameWorld = document.querySelector('.game-world');
+            gameWorld.style.animation = 'screen-shake 0.5s ease-in-out';
+            
+            setTimeout(() => {
+                gameWorld.style.animation = '';
+            }, 500);
+        }
 
         function updateScoreBoard() {
             document.getElementById('score').textContent = gameState.score;
-            document.getElementById('coins').textContent = gameState.coins;
-            document.getElementById('gems').textContent = gameState.gems;
-            document.getElementById('crystals').textContent = gameState.crystals;
         }
 
         function saveGameProgress() {
