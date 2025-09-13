@@ -42,6 +42,42 @@
   ],
   "shortcuts": [
     {
+      "name": "FreeSteamHub",
+      "short_name": "Hub",
+      "description": "FreeSteamHub",
+      "url": "./freesteamhub.html",
+      "icons": [
+        {
+          "src": "steamfreeico.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Бесплатные игры",
+      "short_name": "Games",
+      "description": "Бесплатные игры",
+      "url": "./free_games.html",
+      "icons": [
+        {
+          "src": "steamfreeico.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "О проекте",
+      "short_name": "About",
+      "description": "Информация о FreeSteam",
+      "url": "./landing.html",
+      "icons": [
+        {
+          "src": "steamfreeico.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
       "name": "Проверка профиля Steam",
       "short_name": "Checker",
       "description": "Быстрая проверка Steam профиля",
