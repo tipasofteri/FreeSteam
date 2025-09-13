@@ -1,114 +1,150 @@
 {
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "id": "/",
   "name": "FreeSteam - Бесплатные игры Steam",
   "short_name": "FreeSteam",
   "description": "Агрегатор бесплатных игр и скидок в Steam с фильтрами и уведомлениями",
-  "start_url": "./index.html",
+  "start_url": "./index.html?source=pwa",
   "display": "standalone",
+  "display_override": ["window-controls-overlay"],
+  "launch_handler": {
+    "client_mode": "auto"
+  },
+  "handle_links": "preferred",
   "background_color": "#0f0f0f",
   "theme_color": "#ff3366",
   "orientation": "any",
-  "scope": "./",
+  "scope": "/",
   "lang": "ru",
+  "dir": "ltr",
   "categories": ["games", "entertainment", "utilities"],
+  "iarc_rating_id": "e10b0d69-7661-46ff-8b18-ccf2ee30703d",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "shortcuts": [
+    {
+      "name": "FreeSteamHub",
+      "short_name": "Хаб",
+      "description": "Центральный хаб FreeSteam",
+      "url": "./freesteamhub.html",
+      "icons": [{"src": "icons/icon-192x192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Бесплатные игры",
+      "short_name": "Игры",
+      "description": "Каталог бесплатных игр",
+      "url": "./free_games.html",
+      "icons": [{"src": "icons/icon-192x192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Проверка профиля",
+      "short_name": "Профиль",
+      "description": "Проверка профиля Steam",
+      "url": "./checker.html",
+      "icons": [{"src": "icons/icon-192x192.png", "sizes": "192x192"}]
+    }
+  ],
   "icons": [
     {
-      "src": "steamfreeico.png",
+      "src": "icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "steamfreeico.png", 
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],
   "screenshots": [
     {
-      "src": "assets/screenshot1.png",
+      "src": "screenshots/desktop.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Главная страница с фильтрами игр"
     },
     {
-      "src": "assets/screenshot2.png", 
-      "sizes": "640x1136",
+      "src": "screenshots/mobile.png",
+      "sizes": "375x812",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Мобильная версия с боковой панелью"
+      "label": "Мобильная версия приложения"
     }
   ],
-  "shortcuts": [
-    {
-      "name": "FreeSteamHub",
-      "short_name": "Hub",
-      "description": "FreeSteamHub",
-      "url": "./freesteamhub.html",
-      "icons": [
-        {
-          "src": "steamfreeico.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "Бесплатные игры",
-      "short_name": "Games",
-      "description": "Бесплатные игры",
-      "url": "./free_games.html",
-      "icons": [
-        {
-          "src": "steamfreeico.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "О проекте",
-      "short_name": "About",
-      "description": "Информация о FreeSteam",
-      "url": "./landing.html",
-      "icons": [
-        {
-          "src": "steamfreeico.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "Проверка профиля Steam",
-      "short_name": "Checker",
-      "description": "Быстрая проверка Steam профиля",
-      "url": "./checker.html",
-      "icons": [
-        {
-          "src": "steamfreeico.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "О проекте",
-      "short_name": "About",
-      "description": "Информация о FreeSteam",
-      "url": "./landing.html",
-      "icons": [
-        {
-          "src": "steamfreeico.png",
-          "sizes": "192x192"
-        }
-      ]
-    }
-  ],
-  "related_applications": [],
-  "prefer_related_applications": false,
-  "dir": "ltr",
   "protocol_handlers": [
     {
       "protocol": "web+freesteam",
       "url": "/checker.html?steamid=%s"
     }
-  ]
+  ],
+  "share_target": {
+    "action": "/share-target/",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "name",
+      "text": "description",
+      "url": "link"
+    }
+  },
+  "file_handlers": [
+    {
+      "action": "/handle-file",
+      "accept": {
+        "text/plain": [".txt"]
+      },
+      "name": "Text Files"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
+  "permissions": ["clipboard-write"],
+  "short_name_2": "FreeSteam",
+  "splash_pages": null
 }
