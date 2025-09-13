@@ -9,6 +9,7 @@ class FreeSteamNotifications {
         this.settings = this.getSettings();
         this.registration = null;
         this.subscription = null;
+        this.usingLocalNotifications = false;
         
         // Инициализация при загрузке страницы
         if (this.isSupported) {
@@ -28,24 +29,244 @@ class FreeSteamNotifications {
     }
     
     /**
+     * Получение настроек уведомлений
+     */
+    getSettings() {
+        const defaults = {
+            enabled: true,
+            sound: true,
+            vibration: true,
+            quietHours: {
+                enabled: false,
+                start: '22:00',
+                end: '08:00'
+            },
+            categories: {
+                newGames: true,
+                discounts: true,
+                updates: true,
+                news: false
+            }
+        };
+        
+        try {
+            const saved = JSON.parse(localStorage.getItem('notificationSettings'));
+            return { ...defaults, ...saved };
+        } catch (e) {
+            return defaults;
+        }
+    }
+    
+    /**
+     * Сохранение настроек уведомлений
+     */
+    saveSettings() {
+        try {
+            localStorage.setItem('notificationSettings', JSON.stringify(this.settings));
+            return true;
+        } catch (e) {
+            console.error('Failed to save notification settings:', e);
+            return false;
+        }
+    }
+    
+    /**
+     * Подписка на push-уведомления
+     */
+    async subscribe() {
+        try {
+            console.log('[Notifications] Subscribing to push notifications...');
+            
+            // Пробуем получить VAPID ключ, но не падаем, если его нет
+            let subscriptionOptions = {
+                userVisibleOnly: true
+            };
+            
+            try {
+                const response = await fetch('/api/vapid-public-key');
+                if (response.ok) {
+                    const vapidPublicKey = await response.text();
+                    if (vapidPublicKey) {
+                        // Конвертируем VAPID public key в Uint8Array
+                        const convertedVapidKey = this.urlBase64ToUint8Array(vapidPublicKey);
+                        subscriptionOptions.applicationServerKey = convertedVapidKey;
+                    }
+                }
+            } catch (e) {
+                console.warn('[Notifications] Could not get VAPID key, using fallback notifications');
+            }
+            
+            // Подписываемся на push-уведомления
+            this.subscription = await this.registration.pushManager.subscribe(subscriptionOptions);
+            
+            console.log('[Notifications] Push subscription successful:', this.subscription);
+            
+            // Если есть валидная подписка, пробуем отправить её на сервер
+            if (this.subscription) {
+                try {
+                    await this.sendSubscriptionToServer(this.subscription);
+                } catch (e) {
+                    console.warn('[Notifications] Could not send subscription to server, using fallback notifications');
+                }
+            }
+            
+            return this.subscription;
+            
+        } catch (error) {
+            console.error('[Notifications] Failed to subscribe to push notifications, falling back to local notifications:', error);
+            // Не бросаем ошибку, используем локальные уведомления как запасной вариант
+            return null;
+        }
+    }
+    
+    /**
+     * Конвертация base64 строки в Uint8Array
+     */
+    urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding)
+            .replace(/\-/g, '+')
+            .replace(/_/g, '/');
+        
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        
+        return outputArray;
+    }
+    
+    /**
+     * Отправка подписки на сервер
+     */
+    async sendSubscriptionToServer(subscription) {
+        try {
+            const response = await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(subscription)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to send subscription to server');
+            }
+            
+            console.log('[Notifications] Subscription sent to server successfully');
+            return await response.json();
+            
+        } catch (error) {
+            console.error('[Notifications] Error sending subscription to server:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * Настройка локальных уведомлений как запасного варианта
+     */
+    setupLocalNotifications() {
+        console.log('[Notifications] Setting up local notifications');
+        
+        // Указываем, что используем локальные уведомления
+        this.usingLocalNotifications = true;
+        
+        // Настраиваем канал сообщений для общения с Service Worker
+        this.messageChannel = new MessageChannel();
+        this.messageChannel.port1.onmessage = (event) => {
+            console.log('[Notifications] Message from service worker:', event.data);
+            if (event.data.type === 'SHOW_LOCAL_NOTIFICATION') {
+                this.showLocalNotification(event.data.title, event.data.options);
+            }
+        };
+        
+        // Отправляем порт в Service Worker
+        if (navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({
+                type: 'INIT_LOCAL_NOTIFICATIONS'
+            }, [this.messageChannel.port2]);
+        }
+    }
+    
+    /**
+     * Показать локальное уведомление
+     */
+    showLocalNotification(title, options) {
+        // Проверяем наличие разрешения
+        if (Notification.permission !== 'granted') {
+            console.warn('[Notifications] Cannot show notification: no permission');
+            return;
+        }
+        
+        // Показываем уведомление
+        const notification = new Notification(title, options);
+        
+        // Обрабатываем клик по уведомлению
+        notification.onclick = (event) => {
+            event.preventDefault();
+            window.focus();
+            notification.close();
+            
+            // Обрабатываем клик по уведомлению
+            if (options.data && options.data.url) {
+                window.location.href = options.data.url;
+            }
+        };
+        
+        return notification;
+    }
+    
+    /**
      * Инициализация системы уведомлений
      */
     async init() {
         try {
             console.log('[Notifications] Initializing...');
             
+            // Сначала проверяем разрешение на уведомления
+            const permission = await Notification.requestPermission();
+            console.log('[Notifications] Notification permission:', permission);
+            
+            if (permission !== 'granted') {
+                console.warn('[Notifications] Notification permission not granted');
+                return;
+            }
+            
             // Регистрируем Service Worker
             this.registration = await navigator.serviceWorker.register('./sw.js', {
                 scope: './'
             });
             
-            console.log('[Notifications] Service Worker registered');
+            console.log('[Notifications] Service Worker registered:', this.registration);
             
-            // Ждем активации
+            // Ждем, пока Service Worker будет готов
             await navigator.serviceWorker.ready;
+            console.log('[Notifications] Service Worker is ready');
             
-            // Проверяем текущую подписку
-            this.subscription = await this.registration.pushManager.getSubscription();
+            // Пробуем настроить push-уведомления
+            try {
+                // Проверяем текущую подписку
+                this.subscription = await this.registration.pushManager.getSubscription();
+                console.log('[Notifications] Current subscription:', this.subscription);
+                
+                // Подписываемся, если еще не подписаны
+                if (!this.subscription) {
+                    this.subscription = await this.subscribe();
+                }
+                
+                // Если есть валидная подписка, используем push-уведомления
+                if (this.subscription) {
+                    console.log('[Notifications] Push notifications enabled');
+                } else {
+                    console.log('[Notifications] Using local notifications as fallback');
+                    this.setupLocalNotifications();
+                }
+            } catch (error) {
+                console.error('[Notifications] Error setting up push notifications, falling back to local:', error);
+                this.setupLocalNotifications();
+            }
             
             // Обновляем UI
             this.updateUI();
@@ -55,74 +276,11 @@ class FreeSteamNotifications {
             
         } catch (error) {
             console.error('[Notifications] Initialization failed:', error);
-            this.showFallbackNotification('Не удалось инициализировать уведомления');
-        }
-    }
-    
-    /**
-     * Получение настроек уведомлений
-     */
-    getSettings() {
-        try {
-            const stored = localStorage.getItem('fs_notification_settings');
-            if (stored) {
-                return JSON.parse(stored);
+            // Пробуем использовать локальные уведомления как запасной вариант
+            if (Notification.permission === 'granted') {
+                this.setupLocalNotifications();
             }
-        } catch (error) {
-            console.warn('[Notifications] LocalStorage blocked or unavailable:', error.message);
-            // Показываем предупреждение пользователю
-            this.showFallbackNotification('⚠️ Хранилище браузера недоступно. Настройки уведомлений не сохраняются.', 'warning');
         }
-        
-        // Настройки по умолчанию
-        return {
-            enabled: false,
-            types: {
-                newFreeGames: true,
-                priceDrops: false,
-                weeklyUpdates: false
-            },
-            frequency: 'instant', // instant, hourly, daily
-            quietHours: {
-                enabled: false,
-                start: 22,
-                end: 8
-            },
-            maxPerDay: 10,
-            sound: true,
-            vibrate: true
-        };
-    }
-    
-    /**
-     * Сохранение настроек
-     */
-    saveSettings(settings) {
-        try {
-            this.settings = { ...this.settings, ...settings };
-            localStorage.setItem('fs_notification_settings', JSON.stringify(this.settings));
-            
-            // Отправляем настройки в Service Worker
-            if (this.registration && this.registration.active) {
-                this.registration.active.postMessage({
-                    type: 'UPDATE_NOTIFICATION_SETTINGS',
-                    settings: this.settings
-                });
-            }
-            
-            console.log('[Notifications] Settings saved:', this.settings);
-            return true;
-        } catch (error) {
-            console.error('[Notifications] Error saving settings:', error);
-            return false;
-        }
-    }
-    
-    /**
-     * Обновление настроек (алиас для saveSettings)
-     */
-    updateSettings(settings) {
-        return this.saveSettings(settings);
     }
     
     /**
@@ -138,402 +296,283 @@ class FreeSteamNotifications {
             const permission = await Notification.requestPermission();
             
             if (permission === 'granted') {
-                console.log('[Notifications] Permission granted');
-                
-                // Создаем подписку
-                await this.subscribeToPush();
-                
-                // Включаем уведомления
-                this.saveSettings({ enabled: true });
-                
-                // Показываем тестовое уведомление
-                this.showTestNotification();
-                
+                // Переинициализируем, если разрешение получено
+                await this.init();
                 return true;
-            } else if (permission === 'denied') {
-                this.showFallbackNotification('Уведомления заблокированы в настройках браузера');
-                return false;
             } else {
-                this.showFallbackNotification('Разрешение на уведомления не предоставлено');
+                console.warn('[Notifications] Notification permission denied');
                 return false;
             }
         } catch (error) {
             console.error('[Notifications] Error requesting permission:', error);
-            this.showFallbackNotification('Ошибка при запросе разрешения на уведомления');
             return false;
         }
     }
     
     /**
-     * Подписка на push уведомления
-     */
-    async subscribeToPush() {
-        try {
-            // Здесь должен быть VAPID ключ сервера
-            // Для демо используем заглушку
-            const applicationServerKey = this.urlBase64ToUint8Array(
-                'BNcA5LJGJkPNzUfVT5MxJ1CQe4kFCM5bPdJhGzqRuHZbTlGzJPd7vZuKjF3H2CXr7YjqGzCHGvJ0PjvvY5R1PqM'
-            );
-            
-            this.subscription = await this.registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: applicationServerKey
-            });
-            
-            console.log('[Notifications] Push subscription created:', this.subscription);
-            
-            // Здесь можно отправить подписку на сервер
-            // await this.sendSubscriptionToServer(this.subscription);
-            
-        } catch (error) {
-            console.error('[Notifications] Error subscribing to push:', error);
-            throw error;
-        }
-    }
-    
-    /**
-     * Показ тестового уведомления
+     * Показать тестовое уведомление
      */
     async showTestNotification() {
         try {
             console.log('[Notifications] Showing test notification...');
             console.log('[Notifications] Permission:', Notification.permission);
             console.log('[Notifications] Registration:', !!this.registration);
-            console.log('[Notifications] Settings:', this.settings);
+            console.log('[Notifications] Subscription:', this.subscription);
             
-            // Проверяем разрешение на уведомления
             if (Notification.permission !== 'granted') {
-                console.log('[Notifications] Requesting permission first...');
-                const permission = await Notification.requestPermission();
-                if (permission !== 'granted') {
-                    this.showFallbackNotification('Разрешение на уведомления не получено', 'error');
-                    return;
-                }
+                const granted = await this.requestPermission();
+                if (!granted) return;
             }
             
-            const notificationOptions = {
-                body: 'Теперь вы будете получать уведомления о новых бесплатных играх',
+            const options = {
+                body: 'Это тестовое уведомление от FreeSteam',
                 icon: './steamfreeico.png',
                 badge: './steamfreeico.png',
                 tag: 'test-notification',
-                requireInteraction: false,
-                vibrate: this.settings.vibrate ? [200, 100, 200] : undefined,
+                requireInteraction: true,
+                actions: [
+                    {
+                        action: 'open',
+                        title: 'Открыть',
+                        icon: './steamfreeico.png'
+                    },
+                    {
+                        action: 'close',
+                        title: 'Закрыть'
+                    }
+                ],
                 data: {
-                    type: 'test',
-                    timestamp: Date.now()
+                    url: window.location.href,
+                    timestamp: new Date().toISOString()
                 }
             };
             
-            if (this.registration && this.registration.active) {
-                console.log('[Notifications] Using Service Worker notification');
-                await this.registration.showNotification('FreeSteam - Тестовое уведомление', notificationOptions);
-                console.log('[Notifications] Service Worker notification sent');
-            } else {
-                console.log('[Notifications] Using direct browser notification');
-                // Fallback для браузеров без Service Worker или когда SW не активен
-                const notification = new Notification('FreeSteam - Тестовое уведомление', notificationOptions);
-                
-                // Автоматически закрываем через 5 секунд
-                setTimeout(() => {
-                    try {
-                        notification.close();
-                    } catch (e) {
-                        console.log('[Notifications] Could not close notification:', e);
-                    }
-                }, 5000);
-                
-                console.log('[Notifications] Direct browser notification sent');
+            // Если есть Service Worker и push-уведомления, используем их
+            if (this.registration && this.subscription) {
+                // Отправляем сообщение в Service Worker для показа уведомления
+                await this.registration.showNotification('Тестовое уведомление', options);
+            } 
+            // Иначе используем локальные уведомления
+            else if (this.usingLocalNotifications) {
+                this.showLocalNotification('Тестовое уведомление', options);
+            }
+            // Или показываем fallback-уведомление
+            else {
+                this.showFallbackNotification('Тестовое уведомление: ' + options.body);
             }
             
-            // Показываем успешное fallback уведомление на странице
-            this.showFallbackNotification('✅ Тестовое уведомление отправлено!', 'success');
+            return true;
             
         } catch (error) {
-            console.error('[Notifications] Error showing test notification:', error);
-            this.showFallbackNotification(`Ошибка: ${error.message}`, 'error');
+            console.error('[Notifications] Failed to show test notification:', error);
+            this.showFallbackNotification('Не удалось показать тестовое уведомление');
+            return false;
         }
     }
     
     /**
-     * Проверка новых игр и отправка уведомлений
+     * Показать fallback-уведомление (для браузеров без поддержки)
      */
-    async checkForNewGames() {
-        if (!this.settings.enabled) {
-            console.log('[Notifications] Notifications disabled');
-            return;
-        }
+    showFallbackNotification(message) {
+        // Показываем простое уведомление в интерфейсе
+        const notification = document.createElement('div');
+        notification.className = 'fixed bottom-4 right-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded shadow-lg';
+        notification.role = 'alert';
         
-        if (this.isQuietTime()) {
-            console.log('[Notifications] Quiet time - skipping notification');
-            return;
-        }
+        const closeButton = document.createElement('button');
+        closeButton.className = 'absolute top-0 right-0 px-2 py-1 text-yellow-700 hover:text-yellow-900';
+        closeButton.innerHTML = '&times;';
+        closeButton.onclick = () => notification.remove();
         
-        try {
-            // Запрашиваем проверку через Service Worker
-            if (this.registration && this.registration.active) {
-                this.registration.active.postMessage({
-                    type: 'CHECK_NEW_GAMES'
-                });
-            }
-        } catch (error) {
-            console.error('[Notifications] Error checking for new games:', error);
-        }
+        notification.innerHTML = `
+            <p class="font-bold">Уведомление</p>
+            <p>${message}</p>
+        `;
+        
+        notification.prepend(closeButton);
+        document.body.appendChild(notification);
+        
+        // Автоматически скрываем через 5 секунд
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
     }
     
     /**
-     * Проверка тихого времени
+     * Проверить, находится ли текущее время в "тихих часах"
      */
     isQuietTime() {
         if (!this.settings.quietHours.enabled) {
             return false;
         }
         
-        const now = new Date();
-        const hour = now.getHours();
-        
-        // Поддерживаем как числовой, так и строковый формат времени
+        // Функция для преобразования времени в минуты
         const parseHour = (timeValue) => {
             if (typeof timeValue === 'number') {
                 return timeValue;
             }
+            
             if (typeof timeValue === 'string') {
-                const match = timeValue.match(/^(\d{1,2}):(\d{2})$/);
-                return match ? parseInt(match[1], 10) : 0;
+                const [hours, minutes] = timeValue.split(':').map(Number);
+                return hours * 60 + (minutes || 0);
             }
+            
             return 0;
         };
         
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
         const start = parseHour(this.settings.quietHours.start);
         const end = parseHour(this.settings.quietHours.end);
         
         if (start <= end) {
-            return hour >= start && hour < end;
+            return currentMinutes >= start && currentMinutes < end;
         } else {
-            return hour >= start || hour < end;
+            return currentMinutes >= start || currentMinutes < end;
         }
     }
     
     /**
-     * Запуск периодической проверки
+     * Запланировать периодическую проверку уведомлений
      */
     schedulePeriodicCheck() {
-        if (!this.settings.enabled) {
-            return;
+        // Очищаем предыдущий таймер, если он был
+        if (this.checkInterval) {
+            clearInterval(this.checkInterval);
         }
         
-        const intervals = {
-            'instant': 5 * 60 * 1000,  // 5 минут
-            'hourly': 60 * 60 * 1000,  // 1 час  
-            'daily': 24 * 60 * 60 * 1000  // 24 часа
-        };
+        // Проверяем уведомления каждые 5 минут
+        this.checkInterval = setInterval(() => {
+            this.checkForUpdates();
+        }, 5 * 60 * 1000);
         
-        const interval = intervals[this.settings.frequency] || intervals.instant;
-        
-        setInterval(() => {
-            this.checkForNewGames();
-        }, interval);
-        
-        console.log('[Notifications] Periodic check scheduled every', interval / 1000, 'seconds');
+        // Также проверяем при следующем запуске
+        this.checkForUpdates();
     }
     
     /**
-     * Fallback уведомление для браузеров без поддержки
+     * Проверить наличие обновлений
      */
-    showFallbackNotification(message, type = 'info') {
-        // Создаем визуальное уведомление на странице
-        const notification = document.createElement('div');
-        notification.className = `notification-fallback notification-${type}`;
-        notification.innerHTML = `
-            <div class="notification-content">
-                <i class="fas fa-bell"></i>
-                <span>${message}</span>
-                <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
-            </div>
-        `;
+    async checkForUpdates() {
+        if (this.isCheckingForUpdates) return;
         
-        // Добавляем стили если их нет
-        if (!document.getElementById('notification-fallback-styles')) {
-            const styles = document.createElement('style');
-            styles.id = 'notification-fallback-styles';
-            styles.textContent = `
-                .notification-fallback {
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    max-width: 350px;
-                    background: linear-gradient(135deg, #1e2332 0%, #252b3d 100%);
-                    color: #ffffff;
-                    border-radius: 12px;
-                    padding: 16px;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-                    border: 1px solid rgba(0, 212, 170, 0.3);
-                    z-index: 10000;
-                    animation: slideInRight 0.3s ease;
-                }
-                
-                .notification-fallback.notification-error {
-                    border-color: rgba(255, 71, 87, 0.5);
-                }
-                
-                .notification-content {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                }
-                
-                .notification-content i {
-                    color: #00d4aa;
-                    font-size: 18px;
-                }
-                
-                .notification-close {
-                    background: none;
-                    border: none;
-                    color: #6b7785;
-                    font-size: 20px;
-                    cursor: pointer;
-                    padding: 0;
-                    margin-left: auto;
-                    transition: color 0.2s;
-                }
-                
-                .notification-close:hover {
-                    color: #ffffff;
-                }
-                
-                @keyframes slideInRight {
-                    from {
-                        transform: translateX(100%);
-                        opacity: 0;
-                    }
-                    to {
-                        transform: translateX(0);
-                        opacity: 1;
-                    }
-                }
-            `;
-            document.head.appendChild(styles);
-        }
-        
-        document.body.appendChild(notification);
-        
-        // Автоудаление через 5 секунд
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.remove();
+        try {
+            this.isCheckingForUpdates = true;
+            
+            // Пропускаем проверку в "тихие часы"
+            if (this.isQuietTime()) {
+                console.log('[Notifications] Skipping update check during quiet hours');
+                return;
             }
-        }, 5000);
+            
+            console.log('[Notifications] Checking for updates...');
+            
+            // Здесь должна быть логика проверки обновлений
+            // Например, запрос к API для проверки новых игр или скидок
+            
+            // Временная заглушка
+            const hasUpdates = Math.random() > 0.5;
+            
+            if (hasUpdates) {
+                console.log('[Notifications] Updates found');
+                
+                const options = {
+                    body: 'Доступны новые бесплатные игры и скидки на Steam!',
+                    icon: './steamfreeico.png',
+                    badge: './steamfreeico.png',
+                    tag: 'updates-available',
+                    data: {
+                        url: window.location.href,
+                        timestamp: new Date().toISOString()
+                    }
+                };
+                
+                // Показываем уведомление в зависимости от доступного метода
+                if (this.registration) {
+                    await this.registration.showNotification('Новые обновления на FreeSteam', options);
+                } else if (this.usingLocalNotifications) {
+                    this.showLocalNotification('Новые обновления на FreeSteam', options);
+                } else {
+                    this.showFallbackNotification(options.body);
+                }
+            } else {
+                console.log('[Notifications] No updates found');
+            }
+            
+        } catch (error) {
+            console.error('[Notifications] Error checking for updates:', error);
+        } finally {
+            this.isCheckingForUpdates = false;
+        }
     }
     
     /**
-     * Обновление UI элементов
+     * Обновить UI в соответствии с текущим состоянием
      */
     updateUI() {
         const toggleButtons = document.querySelectorAll('[data-notification-toggle]');
         toggleButtons.forEach(button => {
             if (this.settings.enabled && Notification.permission === 'granted') {
                 button.textContent = '🔔 Уведомления включены';
-                button.className = button.className.replace('btn-outline-light', 'btn-success');
+                button.classList.remove('bg-gray-200', 'text-gray-700');
+                button.classList.add('bg-green-100', 'text-green-800');
+            } else if (Notification.permission === 'denied') {
+                button.textContent = '❌ Уведомления отключены';
+                button.classList.remove('bg-green-100', 'text-green-800');
+                button.classList.add('bg-red-100', 'text-red-800');
             } else {
-                button.textContent = '🔕 Включить уведомления';
-                button.className = button.className.replace('btn-success', 'btn-outline-light');
+                button.textContent = '🔕 Нажмите, чтобы включить уведомления';
+                button.classList.remove('bg-green-100', 'text-green-800');
+                button.classList.add('bg-gray-200', 'text-gray-700');
+            }
+            
+            // Добавляем обработчик клика, если его еще нет
+            if (!button.hasAttribute('data-notification-listener')) {
+                button.setAttribute('data-notification-listener', 'true');
+                button.addEventListener('click', () => this.toggleNotifications());
             }
         });
-        
-        // Обновляем переключатели в настройках
-        const notificationsSwitch = document.getElementById('notificationsSwitch');
-        const soundSwitch = document.getElementById('soundSwitch');
-        const vibrateSwitch = document.getElementById('vibrateSwitch');
-        const quietHoursSwitch = document.getElementById('quietHoursSwitch');
-        
-        if (notificationsSwitch) {
-            notificationsSwitch.checked = this.settings.enabled && Notification.permission === 'granted';
-        }
-        if (soundSwitch) {
-            soundSwitch.checked = this.settings.sound;
-        }
-        if (vibrateSwitch) {
-            vibrateSwitch.checked = this.settings.vibrate;
-        }
-        if (quietHoursSwitch) {
-            quietHoursSwitch.checked = this.settings.quietHours.enabled;
-        }
     }
     
     /**
-     * Отключение уведомлений
+     * Переключить состояние уведомлений
      */
-    async disable() {
-        try {
-            // Отписываемся от push уведомлений
-            if (this.subscription) {
-                await this.subscription.unsubscribe();
-                this.subscription = null;
-            }
-            
-            // Сохраняем настройки
-            this.saveSettings({ enabled: false });
-            
-            // Обновляем UI
+    async toggleNotifications() {
+        if (Notification.permission === 'granted') {
+            // Если уведомления уже включены, отключаем их
+            this.settings.enabled = !this.settings.enabled;
+            this.saveSettings();
             this.updateUI();
             
-            this.showFallbackNotification('Уведомления отключены');
-            
-        } catch (error) {
-            console.error('[Notifications] Error disabling notifications:', error);
-            this.showFallbackNotification('Ошибка при отключении уведомлений', 'error');
+            if (!this.settings.enabled) {
+                // Показываем подтверждение отключения
+                this.showFallbackNotification('Уведомления отключены');
+            }
+        } else if (Notification.permission === 'denied') {
+            // Если доступ запрещен, показываем инструкции
+            this.showFallbackNotification('Разрешите уведомления в настройках браузера');
+        } else {
+            // Запрашиваем разрешение
+            await this.requestPermission();
         }
     }
     
     /**
-     * Диагностика состояния уведомлений
+     * Очистить все уведомления
      */
-    getNotificationStatus() {
-        const status = {
-            isSupported: this.isSupported,
-            permission: Notification.permission,
-            registration: {
-                exists: !!this.registration,
-                active: !!(this.registration && this.registration.active),
-                scope: this.registration ? this.registration.scope : null,
-                state: this.registration && this.registration.active ? this.registration.active.state : null
-            },
-            subscription: {
-                exists: !!this.subscription,
-                endpoint: this.subscription ? this.subscription.endpoint : null
-            },
-            settings: this.settings,
-            serviceWorkerSupport: 'serviceWorker' in navigator,
-            pushSupport: 'PushManager' in window
-        };
-        
-        console.table(status);
-        return status;
-    }
-    
-    /**
-     * Вспомогательные функции
-     */
-    urlBase64ToUint8Array(base64String) {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding)
-            .replace(/-/g, '+')
-            .replace(/_/g, '/');
-        
-        const rawData = window.atob(base64);
-        const outputArray = new Uint8Array(rawData.length);
-        
-        for (let i = 0; i < rawData.length; ++i) {
-            outputArray[i] = rawData.charCodeAt(i);
+    clearNotifications() {
+        if (this.registration) {
+            this.registration.getNotifications().then(notifications => {
+                notifications.forEach(notification => notification.close());
+            });
         }
-        return outputArray;
     }
 }
 
-// Глобальный экземпляр системы уведомлений
-window.FreeSteamNotifications = new FreeSteamNotifications();
-
-// Экспорт для использования в других модулях
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = FreeSteamNotifications;
+// Создаем глобальный экземпляр
+if (!window.FreeSteamNotifications) {
+    window.FreeSteamNotifications = new FreeSteamNotifications();
 }
+
+// Экспортируем для использования в модулях
+export default window.FreeSteamNotifications;
