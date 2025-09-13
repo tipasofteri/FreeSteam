@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="FreeSteam Platformer Game - интерактивная игровая страница сообщества">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>FreeSteam Platformer | Игровой Hub</title>
     
     <!-- Google Fonts -->
@@ -752,6 +755,27 @@
     </div>
 
     <script>
+        // Check for service worker updates
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful');
+                    
+                    // Проверяем обновления при загрузке
+                    registration.update().then(() => {
+                        console.log('Checking for updates...');
+                        // Если есть новая версия, перезагружаем страницу
+                        registration.addEventListener('updatefound', () => {
+                            console.log('New version found, reloading...');
+                            window.location.reload();
+                        });
+                    });
+                }).catch(error => {
+                    console.log('ServiceWorker registration failed:', error);
+                });
+            });
+        }
+
         // Sound Effects System
         class SoundManager {
             constructor() {
