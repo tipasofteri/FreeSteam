@@ -8422,7 +8422,9 @@ input::-webkit-inner-spin-button {
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
                 try {
-                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    const registration = await navigator.serviceWorker.register('./sw.js', {
+                        scope: './'
+                    });
                     console.log('[PWA] Service Worker registered:', registration.scope);
                     
                     // Handle updates
