@@ -1,1 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreeSteam | Community Hub</title>
+    <!-- Подключение Tailwind CSS через CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Конфигурация Tailwind для кастомных цветов и шрифтов -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-bg': '#0a0a0f',
+                        'secondary-bg': '#121218',
+                        'card-bg': '#1e1e24',
+                        'accent-blue': '#4a90e2',
+                        'accent-purple': '#9b59b6',
+                        'text-main': '#e6e6e6',
+                        'text-secondary': '#b0b0b0',
+                        'brand-telegram': '#2aabdf',
+                        'brand-vk': '#5181b8',
+                        'brand-github': '#6e5494',
+                        'brand-steam': '#1b2838',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
+                        'inner-lg': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)'
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in',
+                        'slide-up': 'slideUp 0.4s ease-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts для кастомных шрифтов -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #0a0a0f;
+            --secondary-bg: #121218;
+            --card-bg: #1e1e24;
+            --accent-blue: #4a90e2;
+            --accent-purple: #9b59b6;
+            --text-main: #e6e6e6;
+            --text-secondary: #b0b0b0;
+            --brand-telegram: #2aabdf;
+            --brand-vk: #5181b8;
+            --brand-github: #6e5494;
+            --brand-steam: #1b2838;
+        }
+        
+        body {
+            background-color: var(--primary-bg);
+            background-image: 
+                radial-gradient(at 100% 100%, var(--accent-purple) 0, transparent 50%), 
+                radial-gradient(at 0% 0%, var(--accent-blue) 0, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+        
+        /* Animated background */
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+        
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+        
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+        
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(90deg, #9b59b6, #4a90e2);
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 40px rgba(74, 144, 226, 0.3);
+        }
+        .button-glow {
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5), 0 0 10px rgba(74, 144, 226, 0.5);
+            transition: box-shadow 0.3s ease;
+        }
+        .button-glow:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(74, 144, 226, 0.8);
+            transform: translateY(-2px);
+        }
+        
+        /* Hover effects for cards */
+        .card-hover-effect {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover-effect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: 0.5s;
+        }
+        
+        .card-hover-effect:hover::before {
+            left: 100%;
+        }
+        
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 120px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Loading animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="font-sans text-text-main antialiased min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 overflow-x-hidden">
+    <!-- Animated background elements -->
+    <div class="fixed top-0 left-0 w-full h-full -z-10 overflow-hidden">
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div class="absolute top-1/3 right-1/4 w-64 h-64 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-1/4 left-1/2 w-64 h-64 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+    </div>
 
+    <!-- Главный контейнер -->
+    <div class="w-full max-w-6xl bg-secondary-bg/80 backdrop-blur-lg rounded-3xl shadow-2xl p-6 sm:p-12 border border-white/5 hover:border-white/10 transition-all duration-300">
+
+        <!-- Заголовок страницы -->
+        <header class="text-center mb-16">
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-heading font-bold mb-4">
+                <span class="text-gradient">FreeSteam</span> Community Hub
+            </h1>
+            <p class="text-base sm:text-xl text-text-secondary max-w-2xl mx-auto">
+                Добро пожаловать в центр FreeSteam! Здесь вы найдёте все официальные ресурсы и сообщества для получения самых свежих новостей и общения.
+            </p>
+        </header>
+
+        <!-- Секция Telegram -->
+        <section id="telegram-section" class="mb-16">
+            <h2 class="text-3xl sm:text-4xl font-heading font-bold mb-8 text-center text-brand-telegram">
+                Telegram
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Карточка Telegram Channel -->
+                <div class="card p-6 rounded-2xl bg-card-bg/80 backdrop-blur-sm border border-brand-telegram/30 hover:border-brand-telegram/60 transition-all duration-300 hover:shadow-lg hover:shadow-brand-telegram/10">
+                    <h3 class="text-2xl font-bold mb-2">Канал | Анонсы</h3>
+                    <p class="text-text-secondary mb-6">
+                        Официальный канал FreeSteam, где публикуются анонсы всех бесплатных игр и самых выгодных скидок в Steam. Это ваш главный источник информации, канал только для чтения.
+                    </p>
+                    <div class="flex justify-end mt-4">
+                        <a href="https://t.me/+uSSIjGsA9gI2OGJi" class="inline-block px-6 py-2.5 bg-gradient-to-r from-brand-telegram to-blue-600 hover:from-blue-600 hover:to-brand-telegram text-white font-medium rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-telegram/20 flex items-center gap-2 group" target="_blank">
+                            <span>Присоединиться</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <!-- Карточка Telegram Group -->
+                <div class="card p-6 rounded-2xl bg-card-bg/80 backdrop-blur-sm border border-brand-telegram/30 hover:border-brand-telegram/60 transition-all duration-300 hover:shadow-lg hover:shadow-brand-telegram/10">
+                    <h3 class="text-2xl font-bold mb-2">Группа | Обсуждения</h3>
+                    <p class="text-text-secondary mb-6">
+                        Вступите в нашу активную группу, чтобы общаться с единомышленниками, обсуждать игры, делиться мнениями и помогать друг другу.
+                    </p>
+                    <div class="flex justify-end mt-4">
+                        <a href="https://t.me/+k2sEyazToE9kZTEy" class="inline-block px-6 py-2.5 bg-gradient-to-r from-brand-telegram to-blue-600 hover:from-blue-600 hover:to-brand-telegram text-white font-medium rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-telegram/20 flex items-center gap-2 group" target="_blank">
+                            <span>Присоединиться</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция GitHub -->
+        <section id="github-section" class="mb-16">
+            <h2 class="text-3xl sm:text-4xl font-heading font-bold mb-8 text-center text-text-main">
+                Для разработчиков
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Карточка GitHub Repository -->
+                <div class="card p-6 rounded-2xl bg-card-bg/80 backdrop-blur-sm border border-brand-github/30 hover:border-brand-github/60 transition-all duration-300 hover:shadow-lg hover:shadow-brand-github/10">
+                    <h3 class="text-2xl font-bold mb-2">Исходный код проекта</h3>
+                    <p class="text-text-secondary mb-6">
+                        Посетите репозиторий проекта на GitHub. Вы можете изучить исходный код, открыть issues, отправить pull-requests и внести свой вклад.
+                    </p>
+                    <div class="flex justify-end mt-4">
+                        <a href="https://github.com/tipasofteri/FreeSteam" class="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2" target="_blank">
+                            <span>Перейти на GitHub</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <!-- Карточка Developer Portfolio -->
+                <div class="card p-6 rounded-2xl bg-card-bg/80 backdrop-blur-sm border border-brand-github/30 hover:border-brand-github/60 transition-all duration-300 hover:shadow-lg hover:shadow-brand-github/10">
+                    <h3 class="text-2xl font-bold mb-2">Портфолио разработчика</h3>
+                    <p class="text-text-secondary mb-6">
+                        Познакомьтесь с другими работами и проектами основного разработчика. Это отличный способ узнать о других идеях, над которыми мы работаем.
+                    </p>
+                    <div class="flex justify-end mt-4">
+                        <a href="https://pixelslayer.onrender.com" class="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2" target="_blank">
+                            <span>Посмотреть портфолио</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция Steam -->
+        <section id="steam-section">
+            <h2 class="text-3xl sm:text-4xl font-heading font-bold mb-8 text-center text-brand-steam">
+                Steam
+            </h2>
+            <div class="grid grid-cols-1 gap-8">
+                <!-- Карточка Steam Developer Page -->
+                <div class="card p-6 rounded-2xl bg-card-bg/80 backdrop-blur-sm border border-brand-steam/30 hover:border-brand-steam/60 transition-all duration-300 hover:shadow-lg hover:shadow-brand-steam/10">
+                    <h3 class="text-2xl font-bold mb-2">Страница разработчика в Steam</h3>
+                    <p class="text-text-secondary mb-6">
+                        Здесь вы можете увидеть все игры и продукты, созданные FreeSteam, и добавить их в свой список желаемого.
+                    </p>
+                    <div class="flex justify-end mt-4">
+                        <a href="https://steamcommunity.com/id/PixelSSSlayer/" class="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2" target="_blank">
+                            <span>Перейти на страницу</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Enhanced JavaScript for better interactivity -->
+    <script>
+        // Функция для плавной прокрутки вверх
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Показать/скрыть кнопку возврата наверх
+        function toggleBackToTopButton() {
+            const backToTopButton = document.getElementById('backToTop');
+            if (window.scrollY > 300) {
+                backToTopButton.classList.remove('opacity-0', 'invisible', 'translate-y-4');
+                backToTopButton.classList.add('opacity-100', 'visible', 'translate-y-0');
+            } else {
+                backToTopButton.classList.add('opacity-0', 'invisible', 'translate-y-4');
+                backToTopButton.classList.remove('opacity-100', 'visible', 'translate-y-0');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Инициализация кнопки возврата наверх
+            const backToTopButton = document.getElementById('backToTop');
+            if (backToTopButton) {
+                backToTopButton.addEventListener('click', scrollToTop);
+                window.addEventListener('scroll', toggleBackToTopButton);
+            }
+            // Initialize tooltips
+            const tooltipElements = document.querySelectorAll('.tooltip');
+            tooltipElements.forEach(element => {
+                element.addEventListener('mouseenter', showTooltip);
+                element.addEventListener('mouseleave', hideTooltip);
+            });
+
+            // Упрощенный обработчик для кнопок, если они еще где-то используются
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.getAttribute('data-url');
+                    if (url) {
+                        window.open(url, '_blank');
+                    }
+                });
+            });
+        });
+        
+        // Tooltip functions
+        function showTooltip(e) {
+            const tooltip = this.querySelector('.tooltip-text');
+            if (!tooltip) return;
+            
+            tooltip.style.visibility = 'visible';
+            tooltip.style.opacity = '1';
+        }
+        
+        function hideTooltip(e) {
+            const tooltip = this.querySelector('.tooltip-text');
+            if (!tooltip) return;
+            
+            tooltip.style.visibility = 'hidden';
+            tooltip.style.opacity = '0';
+        }
+        
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Плавное появление элементов при скролле
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-6');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        // Наблюдаем за всеми карточками
+        document.querySelectorAll('.card').forEach(card => {
+            card.classList.add('opacity-0', 'translate-y-6', 'transition-all', 'duration-500', 'ease-out');
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
