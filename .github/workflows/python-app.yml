@@ -21,8 +21,8 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Run crawler
       run: |
-        python NeedFree.py
-    - name: Update free details json
+        python NeedFree2.py
+    - name: Update free games details json
       run: |
         git pull
         git config --global user.name 'InJeCTrL'
