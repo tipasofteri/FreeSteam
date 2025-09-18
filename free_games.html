@@ -537,7 +537,7 @@
     <script>
         function loadAndShowFreeGames() {
             return new Promise((resolve, reject) => {
-                fetch('https://github.com/InJeCTrL/NeedFree/blob/master/free_goods_detail.json')
+                fetch('https://github.com/tipasofteri/FreeSteam/blob/main/free_goods_detail.json')
                     .then(response => response.json())
                     .then(data => {
                         const gamesContainer = document.getElementById('gamesContainer');
