@@ -4358,6 +4358,87 @@ input::-webkit-inner-spin-button {
     }
   }
   
+  /* Blocked page overlay styles */
+  .blocked-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .blocked-content {
+    text-align: center;
+    background: rgba(30, 35, 50, 0.9);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    border: 2px solid rgba(76, 175, 80, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    max-width: 600px;
+    margin: 0 20px;
+  }
+  
+  .blocked-title {
+    color: #ff4757;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .blocked-message {
+    color: #e0e0e0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+  
+  .blocked-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .btn-retry {
+    background: linear-gradient(135deg, var(--accent-primary), #6dd3a7);
+    color: #0f1115;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-retry:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+    color: #0f1115;
+  }
+  
+  .blocked-icon {
+    animation: blockPulse 2s infinite;
+  }
+  
+  @keyframes blockPulse {
+    0%, 100% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
   /* Light theme overrides */
   .light-theme {
     background: #f8f9fa !important;
@@ -5406,6 +5487,26 @@ input::-webkit-inner-spin-button {
                     <button type="button" class="btn btn-outline-secondary" id="disagreeBtn">Disagree</button>
                     <button type="button" class="btn btn-primary" id="agreeBtn">Agree</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Блокирующий overlay при отказе от пользовательского соглашения -->
+    <div class="blocked-overlay" id="blockedOverlay">
+        <div class="blocked-content">
+            <div class="blocked-title">
+                <i class="fas fa-ban blocked-icon"></i>
+                Доступ заблокирован
+            </div>
+            <div class="blocked-message">
+                <p>Для использования сайта необходимо принять пользовательское соглашение.</p>
+                <p>Без принятия условий использования доступ к функциям сайта невозможен.</p>
+            </div>
+            <div class="blocked-actions">
+                <button class="btn-retry" onclick="retryAgreement()">
+                    <i class="fas fa-redo"></i>
+                    Принять соглашение
+                </button>
             </div>
         </div>
     </div>
@@ -6475,13 +6576,19 @@ input::-webkit-inner-spin-button {
 
 
             [minInput, maxInput].forEach(input => {
-
+                // Обработчик изменения (при потере фокуса)
                 input.addEventListener('change', () => {
-
                     slider.set([minInput.value || 0, maxInput.value || slider.options.range.max]);
-
                 });
-
+                
+                // Обработчик нажатия Enter
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        slider.set([minInput.value || 0, maxInput.value || slider.options.range.max]);
+                        input.blur(); // Убираем фокус для лучшего UX
+                    }
+                });
             });
 
         }
@@ -6533,11 +6640,16 @@ input::-webkit-inner-spin-button {
 
             filteredGames = allGames.filter(game => {
 
-                const nameMatch = game.title.toLowerCase().includes(searchText);
+                const nameMatch = !searchText || game.title.toLowerCase().includes(searchText);
 
-                const discountMatch = game.discount >= minDiscount && game.discount <= maxDiscount;
+                // Фильтр по скидке
+                const discount = parseFloat(game.discount) || 0;
+                const discountMatch = discount >= minDiscount && discount <= maxDiscount;
 
-                const priceMatch = game.price_numeric >= minPrice && game.price_numeric <= maxPrice;
+                // Фильтр по цене - используем базовую цену (до скидки) для корректной фильтрации
+                // Если базовая цена равна 0, используем финальную цену (для бесплатных игр)
+                const priceToCheck = game.base_price_numeric > 0 ? game.base_price_numeric : game.price_numeric;
+                const priceMatch = priceToCheck >= minPrice && priceToCheck <= maxPrice;
 
                 const reviewPercentMatch = game.review_percent >= minReviewPercent && game.review_percent <= maxReviewPercent;
 
@@ -7172,9 +7284,96 @@ input::-webkit-inner-spin-button {
 
 
 
-        $(document).ready(() => {
+        // Функции управления блокировкой доступа
+        function blockPageAccess() {
+            try {
+                // Скрываем основной контент
+                const mainContent = document.querySelectorAll('.container > *:not(#blockedOverlay)');
+                mainContent.forEach(el => el.style.display = 'none');
+                
+                // Показываем блокирующий overlay
+                const overlay = document.getElementById('blockedOverlay');
+                if (overlay) {
+                    overlay.style.display = 'flex';
+                }
+                
+                // Сохраняем состояние отказа
+                localStorage.setItem('fs_agreement_refused_v1', '1');
+                localStorage.removeItem('fs_agreement_accepted_v1');
+                
+                // Блокируем прокрутку
+                document.body.style.overflow = 'hidden';
+            } catch(e) {
+                console.error('Ошибка блокировки доступа:', e);
+            }
+        }
+        
+        function unblockPageAccess() {
+            try {
+                // Показываем основной контент
+                const mainContent = document.querySelectorAll('.container > *:not(#blockedOverlay)');
+                mainContent.forEach(el => el.style.display = '');
+                
+                // Скрываем блокирующий overlay
+                const overlay = document.getElementById('blockedOverlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                }
+                
+                // Убираем состояние отказа
+                localStorage.removeItem('fs_agreement_refused_v1');
+                
+                // Разрешаем прокрутку
+                document.body.style.overflow = 'auto';
+            } catch(e) {
+                console.error('Ошибка разблокировки доступа:', e);
+            }
+        }
+        
+        function retryAgreement() {
+            try {
+                // Разблокируем доступ
+                unblockPageAccess();
+                
+                // Показываем модальное окно соглашения
+                const modalEl = document.getElementById('agreementModal');
+                if (modalEl) {
+                    const agreementModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    agreementModal.show();
+                }
+            } catch(e) {
+                console.error('Ошибка повторного показа соглашения:', e);
+            }
+        }
+        
+        function checkAgreementStatus() {
+            try {
+                const agreed = localStorage.getItem('fs_agreement_accepted_v1') === '1';
+                const refused = localStorage.getItem('fs_agreement_refused_v1') === '1';
+                
+                if (refused && !agreed) {
+                    // Пользователь ранее отказался - блокируем доступ
+                    blockPageAccess();
+                    return false;
+                }
+                return true;
+            } catch(e) {
+                console.error('Ошибка проверки статуса соглашения:', e);
+                return true;
+            }
+        }
+        
+        // Делаем функцию retryAgreement доступной глобально
+        window.retryAgreement = retryAgreement;
 
+        $(document).ready(() => {
             const AGREEMENT_KEY = 'fs_agreement_accepted_v1';
+            
+            // Проверяем статус соглашения при загрузке
+            if (!checkAgreementStatus()) {
+                return; // Доступ заблокирован, не продолжаем инициализацию
+            }
+            
             try {
                 const agreed = localStorage.getItem(AGREEMENT_KEY) === '1';
                 const modalEl = document.getElementById('agreementModal');
@@ -7184,11 +7383,18 @@ input::-webkit-inner-spin-button {
                         agreementModal.show();
                     }
                     $('#agreeBtn').off('click').on('click', function() {
-                        try { localStorage.setItem(AGREEMENT_KEY, '1'); } catch(e) {}
+                        try { 
+                            localStorage.setItem(AGREEMENT_KEY, '1'); 
+                            localStorage.removeItem('fs_agreement_refused_v1'); // Убираем отказ при согласии
+                        } catch(e) {}
                         agreementModal.hide();
                     });
                     $('#disagreeBtn').off('click').on('click', function() {
                         agreementModal.hide();
+                        // Блокируем доступ при отказе
+                        setTimeout(() => {
+                            blockPageAccess();
+                        }, 300); // Небольшая задержка для закрытия модала
                     });
                     $('.language-switcher button').on('click', function() {
                         $('.language-switcher button').removeClass('active');
@@ -7487,7 +7693,9 @@ input::-webkit-inner-spin-button {
                             item.tags_numeric = item.tags;
                             item.tags = (item.tags_numeric || []).map(id => (allAvailableTagsMap.get(Number(id)) || allAvailableTags[id] || String(id)));
 
-                            maxPrice = Math.max(maxPrice, item.price_numeric);
+                            // Используем ту же логику, что и в фильтрации
+                            const priceToCheck = item.base_price_numeric > 0 ? item.base_price_numeric : item.price_numeric;
+                            maxPrice = Math.max(maxPrice, priceToCheck);
                             maxReviewUsers = Math.max(maxReviewUsers, item.review_users || 0);
                             return item;
                         });
