@@ -5,12 +5,12 @@ on:
     - cron: '0 * * * *'
       workflow_dispatch:
 
-      permissions:
-       contents: write
+permissions:
+  contents: write
 
-       concurrency:
-       group: update-freesteam
-      cancel-in-progress: false
+concurrency:
+  group: update-freesteam
+  cancel-in-progress: false
 
 jobs:
   build:
