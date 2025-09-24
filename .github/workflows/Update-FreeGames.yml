@@ -38,7 +38,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run crawler (one-shot)
+      - name: Run crawler and commit changes
         run: |
           python FreeSteam.py
-          done
+          git add .
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update free games" && git push origin main)
