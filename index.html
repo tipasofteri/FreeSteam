@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-
-<html lang="ru">
-
+<html lang="ru" data-baseurl="/FreeSteam">
 <head>
+    <base href="/FreeSteam/" />
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -76,7 +75,7 @@
       "screenshot": "https://tipasofteri.github.io/FreeSteam/steamfreeico.png",
       "author": {
         "@type": "Person",
-        "name": "Pavel Ovchinnikov"
+        "name": "Pavel"
       },
       "aggregateRating": {
         "@type": "AggregateRating",
@@ -3072,16 +3071,87 @@ input::-webkit-inner-spin-button {
     </style>
 
     <style>
+        /* Стили для баннера бесплатных игр */
         .free100-banner {
             display: none;
+            align-items: center;
+            justify-content: center;
             margin: 0.5rem 0 1rem 0;
             padding: 0.75rem 1rem;
+            background-color: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: var(--radius-md);
+            color: var(--accent-primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .free100-banner:hover {
+            background-color: rgba(0, 212, 170, 0.15);
+            border-color: var(--accent-primary);
+        }
+        
+        .free100-banner .count {
+            font-weight: 700;
+            margin-left: 0.5rem;
+            color: var(--accent-primary);
+        }
+        
+        /* Стили для списка бесплатных игр */
+        #freeGamesList {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+        
+        .free-game-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg-surface);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+        
+        .free-game-item:hover {
+            background: var(--bg-elevated);
+            transform: translateX(4px);
+            border-color: var(--accent-primary);
+        }
+        
+        .free-game-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 1rem;
+        }
+        
+        .free-game-badge {
+            background: var(--accent-primary);
+            color: var(--text-inverse);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        /* Обновлённые стили для баннера */
+        .free100-banner {
             border-radius: 8px;
             background: rgba(76, 175, 80, 0.12);
             border: 1px solid rgba(76, 175, 80, 0.35);
             color: #b6f2c0;
             box-shadow: 0 8px 24px rgba(0,0,0,0.25);
         }
+        
         .free100-banner .count {
             color: #8be69b;
             font-weight: 700;
@@ -8456,10 +8526,49 @@ input::-webkit-inner-spin-button {
             }, 10000);
         }
 
+        // Функция для загрузки и отображения бесплатных игр
+        function loadFreeGames() {
+            const baseUrl = document.documentElement.getAttribute('data-baseurl') || '';
+            fetch(`${baseUrl}/free_goods_detail.json`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Не удалось загрузить данные о бесплатных играх');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const freeGamesList = document.getElementById('freeGamesList');
+                    if (!freeGamesList) return;
+                    
+                    if (data.free_list && data.free_list.length > 0) {
+                        freeGamesList.innerHTML = data.free_list.map(game => `
+                            <a href="${game[1]}" target="_blank" class="free-game-item">
+                                <div class="free-game-name">${game[0]}</div>
+                                <div class="free-game-badge">Бесплатно</div>
+                            </a>
+                        `).join('');
+                        
+                        // Обновляем счётчик в баннере
+                        const freeCount = data.free_list.length;
+                        const bannerCount = document.querySelector('.free100-banner .count');
+                        if (bannerCount) {
+                            bannerCount.textContent = freeCount;
+                            document.querySelector('.free100-banner').style.display = 'flex';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки бесплатных игр:', error);
+                });
+        }
+
         // Free Games Panel logic
         document.addEventListener('DOMContentLoaded', function() {
             const freeGamesPanel = document.getElementById('freeGamesPanel');
             const freeGamesTrigger = document.getElementById('freeGamesTrigger');
+            
+            // Загружаем бесплатные игры при загрузке страницы
+            loadFreeGames();
             const closeFreeGamesPanel = document.getElementById('closeFreeGamesPanel');
             
             if (freeGamesTrigger && freeGamesPanel) {
