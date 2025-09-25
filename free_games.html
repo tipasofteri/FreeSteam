@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-baseurl="/FreeSteam">
 <head>
+    <base href="/FreeSteam/" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Бесплатные игры - FreeSteam</title>
@@ -141,6 +142,10 @@
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
+            line-clamp: 2;  /* Добавляем стандартное свойство */
+            display: -ms-flexbox;
+            -ms-line-clamp: 2;  /* Для старых версий IE/Edge */
+            max-height: 2.6em;  /* Примерное значение для резервного отображения */
         }
         
         .game-card:hover .game-title {
@@ -177,6 +182,14 @@
             transform: translateZ(0);
         }
         
+        .game-description {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+             line-clamp: 3;  /* Стандартное свойство */
+             overflow: hidden;
+             text-overflow: ellipsis;
+        }
         .btn-steam::before {
             content: '';
             position: absolute;
@@ -535,12 +548,36 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Функция для получения URL изображения игры
+        function getGameImageUrl(storeUrl) {
+            // Извлекаем ID приложения из URL Steam
+            const match = storeUrl.match(/app\/(\d+)/);
+            if (match && match[1]) {
+                return `https://cdn.cloudflare.steamstatic.com/steam/apps/${match[1]}/header.jpg`;
+            }
+            return 'https://via.placeholder.com/460x215?text=No+Image';
+        }
+
         function loadAndShowFreeGames() {
+            const baseUrl = document.documentElement.getAttribute('data-baseurl') || '';
+            console.log('Начало загрузки данных...');
             return new Promise((resolve, reject) => {
-                fetch('free_goods_detail.json')
-                    .then(response => response.json())
+                fetch(`${baseUrl}/free_goods_detail.json`)
+                    .then(response => {
+                        console.log('Получен ответ от сервера:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`Ошибка HTTP: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log('Данные успешно загружены:', data);
                         const gamesContainer = document.getElementById('gamesContainer');
+                        
+                        if (!gamesContainer) {
+                            console.error('Элемент с id="gamesContainer" не найден');
+                            throw new Error('Ошибка отображения: не найден контейнер для игр');
+                        }
                         
                         if (data.free_list && data.free_list.length > 0) {
                             gamesContainer.className = 'games-grid';
@@ -602,11 +639,12 @@
         }
 
         function getGameImageUrl(steamUrl) {
+            // Извлекаем ID приложения из URL Steam
             const match = steamUrl.match(/app\/(\d+)/);
             if (match && match[1]) {
                 return `https://cdn.cloudflare.steamstatic.com/steam/apps/${match[1]}/header.jpg`;
             }
-            return 'steamfreeico.png';
+            return 'https://via.placeholder.com/460x215?text=No+Image';
         }
 
         // Notification system for free games
@@ -614,177 +652,111 @@
         const FREE_GAMES_SEEN_KEY = 'fs_free_games_seen_ids';
         
         function isNotificationsEnabled() {
-            try { return localStorage.getItem(FREE_GAMES_NOTIF_KEY) === '1'; } catch(_) { return false; }
+            return localStorage.getItem(FREE_GAMES_NOTIF_KEY) === 'true';
         }
         
         function getSeenGameIds() {
-            try {
-                const raw = localStorage.getItem(FREE_GAMES_SEEN_KEY);
-                return raw ? JSON.parse(raw) : [];
-            } catch(_) { return []; }
+            const ids = localStorage.getItem(FREE_GAMES_SEEN_KEY);
+            return ids ? JSON.parse(ids) : [];
         }
         
         function storeSeenGameIds(ids) {
-            try { localStorage.setItem(FREE_GAMES_SEEN_KEY, JSON.stringify(ids)); } catch(_) {}
+            localStorage.setItem(FREE_GAMES_SEEN_KEY, JSON.stringify(ids));
         }
         
         function extractGameId(steamUrl) {
             const match = steamUrl.match(/app\/(\d+)/);
-            return match ? match[1] : steamUrl;
+            return match ? match[1] : null;
         }
         
         function sendFreeGameNotification(newGames) {
-            if (!('Notification' in window) || Notification.permission !== 'granted') return;
-            if (!newGames || newGames.length === 0) return;
+            if (!('Notification' in window)) return;
+            if (Notification.permission !== 'granted') return;
             
-            const count = newGames.length;
-            const titles = newGames.slice(0, 2).map(g => g[0]).join(', ');
-            const body = count === 1 
-                ? `Новая бесплатная игра: ${newGames[0][0]}`
-                : `Новые бесплатные игры (${count}): ${titles}${count > 2 ? ' и другие' : ''}`;
+            const gameTitles = newGames.map(game => game[0]).join(', ');
+            
+            const notification = new Notification('🎮 Новые бесплатные игры!', {
+                body: `Доступны бесплатно: ${gameTitles}`,
+                icon: 'icosteamfree.ico',
+                tag: 'new-free-games'
+            });
+            
+            notification.onclick = function() {
+                window.focus();
+                this.close();
                 
-            try {
-                const notification = new Notification('FreeSteam — Бесплатные игры!', {
-                    body,
-                    icon: 'steamfreeico.png',
-                    tag: 'freesteam-free-games',
-                    requireInteraction: true
-                });
-                
-                notification.onclick = function() {
-                    window.focus();
-                    notification.close();
-                };
-                
-                // Автозакрытие через 10 секунд
-                setTimeout(() => {
-                    try { notification.close(); } catch(_) {}
-                }, 10000);
-                
-            } catch(error) {
-                console.error('Error sending notification:', error);
-            }
+                // Прокручиваем к списку игр
+                const gamesSection = document.getElementById('gamesContainer');
+                if (gamesSection) {
+                    gamesSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            };
+            
+            // Автоматически закрываем уведомление через 10 секунд
+            setTimeout(() => {
+                notification.close();
+            }, 10000);
         }
         
         function checkForNewGames(games) {
-            if (!isNotificationsEnabled() || !games || games.length === 0) return;
+            if (!games || !games.length) return;
             
-            const currentIds = games.map(game => extractGameId(game[1]));
             const seenIds = getSeenGameIds();
-            const newGameIds = currentIds.filter(id => !seenIds.includes(id));
+            const newGames = games.filter(game => {
+                const gameId = extractGameId(game[1]);
+                return gameId && !seenIds.includes(gameId);
+            });
             
-            if (newGameIds.length > 0) {
-                const newGames = games.filter(game => newGameIds.includes(extractGameId(game[1])));
+            if (newGames.length > 0 && isNotificationsEnabled()) {
                 sendFreeGameNotification(newGames);
+                // Обновляем список просмотренных игр
+                const newIds = games.map(game => extractGameId(game[1])).filter(Boolean);
+                storeSeenGameIds([...new Set([...seenIds, ...newIds])]);
             }
-            
-            // Обновляем список просмотренных игр
-            const allSeenIds = [...new Set([...seenIds, ...currentIds])];
-            storeSeenGameIds(allSeenIds);
         }
-        
+
         function enableNotifications() {
             if (!('Notification' in window)) {
                 alert('Ваш браузер не поддерживает уведомления');
-                return Promise.resolve(false);
+                return;
             }
             
-            if (Notification.permission === 'granted') {
-                localStorage.setItem(FREE_GAMES_NOTIF_KEY, '1');
-                return Promise.resolve(true);
-            }
-            
-            if (Notification.permission === 'denied') {
-                alert('Уведомления заблокированы в настройках браузера');
-                return Promise.resolve(false);
-            }
-            
-            return Notification.requestPermission().then(permission => {
+            Notification.requestPermission().then(permission => {
                 if (permission === 'granted') {
-                    localStorage.setItem(FREE_GAMES_NOTIF_KEY, '1');
-                    return true;
-                } else {
-                    return false;
-                }
-            });
-        }
-        
-        // Добавить кнопку уведомлений в заголовок
-        function addNotificationButton() {
-            const header = document.querySelector('.page-header .container .d-flex');
-            if (header) {
-                const isEnabled = isNotificationsEnabled();
-                const buttonClass = isEnabled ? 'btn-success' : 'btn-outline-light';
-                const buttonText = isEnabled ? 'Уведомления включены' : 'Включить уведомления';
-                const iconClass = isEnabled ? 'fas fa-bell' : 'far fa-bell';
-                
-                const notifyButton = document.createElement('button');
-                notifyButton.className = `btn ${buttonClass} me-2 notification-button`;
-                notifyButton.innerHTML = `<i class="${iconClass} me-2"></i>${buttonText}`;
-                notifyButton.id = 'notifyToggle';
-                
-                notifyButton.addEventListener('click', function() {
-                    if (isNotificationsEnabled()) {
-                        localStorage.removeItem(FREE_GAMES_NOTIF_KEY);
-                        this.className = 'btn btn-outline-light me-2';
-                        this.innerHTML = '<i class="far fa-bell me-2"></i>Включить уведомления';
-                    } else {
-                        enableNotifications().then(success => {
-                            if (success) {
-                            this.className = 'btn btn-success me-2 notification-button';
-                            this.innerHTML = '<i class="fas fa-bell me-2"></i>Уведомления включены';
-                                
-                                // Показать тестовое уведомление
-                                setTimeout(() => {
-                                    new Notification('FreeSteam — Уведомления включены!', {
-                                        body: 'Теперь вы будете получать уведомления о новых бесплатных играх',
-                                        icon: 'steamfreeico.png'
-                                    });
-                                }, 500);
-                            }
+                    localStorage.setItem(FREE_GAMES_NOTIF_KEY, 'true');
+                    alert('Уведомления включены! Вы будете получать уведомления о новых бесплатных играх.');
+                    
+                    // Синхронизируем настройки с централизованной системой, если она существует
+                    if (window.FreeSteamNotifications && typeof window.FreeSteamNotifications.updateSettings === 'function') {
+                        window.FreeSteamNotifications.updateSettings({ 
+                            enabled: true 
                         });
                     }
-                });
-                
-                // Вставить кнопку перед кнопкой "На главную"
-                const mainButton = header.querySelector('a[href="index.html"]');
-                header.insertBefore(notifyButton, mainButton);
-            }
-        }
-        
-        // Автоматическая проверка обновлений каждые 5 минут
-        function startAutoRefresh() {
-            setInterval(() => {
-                if (isNotificationsEnabled()) {
-                    fetch('https://raw.githubusercontent.com/InJeCTrL/NeedFree/master/free_goods_detail.json')
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.free_list && data.free_list.length > 0) {
-                                checkForNewGames(data.free_list);
-                            }
-                        })
-                        .catch(error => console.log('Auto-refresh error:', error));
                 }
-            }, 5 * 60 * 1000); // 5 минут
+            });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             const startTime = Date.now();
             const minLoadTime = 2000;
             
-            // Добавить кнопку уведомлений
-            addNotificationButton();
-            
-            loadAndShowFreeGames().then(() => {
-                // Проверить на новые игры после загрузки
-                fetch('https://raw.githubusercontent.com/InJeCTrL/NeedFree/master/free_goods_detail.json')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.free_list && data.free_list.length > 0) {
-                            checkForNewGames(data.free_list);
-                        }
-                    })
-                    .catch(error => console.log('Initial notification check error:', error));
+            loadAndShowFreeGames()
+                .then(data => {
+                    if (data && data.free_list && data.free_list.length > 0) {
+                        checkForNewGames(data.free_list);
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки данных:', error);
+                    const gamesContainer = document.getElementById('gamesContainer');
+                    if (gamesContainer) {
+                        gamesContainer.innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                ${error.message || 'Не удалось загрузить список бесплатных игр'}
+                            </div>`;
+                    }
+                });
             }).finally(() => {
                 const elapsed = Date.now() - startTime;
                 const remainingTime = Math.max(0, minLoadTime - elapsed);
@@ -799,113 +771,9 @@
                     }
                 }, remainingTime);
             });
-            
-            // Запустить автоматические проверки
-            startAutoRefresh();
-        });
     </script>
     
     <!-- Подключение системы уведомлений -->
     <script src="js/notifications.js"></script>
-    
-    <script>
-        // Интеграция с системой уведомлений FreeSteam
-        document.addEventListener('DOMContentLoaded', function() {
-            // Проверяем, доступна ли система уведомлений
-            if (window.FreeSteamNotifications) {
-                console.log('[FreeSteam] Notification system connected');
-                
-                // Переопределяем функции для использования централизованной системы
-                window.originalEnableNotifications = enableNotifications;
-                window.originalSendFreeGameNotification = sendFreeGameNotification;
-                
-                // Новая функция включения уведомлений
-                enableNotifications = function() {
-                    return window.FreeSteamNotifications.requestPermission().then(success => {
-                        if (success) {
-                            localStorage.setItem(FREE_GAMES_NOTIF_KEY, '1');
-                            return true;
-                        }
-                        return false;
-                    });
-                };
-                
-                // Новая функция отправки уведомлений о бесплатных играх
-                sendFreeGameNotification = function(newGames) {
-                    if (!isNotificationsEnabled() || !newGames || newGames.length === 0) return;
-                    
-                    const count = newGames.length;
-                    const firstGameTitle = newGames[0][0];
-                    
-                    const title = count === 1 ? 
-                        '🎮 Новая бесплатная игра!' : 
-                        `🎮 ${count} новых бесплатных игр!`;
-                        
-                    const body = count === 1 ?
-                        `${firstGameTitle} теперь доступна бесплатно!` :
-                        `${firstGameTitle} и еще ${count - 1} игр теперь бесплатны!`;
-                    
-                    // Используем Service Worker для отправки уведомления
-                    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                        navigator.serviceWorker.controller.postMessage({
-                            type: 'SHOW_FREE_GAMES_NOTIFICATION',
-                            data: {
-                                title: title,
-                                body: body,
-                                icon: './steamfreeico.png',
-                                badge: './steamfreeico.png',
-                                tag: 'free-games-' + Date.now(),
-                                requireInteraction: true,
-                                vibrate: [200, 100, 200],
-                                actions: [
-                                    {
-                                        action: 'view',
-                                        title: '👀 Посмотреть',
-                                        icon: './steamfreeico.png'
-                                    },
-                                    {
-                                        action: 'later',
-                                        title: '⏰ Позже'
-                                    }
-                                ],
-                                data: {
-                                    url: './free_games.html',
-                                    games: newGames,
-                                    timestamp: Date.now()
-                                }
-                            }
-                        });
-                    } else {
-                        // Fallback к обычному уведомлению
-                        if ('Notification' in window && Notification.permission === 'granted') {
-                            try {
-                                new Notification(title, {
-                                    body: body,
-                                    icon: './steamfreeico.png',
-                                    tag: 'free-games-' + Date.now(),
-                                    requireInteraction: true,
-                                    data: {
-                                        url: './free_games.html',
-                                        games: newGames
-                                    }
-                                });
-                            } catch (error) {
-                                console.error('[FreeSteam] Error showing notification:', error);
-                            }
-                        }
-                    }
-                };
-                
-                // Синхронизируем настройки с централизованной системой
-                const currentSettings = window.FreeSteamNotifications.getSettings();
-                if (isNotificationsEnabled() && !currentSettings.enabled) {
-                    window.FreeSteamNotifications.updateSettings({ 
-                        enabled: true,
-                        types: { newFreeGames: true }
-                    });
-                }
-            }
-        });
-    </script>
 </body>
 </html>
