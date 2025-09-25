@@ -573,6 +573,3 @@ class FreeSteamNotifications {
 if (!window.FreeSteamNotifications) {
     window.FreeSteamNotifications = new FreeSteamNotifications();
 }
-
-// Экспортируем для использования в модулях
-export default window.FreeSteamNotifications;
