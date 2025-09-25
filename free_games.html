@@ -562,7 +562,8 @@
             const baseUrl = document.documentElement.getAttribute('data-baseurl') || '';
             console.log('Начало загрузки данных...');
             return new Promise((resolve, reject) => {
-                fetch(`${baseUrl}/free_goods_detail.json`)
+                // Используем относительный путь к файлу
+                fetch('free_goods_detail.json')
                     .then(response => {
                         console.log('Получен ответ от сервера:', response.status);
                         if (!response.ok) {
