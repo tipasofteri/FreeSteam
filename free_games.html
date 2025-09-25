@@ -746,6 +746,7 @@
                     if (data && data.free_list && data.free_list.length > 0) {
                         checkForNewGames(data.free_list);
                     }
+                    return data; // Возвращаем данные для следующего then
                 })
                 .catch(error => {
                     console.error('Ошибка загрузки данных:', error);
@@ -757,21 +758,23 @@
                                 ${error.message || 'Не удалось загрузить список бесплатных игр'}
                             </div>`;
                     }
+                    throw error; // Пробрасываем ошибку дальше
+                })
+                .finally(() => {
+                    const elapsed = Date.now() - startTime;
+                    const remainingTime = Math.max(0, minLoadTime - elapsed);
+                    
+                    setTimeout(() => {
+                        const overlay = document.querySelector('.loading-overlay');
+                        if (overlay) {
+                            overlay.style.opacity = '0';
+                            setTimeout(() => {
+                                overlay.style.display = 'none';
+                            }, 300);
+                        }
+                    }, remainingTime);
                 });
-            }).finally(() => {
-                const elapsed = Date.now() - startTime;
-                const remainingTime = Math.max(0, minLoadTime - elapsed);
-                
-                setTimeout(() => {
-                    const overlay = document.querySelector('.loading-overlay');
-                    if (overlay) {
-                        overlay.style.opacity = '0';
-                        setTimeout(() => {
-                            overlay.style.display = 'none';
-                        }, 300);
-                    }
-                }, remainingTime);
-            });
+        });
     </script>
     
     <!-- Подключение системы уведомлений -->
