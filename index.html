@@ -8528,8 +8528,8 @@ input::-webkit-inner-spin-button {
 
         // Функция для загрузки и отображения бесплатных игр
         function loadFreeGames() {
-            const baseUrl = document.documentElement.getAttribute('data-baseurl') || '';
-            fetch(`${baseUrl}/free_goods_detail.json`)
+            // Используем относительный путь к файлу
+            fetch('free_goods_detail.json')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Не удалось загрузить данные о бесплатных играх');
